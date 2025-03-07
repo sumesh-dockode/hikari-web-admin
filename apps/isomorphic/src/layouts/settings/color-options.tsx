@@ -9,12 +9,24 @@ import {
   useColorPresets,
 } from '@/layouts/settings/use-theme-color';
 import DrawerBlock from '@/layouts/settings/drawer-block';
+import { useEffect } from 'react';
 
 export default function ColorOptions() {
   const { theme } = useTheme();
   const COLOR_PRESETS = usePresets();
   const { setColorPresets } = useColorPresets();
   const { colorPresetName, setColorPresetName } = useColorPresetName();
+
+  // useEffect(() => {
+  //   setColorPresets({
+  //     lighter: '#ccfbf1', // Teal 100
+  //     light: '#5eead4', // Teal 300
+  //     default: '#0d9488', // Teal 600
+  //     dark: '#115e59', // Teal 800
+  //     foreground: '#ffffff',
+  //   });
+  //   setColorPresetName('teal');
+  // }, []);
 
   return (
     <DrawerBlock title="Colors">

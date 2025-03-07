@@ -52,17 +52,17 @@ export default function EcommerceDashboard() {
         </WelcomeBanner>
 
         <StatCards className="@2xl:grid-cols-3 @3xl:gap-6 @4xl:col-span-2 @7xl:col-span-8" />
-        <ProfitWidget className="h-[464px] @sm:h-[520px] @7xl:col-span-4 @7xl:col-start-9 @7xl:row-start-1 @7xl:row-end-3 @7xl:h-full" />
+        <ProfitWidget className="h-[464px] @sm:h-[520px] @4xl:col-span-2 @7xl:col-span-4 @7xl:col-start-9 @7xl:row-start-1 @7xl:row-end-3 @7xl:h-full" />
 
         <SalesReport className="@4xl:col-span-2 @7xl:col-span-8" />
+
+        <BestSellers className="@4xl:col-span-2 @7xl:col-span-4" />
 
         {/* <PromotionalSales className="@4xl:col-start-2 @4xl:row-start-3 @7xl:col-span-4 @7xl:col-start-auto @7xl:row-start-auto" /> */}
 
         {/* <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" /> */}
 
         {/* <RepeatCustomerRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" /> */}
-
-        <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
 
         {/* <UserLocation className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
 

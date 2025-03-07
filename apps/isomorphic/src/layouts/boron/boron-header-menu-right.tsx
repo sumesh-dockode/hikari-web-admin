@@ -6,10 +6,19 @@ import NotificationDropdown from '@/layouts/notification-dropdown';
 import ProfileMenu from '@/layouts/profile-menu';
 import SettingsButton from '@/layouts/settings-button';
 import { PiGearFill, PiChatText, PiBellRinging } from 'react-icons/pi';
-import { useColorPresetName } from '@/layouts/settings/use-theme-color';
+import {
+  useApplyColorPreset,
+  useColorPresetName,
+  useColorPresets,
+} from '@/layouts/settings/use-theme-color';
+import { usePresets } from '@/config/color-presets';
 
 export default function HeaderMenuRight() {
   const { colorPresetName } = useColorPresetName();
+  const COLOR_PRESETS = usePresets();
+  const { colorPresets } = useColorPresets();
+
+  useApplyColorPreset<any>(colorPresets ?? COLOR_PRESETS[0].colors);
 
   return (
     <div className="ms-auto flex shrink-0 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-5">

@@ -1,5 +1,6 @@
 import FileDashboard from '@/app/shared/file/dashboard';
 import { metaObject } from '@/config/site.config';
+import EcommerceDashboard from '../shared/ecommerce/dashboard';
 
 export const metadata = {
   ...metaObject(),
@@ -7,5 +8,5 @@ export const metadata = {
 
 export default function FileDashboardPage() {
   // return <>Hello</>;
-  return <FileDashboard />;
+  return <EcommerceDashboard />;
 }

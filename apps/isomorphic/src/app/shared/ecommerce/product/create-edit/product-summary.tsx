@@ -1,12 +1,13 @@
 'use client';
 
 import { Controller, useFormContext } from 'react-hook-form';
-import { Input, Select } from 'rizzui';
+import { Input, MultiSelect, Select, Textarea } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import {
   categoryOption,
   typeOption,
+  materialOptions,
 } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 import dynamic from 'next/dynamic';
 import SelectLoader from '@core/components/loader/select-loader';
@@ -85,11 +86,38 @@ export default function ProductSummary({ className }: { className?: string }) {
           <QuillEditor
             value={value}
             onChange={onChange}
-            label="Description"
+            label="Product Details"
             className="col-span-full [&_.ql-editor]:min-h-[100px]"
             labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
           />
         )}
+      />
+      <Controller
+        name="Material"
+        control={control}
+        render={({ field: { onChange, value } }) => (
+          <MultiSelect
+            value={value}
+            clearable={true}
+            searchable={true}
+            options={materialOptions}
+            onChange={onChange}
+            onClear={() => {}}
+            label="Select Material"
+          />
+        )}
+      />
+      <Input
+        label="Dimentions"
+        placeholder="Dimentions"
+        {...register('dimensions')}
+        error={errors.title?.message as string}
+      />
+      <Textarea
+        label="Care Instructions"
+        placeholder="Enter your instructions"
+        className="col-span-full"
+        {...register('careInstructions')}
       />
     </FormGroup>
   );

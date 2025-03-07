@@ -20,7 +20,7 @@ export default function HeaderMenuRight() {
           className={cn(
             'relative text-gray-200 hover:text-gray-0 dark:text-gray-700',
             colorPresetName === 'black' &&
-            'hover:text-gray-0 dark:hover:text-gray-900'
+              'hover:text-gray-0 dark:hover:text-gray-900'
           )}
         >
           <PiChatText className="h-5 w-auto xl:h-5 3xl:h-6" />
@@ -39,7 +39,7 @@ export default function HeaderMenuRight() {
           className={cn(
             'relative text-gray-200 hover:text-gray-0 dark:text-gray-700',
             colorPresetName === 'black' &&
-            'hover:text-gray-0 dark:hover:text-gray-900'
+              'hover:text-gray-0 dark:hover:text-gray-900'
           )}
         >
           <PiBellRinging className="h-5 w-auto xl:h-5 3xl:h-6" />
@@ -56,17 +56,17 @@ export default function HeaderMenuRight() {
         buttonClassName="w-[unset] sm:w-[unset] flex items-center gap-3 xl:ms-2"
         avatarClassName="!w-8 !h-8"
       />
-      <SettingsButton
+      {/* <SettingsButton
         className={cn(
           'inline-flex h-[unset] w-[unset] gap-2 rounded-md bg-primary-dark px-2.5 py-2 text-gray-200 hover:bg-primary-dark/80 hover:text-gray-200 dark:bg-primary dark:text-gray-0 md:ms-3 md:h-auto md:w-auto xl:ms-4 xl:px-3.5 xl:py-2.5',
           colorPresetName === 'black' &&
-          'bg-gray-0 text-gray-900 hover:bg-gray-0 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-0 dark:hover:bg-gray-900 dark:hover:text-gray-0',
+            'bg-gray-0 text-gray-900 hover:bg-gray-0 hover:text-gray-900 dark:bg-gray-900 dark:text-gray-0 dark:hover:bg-gray-900 dark:hover:text-gray-0',
           'dark:text-white'
         )}
       >
         <PiGearFill className="h-[18px] w-auto animate-spin-slow xl:h-5" />
         <span className="hidden xl:inline"> Customize</span>
-      </SettingsButton>
+      </SettingsButton> */}
     </div>
   );
 }

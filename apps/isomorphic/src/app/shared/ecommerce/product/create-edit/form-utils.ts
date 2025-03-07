@@ -188,3 +188,18 @@ export const variantOption = [
     label: 'Multiple',
   },
 ];
+
+export const materialOptions = [
+  {
+    value: 'velvet',
+    label: 'Velvet',
+  },
+  {
+    value: 'memory_foam',
+    label: 'Memory Foam',
+  },
+  {
+    value: 'fiber_fill',
+    label: 'Fiber Fill',
+  },
+];

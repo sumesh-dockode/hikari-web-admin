@@ -20,6 +20,7 @@ import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
 import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
 import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
 import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
+import similiarProducts from '@/app/shared/ecommerce/product/create-edit/similiar-products';
 import FormFooter from '@core/components/form-footer';
 import {
   CreateProductInput,
@@ -38,6 +39,7 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.deliveryEvent]: DeliveryEvent,
   [formParts.variantOptions]: ProductVariants,
   [formParts.tagsAndCategory]: ProductTaxonomies,
+  [formParts.similiarProducts]: similiarProducts,
 };
 
 interface IndexProps {

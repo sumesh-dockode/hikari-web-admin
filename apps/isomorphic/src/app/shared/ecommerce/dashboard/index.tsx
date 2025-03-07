@@ -56,17 +56,17 @@ export default function EcommerceDashboard() {
 
         <SalesReport className="@4xl:col-span-2 @7xl:col-span-8" />
 
-        <PromotionalSales className="@4xl:col-start-2 @4xl:row-start-3 @7xl:col-span-4 @7xl:col-start-auto @7xl:row-start-auto" />
+        {/* <PromotionalSales className="@4xl:col-start-2 @4xl:row-start-3 @7xl:col-span-4 @7xl:col-start-auto @7xl:row-start-auto" /> */}
 
-        <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" />
+        {/* <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" /> */}
 
-        <RepeatCustomerRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" />
+        {/* <RepeatCustomerRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" /> */}
 
         <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
 
-        <UserLocation className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
+        {/* <UserLocation className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
 
-        <StockReport className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-7 @[112rem]:col-span-8" />
+        <StockReport className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-7 @[112rem]:col-span-8" /> */}
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ export const formParts = {
   deliveryEvent: 'deliveryEvent',
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
+  similiarProducts: 'similarProducts',
 };
 
 export const menuItems = [
@@ -41,6 +42,10 @@ export const menuItems = [
   {
     label: 'Variant Options',
     value: formParts.variantOptions,
+  },
+  {
+    label: 'Similiar Products',
+    value: formParts.similiarProducts,
   },
 ];
 

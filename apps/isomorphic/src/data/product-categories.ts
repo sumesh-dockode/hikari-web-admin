@@ -1,9 +1,14 @@
+import ArmChairIcon from '@core/components/icons/arm-chair';
+import SofaIcon from '@core/components/icons/sofa';
+import ChestOfdrawers from '@core/components/icons/chestOfdrawers';
+import BedIcon from '@core/components/icons/bed';
 export const categories = [
   {
     id: '0o65741345',
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
     name: 'Bag',
+    icon: ArmChairIcon,
     slug: 'bag',
     description: 'Practical Granite Chicken',
     products: 19,
@@ -13,6 +18,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/sunglass.webp',
     name: 'Sunglass',
+    icon: SofaIcon,
     slug: 'sunglass',
     description: 'Oriental Plastic Gloves',
     products: 19,
@@ -22,6 +28,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/watch.webp',
     name: 'Watch',
+    icon: ChestOfdrawers,
     slug: 'watch',
     description: 'Recycled Frozen Gloves',
     products: 5,
@@ -31,6 +38,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/sneakers.webp',
     name: 'Sneakers',
+    icon: BedIcon,
     slug: 'sneakers',
     description: 'Luxurious Soft Shoes',
     products: 12,
@@ -40,6 +48,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/chair.webp',
     name: 'Chair',
+    icon: ArmChairIcon,
     slug: 'chair',
     description: 'Fantastic Wooden Chairs',
     products: 35,
@@ -49,6 +58,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/tools.webp',
     name: 'Tools',
+    icon: ArmChairIcon,
     slug: 'tools',
     description: 'Recycled Frozen Gloves',
     products: 18,
@@ -59,6 +69,7 @@ export const categories = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/kids.webp',
     name: 'Kids',
+    icon: ArmChairIcon,
     slug: 'kids',
     description: 'Recycled Frozen Gloves',
     products: 15,

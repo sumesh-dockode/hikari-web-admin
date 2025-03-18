@@ -40,6 +40,21 @@ export const categoriesColumns = [
       </figure>
     ),
   }),
+  columnHelper.display({
+    id: 'icon',
+    size: 100,
+    header: 'Icon',
+    cell: ({ row }) => {
+      const IconComponent = row.original.icon;
+
+      return (
+        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
+          <IconComponent className="h-6 w-6 text-gray-700" />
+        </div>
+      );
+    },
+  }),
+
   columnHelper.accessor('name', {
     id: 'name',
     size: 200,
@@ -58,12 +73,12 @@ export const categoriesColumns = [
       <Text className="truncate !text-sm">{row.original.description}</Text>
     ),
   }),
-  columnHelper.accessor('slug', {
-    id: 'slug',
-    size: 200,
-    header: 'Slug',
-    cell: ({ getValue }) => <Text>{getValue()}</Text>,
-  }),
+  // columnHelper.accessor('slug', {
+  //   id: 'slug',
+  //   size: 200,
+  //   header: 'Slug',
+  //   cell: ({ getValue }) => <Text>{getValue()}</Text>,
+  // }),
   columnHelper.display({
     id: 'products',
     size: 120,

@@ -164,12 +164,12 @@ export default function CreateCategory({
                   {...register('name')}
                   error={errors.name?.message}
                 />
-                <Input
+                {/* <Input
                   label="Slug"
                   placeholder="slug"
                   {...register('slug')}
                   error={errors.slug?.message}
-                />
+                /> */}
                 <Controller
                   name="parentCategory"
                   control={control}
@@ -224,6 +224,18 @@ export default function CreateCategory({
               >
                 <UploadZone
                   name="images"
+                  getValues={getValues}
+                  setValue={setValue}
+                  className="col-span-full"
+                />
+              </HorizontalFormBlockWrapper>
+              <HorizontalFormBlockWrapper
+                title="Upload new  icon"
+                description="Upload your product icon here"
+                isModalView={isModalView}
+              >
+                <UploadZone
+                  name="icons"
                   getValues={getValues}
                   setValue={setValue}
                   className="col-span-full"

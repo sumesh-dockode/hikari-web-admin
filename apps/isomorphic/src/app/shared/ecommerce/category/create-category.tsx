@@ -14,51 +14,12 @@ import {
 } from '@/validators/create-category.schema';
 import UploadZone from '@core/ui/file-upload/upload-zone';
 
-// const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
-//   ssr: false,
-//   loading: () => <SelectLoader />,
-// });
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
 
-// Parent category option
-const parentCategoryOption = [
-  {
-    value: 'fruits',
-    label: 'Fruits',
-  },
-  {
-    value: 'grocery',
-    label: 'Grocery',
-  },
-  {
-    value: 'meat',
-    label: 'Meat',
-  },
-  {
-    value: 'cat food',
-    label: 'Cat Food',
-  },
-];
-
-// Type option
-const typeOption = [
-  {
-    value: 'fresh vegetables',
-    label: 'Fresh Vegetables',
-  },
-  {
-    value: 'diet foods',
-    label: 'Diet Foods',
-  },
-  {
-    value: 'green vegetables',
-    label: 'Green Vegetables',
-  },
-];
 
 // a reusable form wrapper component
 function HorizontalFormBlockWrapper({
@@ -164,58 +125,6 @@ export default function CreateCategory({
                   {...register('name')}
                   error={errors.name?.message}
                 />
-                {/* <Input
-                  label="Slug"
-                  placeholder="slug"
-                  {...register('slug')}
-                  error={errors.slug?.message}
-                /> */}
-                <Controller
-                  name="parentCategory"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      dropdownClassName="!z-0"
-                      options={parentCategoryOption}
-                      value={value}
-                      onChange={onChange}
-                      label="Parent Category"
-                      error={errors?.parentCategory?.message as string}
-                      getOptionValue={(option) => option.label}
-                    />
-                  )}
-                />
-                <Controller
-                  name="type"
-                  control={control}
-                  render={({ field: { onChange, value } }) => (
-                    <Select
-                      dropdownClassName="!z-0"
-                      options={typeOption}
-                      value={value}
-                      onChange={onChange}
-                      label="Display Type"
-                      error={errors?.type?.message as string}
-                      getOptionValue={(option) => option.label}
-                    />
-                  )}
-                />
-
-                <div className="col-span-2">
-                  <Controller
-                    control={control}
-                    name="description"
-                    render={({ field: { onChange, value } }) => (
-                      <QuillEditor
-                        value={value}
-                        onChange={onChange}
-                        label="Description"
-                        className="[&>.ql-container_.ql-editor]:min-h-[100px]"
-                        labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
-                      />
-                    )}
-                  />
-                </div>
               </HorizontalFormBlockWrapper>
               <HorizontalFormBlockWrapper
                 title="Upload new thumbnail image"

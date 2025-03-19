@@ -29,6 +29,9 @@ const allStatus = {
   delayed: statusColors.default,
   draft: statusColors.default,
   refunded: statusColors.default,
+  service_started: statusColors.default,
+  Booking_initiated: statusColors.warning,
+  confirm: statusColors.success,
 };
 
 export type StatusTypes = keyof typeof allStatus;

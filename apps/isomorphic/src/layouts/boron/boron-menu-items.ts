@@ -1,5 +1,6 @@
 import { DUMMY_ID } from '@/config/constants';
 import { routes } from '@/config/routes';
+import { MdMiscellaneousServices, MdOutlineLocalOffer } from 'react-icons/md';
 import {
   PiAirplaneTiltDuotone,
   PiApplePodcastsLogoDuotone,
@@ -142,15 +143,25 @@ export const menuItems = [
       },
     ],
   },
+  // {
+  //   name: 'Reviews',
+  //   href: routes.eCommerce.reviews,
+  //   icon: PiChatTeardropTextDuotone,
+  // },
   {
-    name: 'Reviews',
-    href: routes.eCommerce.reviews,
-    icon: PiChatTeardropTextDuotone,
+    name: 'Promotion',
+    href: routes.eCommerce.promotion,
+    icon: MdOutlineLocalOffer,
   },
   {
     name: 'Shop',
     href: routes.eCommerce.shop,
     icon: PiShoppingBagDuotone,
+  },
+  {
+    name: 'Service Booking',
+    href: routes.eCommerce.servicebooking,
+    icon: MdMiscellaneousServices,
   },
   {
     name: 'Cart',

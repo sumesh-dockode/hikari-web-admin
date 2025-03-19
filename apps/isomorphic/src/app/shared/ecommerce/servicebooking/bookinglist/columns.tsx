@@ -6,12 +6,13 @@ import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Text, Title, Tooltip } from 'rizzui';
-import { CategoryDataType } from './table';
+import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
+import { ServiceBookingDataType } from './table';
+import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 
-const columnHelper = createColumnHelper<CategoryDataType>();
+const columnHelper = createColumnHelper<ServiceBookingDataType>();
 
-export const categoriesColumns = [
+export const servicebookingColumn = [
   columnHelper.display({
     id: 'checked',
     size: 50,
@@ -40,46 +41,50 @@ export const categoriesColumns = [
       </figure>
     ),
   }),
-  columnHelper.display({
-    id: 'icon',
-    size: 100,
-    header: 'Icon',
-    cell: ({ row }) => {
-      const IconComponent = row.original.icon;
-
-      return (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
-          <IconComponent className="h-6 w-6 text-gray-700" />
-        </div>
-      );
-    },
-  }),
 
   columnHelper.accessor('name', {
     id: 'name',
     size: 200,
-    header: 'Category Name',
+    header: 'Product Name',
     cell: ({ getValue }) => (
       <Title as="h6" className="!text-sm font-medium">
         {getValue()}
       </Title>
     ),
   }),
-  // columnHelper.display({
-  //   id: 'description',
-  //   size: 250,
-  //   header: 'Description',
-  //   cell: ({ row }) => (
-  //     <Text className="truncate !text-sm">{row.original.description}</Text>
-  //   ),
-  // }),
- 
   columnHelper.display({
-    id: 'products',
-    size: 120,
-    header: 'Products',
-    cell: ({ row }) => <div className="ps-6">{row.original.products}</div>,
+    id: 'promocode',
+    size: 250,
+    header: 'Promo code',
+    cell: ({ row }) => (
+      <Text className="truncate !text-sm">{row.original.promocode}</Text>
+    ),
   }),
+  columnHelper.display({
+    id: 'selectedservices',
+    size: 250,
+    header: 'Selected service',
+    cell: ({ row }) => (
+      <Text className="truncate !text-sm">{row.original.selectedservices}</Text>
+    ),
+  }),
+
+  columnHelper.display({
+    id: 'additionalservicerequest',
+    size: 120,
+    header: 'Additonal Service Requests',
+    cell: ({ row }) => (
+      <div className="ps-6">{row.original.additionalservicerequest}</div>
+    ),
+  }),
+  columnHelper.accessor('status', {
+    id: 'status',
+    size: 140,
+    header: 'Status',
+    enableSorting: false,
+    cell: ({ row }) => getStatusBadge(row.original.status),
+  }),
+
   columnHelper.display({
     id: 'action',
     size: 100,
@@ -90,13 +95,6 @@ export const categoriesColumns = [
       },
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
-        <Tooltip content={'Edit Category'} placement="top" color="invert">
-          <Link href={routes.eCommerce.editCategory(row.original.id)}>
-            <ActionIcon size="sm" variant="outline">
-              <PencilIcon className="h-4 w-4" />
-            </ActionIcon>
-          </Link>
-        </Tooltip>
         <DeletePopover
           title={`Delete the category`}
           description={`Are you sure you want to delete this #${row.original.id} category?`}

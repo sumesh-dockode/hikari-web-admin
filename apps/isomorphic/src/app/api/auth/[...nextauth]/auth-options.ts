@@ -4,7 +4,11 @@ import GoogleProvider from 'next-auth/providers/google';
 import { env } from '@/env.mjs';
 import isEqual from 'lodash/isEqual';
 import { pagesOptions } from './pages-options';
-
+interface User {
+  id: string;
+  username: string;
+  token: string;
+}
 export const authOptions: NextAuthOptions = {
   // debug: true,
   pages: {
@@ -26,8 +30,8 @@ export const authOptions: NextAuthOptions = {
     },
     async jwt({ token, user }) {
       if (user) {
-        // return user as JWT
-        token.user = user;
+        token.id = (user as User).id;
+        token.accessToken = (user as User).token;
       }
       return token;
     },
@@ -46,25 +50,41 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       id: 'credentials',
       name: 'Credentials',
-      credentials: {},
-      async authorize(credentials: any) {
-        // You need to provide your own logic here that takes the credentials
-        // submitted and returns either a object representing a user or value
-        // that is false/null if the credentials are invalid
-        const user = {
-          email: 'admin@admin.com',
-          password: 'admin',
-        };
+      credentials: {
+        username: {
+          label: 'Username',
+          type: 'text',
+          placeholder: 'Enter your username',
+        },
+        password: { label: 'Password', type: 'password' },
+      },
+      async authorize(credentials): Promise<User | null> {
+        try {
+          let url = `${process.env.NEXT_PUBLIC_API_URL}/authentication/login`;
+          console.log('url >>>. ', url);
+          console.log('credentials', credentials);
 
-        if (
-          isEqual(user, {
-            email: credentials?.email,
-            password: credentials?.password,
-          })
-        ) {
-          return user as any;
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              username: credentials?.username,
+              password: credentials?.password,
+            }),
+          });
+          console.log('res>>>>>>>>>>>>', res);
+
+          if (!res.ok) {
+            throw new Error('Invalid credentials');
+          }
+
+          const user = (await res.json()) as User;
+
+          return user;
+        } catch (error) {
+          console.error('Login error:', error);
+          return null;
         }
-        return null;
       },
     }),
     GoogleProvider({

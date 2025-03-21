@@ -15,7 +15,7 @@ import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
 import { PiPlusBold } from 'react-icons/pi';
 import welcomeImg from '@public/shop-illustration.png';
 import HandWaveIcon from '@core/components/icons/hand-wave';
-
+import minglersofa from '../../../../../public/assets/minglersofa.png';
 export default function EcommerceDashboard() {
   return (
     <div className="@container">
@@ -31,10 +31,10 @@ export default function EcommerceDashboard() {
             'Here’s What happening on your store today. See the statistics at once.'
           }
           media={
-            <div className="absolute -bottom-6 end-4 hidden w-[300px] @2xl:block lg:w-[320px] 2xl:-bottom-7 2xl:w-[330px]">
+            <div className="absolute bottom-10 end-4 hidden w-[300px] @2xl:block lg:w-[320px] 2xl:bottom-9 2xl:w-[330px]">
               <div className="relative">
                 <Image
-                  src={welcomeImg}
+                  src={minglersofa}
                   alt="Welcome shop image form freepik"
                   className="dark:brightness-95 dark:drop-shadow-md"
                 />

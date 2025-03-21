@@ -60,17 +60,23 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials): Promise<User | null> {
         try {
-          let url = `${process.env.NEXT_PUBLIC_API_URL}/authentication/login`;
+          let url = `${process.env.NEXT_PUBLIC_API_URL}/authentication/login/`;
           console.log('url >>>. ', url);
           console.log('credentials', credentials);
+
+          const requestBody = JSON.stringify({
+            username: credentials?.username,
+            password: credentials?.password,
+          });
+
+          console.log('url', url);
+
+          console.log('requestBody', requestBody);
 
           const res = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: credentials?.username,
-              password: credentials?.password,
-            }),
+            body: requestBody,
           });
           console.log('res>>>>>>>>>>>>', res);
 

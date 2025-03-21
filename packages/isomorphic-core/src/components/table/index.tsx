@@ -16,6 +16,7 @@ import {
 } from "./table-types";
 import { pinningStyles } from "./table-pinning.style";
 
+
 export default function MainTable<TData extends Record<string, any>>({
   table,
   dataIds,
@@ -26,6 +27,8 @@ export default function MainTable<TData extends Record<string, any>>({
   showLoadingText = false,
   components,
   stickyHeader = false,
+
+  
 }: MainTableProps<TData>) {
   const { containerRef, tableRef, isLeftScrollable, isRightScrollable } =
     useScrollPosition();

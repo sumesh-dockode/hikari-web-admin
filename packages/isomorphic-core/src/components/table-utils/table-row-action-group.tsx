@@ -22,6 +22,10 @@ export default function TableRowActionGroup({
   deletePopoverDescription?: string;
   className?: string;
 }) {
+
+  const isViewUrlAvailable = viewUrl && viewUrl !== "#";
+  const isEditUrlAvailable = editUrl && editUrl !== "#";
+
   return (
     <Flex
       align="center"
@@ -29,30 +33,34 @@ export default function TableRowActionGroup({
       gap="3"
       className={cn("pe-3", className)}
     >
-      <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
-        <Link href={editUrl}>
-          <ActionIcon
-            as="span"
-            size="sm"
-            variant="outline"
-            aria-label="Edit Item"
-          >
-            <PencilIcon className="size-4" />
-          </ActionIcon>
-        </Link>
-      </Tooltip>
-      <Tooltip size="sm" content="View Item" placement="top" color="invert">
-        <Link href={viewUrl}>
-          <ActionIcon
-            as="span"
-            size="sm"
-            variant="outline"
-            aria-label="View item"
-          >
-            <EyeIcon className="size-4" />
-          </ActionIcon>
-        </Link>
-      </Tooltip>
+      {isEditUrlAvailable && (
+        <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
+          <Link href={editUrl}>
+            <ActionIcon
+              as="span"
+              size="sm"
+              variant="outline"
+              aria-label="Edit Item"
+            >
+              <PencilIcon className="size-4" />
+            </ActionIcon>
+          </Link>
+        </Tooltip>
+      )}
+      {isViewUrlAvailable && (
+        <Tooltip size="sm" content="View Item" placement="top" color="invert">
+          <Link href={viewUrl}>
+            <ActionIcon
+              as="span"
+              size="sm"
+              variant="outline"
+              aria-label="View item"
+            >
+              <EyeIcon className="size-4" />
+            </ActionIcon>
+          </Link>
+        </Tooltip>
+      )}
       <DeletePopover
         title={deletePopoverTitle}
         description={deletePopoverDescription}

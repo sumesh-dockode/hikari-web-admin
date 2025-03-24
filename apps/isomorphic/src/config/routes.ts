@@ -17,6 +17,8 @@ export const routes = {
     shop: '/shop',
     cart: '/cart',
     promotion: '/promotion',
+    promotionDetails: (id: number) => `/promotion/${id}`,
+    editPromotion: (id: number) => `/promotion/${id}/edit`,
     checkout: '/checkout',
     trackingId: (id: string) => `/tracking/${id}`,
   },

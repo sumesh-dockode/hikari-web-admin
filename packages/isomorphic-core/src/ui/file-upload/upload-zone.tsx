@@ -4,7 +4,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
 import prettyBytes from "pretty-bytes";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useDropzone } from "@uploadthing/react";
 import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from "react-icons/pi";
 import { generateClientDropzoneAccept } from "uploadthing/client";
@@ -67,39 +67,51 @@ export default function UploadZone({
     setFiles(updatedFiles);
   }
 
-  const uploadedItems = isEmpty(getValues(name)) ? [] : getValues(name);
-
-  const notUploadedItems = files.filter(
-    (file) => !uploadedItems?.some((uploadedFile: FileType) => uploadedFile.name === file.name)
+  const uploadedItems = useMemo(
+    () => (isEmpty(getValues(name)) ? [] : getValues(name)),
+    [getValues, name]
   );
 
-  const { startUpload, routeConfig, isUploading } = useUploadThing("generalMedia", {
-    onClientUploadComplete: (res: ClientUploadedFileData<any>[] | undefined) => {
-      console.log("res", res);
-      if (setValue) {
-        // const respondedUrls = res?.map((r) => r.url);
-        setFiles([]);
-        const respondedUrls = res?.map((r) => ({
-          name: r.name,
-          size: r.size,
-          url: r.url,
-        }));
-        setValue(name, respondedUrls);
-      }
-      toast.success(
-        <Text
-          as="b"
-          className="font-semibold"
-        >
-          portfolio Images updated
-        </Text>
-      );
-    },
-    onUploadError: (error: Error) => {
-      console.error(error);
-      toast.error(error.message);
-    },
-  });
+  const notUploadedItems = useMemo(
+    () =>
+      files.filter(
+        (file) =>
+          !uploadedItems?.some(
+            (uploadedFile: FileType) => uploadedFile.name === file.name
+          )
+      ),
+    [files, uploadedItems]
+  );
+
+  const { startUpload, routeConfig, isUploading } = useUploadThing(
+    "generalMedia",
+    {
+      onClientUploadComplete: (
+        res: ClientUploadedFileData<any>[] | undefined
+      ) => {
+        console.log("res", res);
+        if (setValue) {
+          // const respondedUrls = res?.map((r) => r.url);
+          setFiles([]);
+          const respondedUrls = res?.map((r) => ({
+            name: r.name,
+            size: r.size,
+            url: r.url,
+          }));
+          setValue(name, respondedUrls);
+        }
+        toast.success(
+          <Text as="b" className="font-semibold">
+            portfolio Images updated
+          </Text>
+        );
+      },
+      onUploadError: (error: Error) => {
+        console.error(error);
+        toast.error(error.message);
+      },
+    }
+  );
 
   const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
 
@@ -110,18 +122,25 @@ export default function UploadZone({
 
   return (
     <div className={cn("grid @container", className)}>
-      {label && <span className="mb-1.5 block font-semibold text-gray-900">{label}</span>}
+      {label && (
+        <span className="mb-1.5 block font-semibold text-gray-900">
+          {label}
+        </span>
+      )}
       <div
         className={cn(
           "rounded-md border-[1.8px]",
-          !isEmpty(files) && "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
+          !isEmpty(files) &&
+            "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
         )}
       >
         <div
           {...getRootProps()}
           className={cn(
             "flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300",
-            isEmpty(files) ? "justify-center" : "flex-grow justify-center @xl:justify-start"
+            isEmpty(files)
+              ? "justify-center"
+              : "flex-grow justify-center @xl:justify-start"
           )}
         >
           <input {...getInputProps()} />
@@ -160,15 +179,9 @@ export default function UploadZone({
       {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
           {uploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
+            <div key={index} className={cn("relative")}>
               <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.url}
-                />
+                <MediaPreview name={file.name} url={file.url} />
                 <button
                   type="button"
                   className="absolute right-0 top-0 rounded-full bg-gray-700 p-1.5 transition duration-300"
@@ -176,22 +189,13 @@ export default function UploadZone({
                   <PiCheckBold className="text-white" />
                 </button>
               </figure>
-              <MediaCaption
-                name={file.name}
-                size={file.size}
-              />
+              <MediaCaption name={file.name} size={file.size} />
             </div>
           ))}
           {notUploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
+            <div key={index} className={cn("relative")}>
               <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.preview}
-                />
+                <MediaPreview name={file.name} url={file.preview} />
                 {isUploading ? (
                   <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
                     <LoadingSpinner />
@@ -206,10 +210,7 @@ export default function UploadZone({
                   </button>
                 )}
               </figure>
-              <MediaCaption
-                name={file.path}
-                size={file.size}
-              />
+              <MediaCaption name={file.path} size={file.size} />
             </div>
           ))}
         </div>

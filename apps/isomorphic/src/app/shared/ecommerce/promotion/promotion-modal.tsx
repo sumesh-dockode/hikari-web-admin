@@ -9,7 +9,7 @@ import UploadZone from '@core/ui/file-upload/upload-zone';
 import {
   PromotionFormInput,
   promotionFormSchema,
-} from '@/validators/create-promotion-schema';
+} from '@/validators/create-promotion.schema';
 
 export default function PromotionModal({
   isOpen,

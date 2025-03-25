@@ -10,13 +10,8 @@ type Props = {
   params: Promise<{ id: string }>;
 };
 
-/**
- * for dynamic metadata
- * @link: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
- */
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // read route params
+  
   const id = (await params).id;
 
   return metaObject(`Edit ${id}`);

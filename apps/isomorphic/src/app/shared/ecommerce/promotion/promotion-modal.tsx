@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { SubmitHandler } from 'react-hook-form';
 import { Button, Title } from 'rizzui';
-import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import UploadZone from '@core/ui/file-upload/upload-zone';
 import {
@@ -11,15 +10,17 @@ import {
   promotionFormSchema,
 } from '@/validators/create-promotion.schema';
 
+export type PromotionModalProps = {
+  isOpen: boolean;
+  onClose: () => void;
+  promotion?: PromotionFormInput;
+};
+
 export default function PromotionModal({
   isOpen,
   onClose,
   promotion,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  promotion?: PromotionFormInput;
-}) {
+}: PromotionModalProps) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
 
@@ -29,26 +30,26 @@ export default function PromotionModal({
       setLoading(false);
       console.log('Submitted Promotion Data ->', data);
       setReset({ images: '' });
-      onClose(); // Close modal after submission
+      onClose();
     }, 600);
   };
 
-  if (!isOpen) return null; // Prevent rendering when closed
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl">
+      <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
         <Form<PromotionFormInput>
           validationSchema={promotionFormSchema}
           resetValues={reset}
           onSubmit={onSubmit}
           useFormProps={{
             mode: 'onChange',
-            defaultValues: promotion, // Use row data as default
+            defaultValues: promotion || {},
           }}
           className="flex flex-col space-y-4"
         >
-          {({ register, control, getValues, setValue }) => (
+          {({ getValues, setValue }) => (
             <>
               <Title as="h6" className="font-semibold">
                 {promotion ? 'Edit Promotion' : 'Create Promotion'}

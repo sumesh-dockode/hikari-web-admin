@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
 import { ServiceBookingDataType } from './table';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
+import EyeIcon from '@core/components/icons/eye';
 
 const columnHelper = createColumnHelper<ServiceBookingDataType>();
 
@@ -53,6 +54,12 @@ export const servicebookingColumn = [
     ),
   }),
   columnHelper.display({
+    id: 'Requested User',
+    size: 120,
+    header: 'Requested By',
+    cell: ({ row }) => <div className="ps-6">{row.original.requesteduser}</div>,
+  }),
+  columnHelper.display({
     id: 'promocode',
     size: 250,
     header: 'Promo code',
@@ -68,15 +75,14 @@ export const servicebookingColumn = [
       <Text className="truncate !text-sm">{row.original.selectedservices}</Text>
     ),
   }),
-
-  columnHelper.display({
-    id: 'additionalservicerequest',
-    size: 120,
-    header: 'Additonal Service Requests',
-    cell: ({ row }) => (
-      <div className="ps-6">{row.original.additionalservicerequest}</div>
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'additionalservicerequest',
+  //   size: 120,
+  //   header: 'Additonal Service Requests',
+  //   cell: ({ row }) => (
+  //     <div className="ps-6">{row.original.additionalservicerequest}</div>
+  //   ),
+  // }),
   columnHelper.accessor('status', {
     id: 'status',
     size: 140,
@@ -95,6 +101,17 @@ export const servicebookingColumn = [
       },
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
+        <Link href={routes.eCommerce.serviceDetails(row.original.id)}>
+          <ActionIcon
+            as="span"
+            size="sm"
+            variant="outline"
+            aria-label={'View Product'}
+          >
+            <EyeIcon className="h-4 w-4" />
+          </ActionIcon>
+        </Link>
+
         <DeletePopover
           title={`Delete the category`}
           description={`Are you sure you want to delete this #${row.original.id} category?`}

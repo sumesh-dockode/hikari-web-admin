@@ -1,7 +1,7 @@
 import Image from 'next/image';
 
 const productGallery = [
-  'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/1.jpg',
+  'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
   'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/2.jpg',
   'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/3.jpg',
   'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/4.jpg',

@@ -2,6 +2,7 @@ import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
 import ProductDetails from '@/app/shared/ecommerce/product/product-details';
 import { metaObject } from '@/config/site.config';
+import ServiceDetails from '@/app/shared/ecommerce/servicebooking/service-detail';
 
 export const metadata = {
   ...metaObject('Service Details'),
@@ -30,7 +31,7 @@ export default async function ServiceDetailPage({ params }: any) {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-      <ProductDetails />
+      <ServiceDetails />
     </>
   );
 }

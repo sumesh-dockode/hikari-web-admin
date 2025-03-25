@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import toast from 'react-hot-toast';
 import isEmpty from 'lodash/isEmpty';
 import { PiShoppingCartSimple } from 'react-icons/pi';
@@ -19,10 +18,6 @@ export type ServiceModalProps = {
   onClose: () => void;
   service?: ServiceDetailsInput;
 };
-
-const serviceDetail = [
-  'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-];
 
 export default function ServiceDetailSummary({
   isOpen,
@@ -44,6 +39,8 @@ export default function ServiceDetailSummary({
 
   if (!isOpen) return null;
 
+ 
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
@@ -60,29 +57,8 @@ export default function ServiceDetailSummary({
           {({ getValues, setValue }) => (
             <>
               <Title as="h6" className="font-semibold">
-                {service ? 'Edit Service' : 'Create Service'}
+                {service ? 'Edit service' : 'Create service'}
               </Title>
-              <Text className="text-gray-600">
-                {service?.requestedby || 'Provide details for the service.'}
-              </Text>
-
-              <div className="grid grid-cols-2 gap-3 @md:gap-4 @xl:gap-5 @2xl:gap-7">
-                {serviceDetail.map((image) => (
-                  <div
-                    key={`service-gallery`}
-                    className="relative mx-auto aspect-[4/4.65] w-full overflow-hidden rounded bg-gray-100 @xl:rounded-md"
-                  >
-                    <Image
-                      fill
-                      priority
-                      src={image}
-                      alt={'Service Gallery'}
-                      sizes="(max-width: 768px) 100vw"
-                      className="h-full w-full object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
 
               <UploadZone
                 name="images"

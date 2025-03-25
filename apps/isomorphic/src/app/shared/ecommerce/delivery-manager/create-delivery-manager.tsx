@@ -1,0 +1,147 @@
+'use client';
+
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { SubmitHandler, Controller } from 'react-hook-form';
+import SelectLoader from '@core/components/loader/select-loader';
+import QuillLoader from '@core/components/loader/quill-loader';
+import { Button, Input, Select, Text, Title } from 'rizzui';
+import cn from '@core/utils/class-names';
+import { Form } from '@core/ui/form';
+import UploadZone from '@core/ui/file-upload/upload-zone';
+import {
+  StoreManagerFormInput,
+  storeManagerFormSchema,
+} from '@/validators/create-store-manager.schema';
+
+const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
+  ssr: false,
+  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
+});
+
+// a reusable form wrapper component
+function HorizontalFormBlockWrapper({
+  title,
+  description,
+  children,
+  className,
+  isModalView = true,
+}: React.PropsWithChildren<{
+  title: string;
+  description?: string;
+  className?: string;
+  isModalView?: boolean;
+}>) {
+  return (
+    <div
+      className={cn(
+        className,
+        isModalView ? '@5xl:grid @5xl:grid-cols-6' : ' '
+      )}
+    >
+      {isModalView && (
+        <div className="col-span-2 mb-6 pe-4 @5xl:mb-0">
+          <Title as="h6" className="font-semibold">
+            {title}
+          </Title>
+          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
+        </div>
+      )}
+
+      <div
+        className={cn(
+          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
+          isModalView ? 'col-span-4' : ' '
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// main category form component for create and update category
+export default function CreateDeliveryManager({
+  id,
+  initialValue,
+  isModalView = true,
+}: {
+  id?: string;
+  isModalView?: boolean;
+  initialValue?: StoreManagerFormInput;
+}) {
+  const [reset, setReset] = useState({});
+  const [isLoading, setLoading] = useState(false);
+
+  const onSubmit: SubmitHandler<StoreManagerFormInput> = (data) => {
+    // set timeout ony required to display loading state of the create button
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      console.log('create delivery manager data ->', data);
+      setReset({
+        name: '',
+        images: '',
+      });
+    }, 600);
+  };
+
+  return (
+    <Form<StoreManagerFormInput>
+      validationSchema={storeManagerFormSchema}
+      resetValues={reset}
+      onSubmit={onSubmit}
+      useFormProps={{
+        mode: 'onChange',
+        defaultValues: initialValue,
+      }}
+      className="isomorphic-form flex flex-grow flex-col @container"
+    >
+      {({ register, control, getValues, setValue, formState: { errors } }) => (
+        <>
+          <div className="flex-grow pb-10">
+            <div
+              className={cn(
+                'grid grid-cols-1',
+                isModalView
+                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
+                  : 'gap-5'
+              )}
+            >
+              <HorizontalFormBlockWrapper
+                title={'Add Delivery Manager'}
+                description={'Edit your delivery manager information from here'}
+                isModalView={isModalView}
+              >
+                <Input
+                  label="Delivery Manager Name"
+                  placeholder="delivery manager name"
+                  {...register('name')}
+                  error={errors.name?.message}
+                />
+              </HorizontalFormBlockWrapper>
+            </div>
+          </div>
+
+          <div
+            className={cn(
+              'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col',
+              isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
+            )}
+          >
+            <Button variant="outline" className="w-full @xl:w-auto">
+              Save as Draft
+            </Button>
+            <Button
+              type="submit"
+              isLoading={isLoading}
+              className="w-full @xl:w-auto"
+            >
+              {id ? 'Update' : 'Create'} Delivery Manager
+            </Button>
+          </div>
+        </>
+      )}
+    </Form>
+  );
+}

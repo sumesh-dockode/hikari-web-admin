@@ -62,6 +62,7 @@ import {
   PiShoppingBagDuotone,
   PiContactlessPaymentDuotone,
   PiHouseDuotone,
+  PiUserListDuotone,
 } from 'react-icons/pi';
 
 // Note: do not add href in the label object, it is rendering as label
@@ -149,10 +150,30 @@ export const menuItems = [
   //   icon: PiChatTeardropTextDuotone,
   // },
   {
+    name: 'User Management',
+    href: '#',
+    icon: PiUserListDuotone,
+    dropdownItems: [
+      {
+        name: 'Store Manager',
+        href: routes.eCommerce.storeManager,
+      },
+      {
+        name: 'Sales Man',
+        href: routes.eCommerce.salesMan,
+      },
+      {
+        name: 'Delivery Manager',
+        href: routes.eCommerce.deliveryManager,
+      },
+    ],
+  },
+  {
     name: 'Promotion',
     href: routes.eCommerce.promotion,
     icon: MdOutlineLocalOffer,
   },
+
   {
     name: 'Shop',
     href: routes.eCommerce.shop,

@@ -21,6 +21,12 @@ export const routes = {
     editPromotion: (id: number) => `/promotion/${id}/edit`,
     checkout: '/checkout',
     trackingId: (id: string) => `/tracking/${id}`,
+    storeManager: '/store-manager',
+    editStoreManager: (id: number) => `/store-manager/${id}/edit`,
+    salesMan: '/salesman',
+    editSalesMan: (id: number) => `/salesman/${id}/edit`,
+    deliveryManager: '/delivery-manager',
+    editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,
   },
   searchAndFilter: {
     realEstate: '/search/real-estate',

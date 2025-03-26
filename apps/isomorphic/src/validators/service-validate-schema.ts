@@ -15,10 +15,10 @@ const allowedStatuses = [
 ] as const; 
 
 export const serviceValidateSchema = z.object({
-  productname: z.string().min(1, { message: messages.bookingNameIsRequired }),
-  requestedby: z.string().min(1, { message: messages.bookingNameIsRequired }),
+  name: z.string().min(1, { message: messages.bookingNameIsRequired }),
+  requesteduser: z.string().min(1, { message: messages.bookingNameIsRequired }),
   promocode: z.string().min(1, { message: messages.bookingNameIsRequired }),
-  selectedservice: z.string().min(1, { message: messages.bookingNameIsRequired }),
+  selectedservices: z.string().min(1, { message: messages.bookingNameIsRequired }),
   status: z
     .string()  // Start with ZodString
     .min(1, { message: messages.bookingNameIsRequired })  // Apply min validation first

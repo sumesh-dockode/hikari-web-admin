@@ -1,15 +1,9 @@
-import { routes } from '@/config/routes';
-import PageHeader from '@/app/shared/page-header';
-import ProductDetails from '@/app/shared/ecommerce/product/product-details';
-import { metaObject } from '@/config/site.config';
-import ServiceDetails from '@/app/shared/ecommerce/servicebooking/service-detail';
+import ServiceDetailGallery from "@/app/shared/ecommerce/servicebooking/service-detail-gallery";
+import PageHeader from "@/app/shared/page-header";
+import { routes } from "@/config/routes";
 
-export const metadata = {
-  ...metaObject('Service Details'),
-};
-
-export default async function ServiceDetailPage({ params }: any) {
-  const id = (await params).id;
+export default function ServiceDetailPage({ params }: any) {
+  const id = (params).id;
 
   const pageHeader = {
     title: 'Service Booking',
@@ -28,10 +22,28 @@ export default async function ServiceDetailPage({ params }: any) {
     ],
   };
 
+  const ServiceData = {
+    image:
+      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
+    name: 'Bag',
+    promocode: 'sale100',
+    selectedservices: 'Cleaning Service',
+    requesteduser: 'Jithin',
+    status: 'Booking_initiated',
+  };
+
   return (
     <>
+      {/* Page Header */}
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-      <ServiceDetails />
+
+      {/* Container */}
+      <div className="@container px-5">
+        {/* Status Dropdown at the Top */}
+        <div className="flex justify-end mb-4">
+          <ServiceDetailGallery service={ServiceData} />
+        </div>
+      </div>
     </>
   );
 }

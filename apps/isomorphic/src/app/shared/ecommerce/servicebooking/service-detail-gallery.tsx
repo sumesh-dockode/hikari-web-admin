@@ -43,7 +43,7 @@ const HorizontalFormBlockWrapper = ({
     <div
       className={cn(
         className,
-        isModalView ? '@5xl:grid @5xl:grid-cols-6' : ' '
+        isModalView ? '' : ' '
       )}
     >
       {isModalView && (
@@ -111,27 +111,10 @@ export default function ServiceDetailsGallery({
     >
       {({ register, control, getValues, setValue, formState: { errors } }) => (
         <>
-          <div className="grid grid-cols-2 gap-3 @md:gap-4 @xl:gap-5 @2xl:gap-7">
-            {serviceGallery.map((image, idx) => (
-              <div
-                key={`product-gallery-${idx}`}
-                className="relative mx-auto aspect-[4/4.65] w-full overflow-hidden rounded bg-gray-100 @xl:rounded-md"
-              >
-                <Image
-                  fill
-                  priority
-                  src={image}
-                  alt={'Product Gallery'}
-                  sizes="(max-width: 768px) 100vw"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-            ))}
-          </div>
-
-          <div className="py-4">
-            <Title as="h6" className="font-semibold">Service Status:</Title>
-            <div className="mt-2">
+          <div className="flex flex-col @lg:flex-row gap-6 mb-6">
+            {/* Status Button at the top */}
+            <div className="w-full @lg:w-auto">
+              <Title as="h6" className="font-semibold mb-2">Service Status:</Title>
               <Controller
                 name="status"
                 control={control}
@@ -141,7 +124,9 @@ export default function ServiceDetailsGallery({
                     options={statusOptions}
                     error={errors?.status?.message}
                     placeholder="Select Service Status"
-                    className="w-full"
+                    className="w-full @lg:w-[200px]"
+                    selectClassName="h-10 rounded-lg border-gray-300 bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-primary"
+                    dropdownClassName="p-2 border border-gray-200 shadow-lg rounded-lg"
                     onChange={(selectedOption: { value: string; label: string }) => {
                       field.onChange(selectedOption.value);
                     }}
@@ -151,45 +136,70 @@ export default function ServiceDetailsGallery({
             </div>
           </div>
 
-          <div className="flex-grow pb-10">
-            <div
-              className={cn(
+          <div className="flex flex-col @lg:flex-row gap-8">
+            {/* Left side - Details */}
+            <div className="flex-grow">
+              <div className={cn(
                 'grid grid-cols-1',
                 isModalView
                   ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
                   : 'gap-5'
-              )}
-            >
-              <HorizontalFormBlockWrapper
-                title={'General Information:'}
-                description={'You cannot update this information'}
-                isModalView={isModalView}
-              >
-                <Input
-                  label="Product Name"
-                  placeholder="product name"
-                  {...register('productname')}
-                  error={errors?.productname?.message}
-                />
-                <Input
-                  label="Requested By"
-                  placeholder="requested by"
-                  {...register('requestedby')}
-                  error={errors.requestedby?.message}
-                />
-                <Input
-                  label="Promo code"
-                  placeholder="Promo Code"
-                  {...register('promocode')}
-                  error={errors.promocode?.message}
-                />
-                <Input
-                  label="Selected Service"
-                  placeholder="Selected Service"
-                  {...register('selectedservice')}
-                  error={errors.selectedservice?.message}
-                />
-              </HorizontalFormBlockWrapper>
+              )}>
+                <HorizontalFormBlockWrapper
+                  title={'General Information:'}
+                  description={'You cannot update this information'}
+                  isModalView={isModalView}
+                >
+                  <Input
+                    label="Product Name"
+                    placeholder="product name"
+                    {...register('name')}
+                    error={errors?.name?.message}
+                    inputClassName="bg-gray-100"
+                    readOnly
+                  />
+                  <Input
+                    label="Requested By"
+                    placeholder="requested by"
+                    {...register('requesteduser')}
+                    error={errors.requesteduser?.message}
+                    inputClassName="bg-gray-100"
+                    readOnly
+                  />
+                  <Input
+                    label="Promo code"
+                    placeholder="Promo Code"
+                    {...register('promocode')}
+                    error={errors.promocode?.message}
+                    inputClassName="bg-gray-100"
+                    readOnly
+                  />
+                  <Input
+                    label="Selected Service"
+                    placeholder="Selected Service"
+                    {...register('selectedservices')}
+                    error={errors.selectedservices?.message}
+                    inputClassName="bg-gray-100"
+                    readOnly
+                  />
+                </HorizontalFormBlockWrapper>
+              </div>
+            </div>
+
+            {/* Right side - Image */}
+            <div className="w-full @lg:w-[40%] @xl:w-[35%]">
+              <div className="sticky top-4">
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+                  <Image
+                    fill
+                    priority
+                    src={serviceGallery[0]}
+                    alt={'Product Gallery'}
+                    sizes="(max-width: 768px) 100vw"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              </div>
             </div>
           </div>
 
@@ -199,7 +209,7 @@ export default function ServiceDetailsGallery({
               isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
             )}
           >
-         
+            {/* Action buttons can go here if needed */}
           </div>
         </>
       )}

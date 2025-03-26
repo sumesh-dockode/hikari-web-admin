@@ -34,7 +34,12 @@ const pageHeader = {
   ],
 };
 
-const deliveryManagerData = { name: 'Delivery Manager' };
+const deliveryManagerData = {
+  first_name: 'Delivery Manager',
+  email: '5Hf3H@example.com',
+  username: 'delivery_manager',
+  password: 'password',
+};
 
 export default async function EditDeliveryManagerPage({ params }: any) {
   const id = (await params).id;

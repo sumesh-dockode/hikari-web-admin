@@ -3,62 +3,22 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
-import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
-import { Button, Input, Select, Text, Title } from 'rizzui';
+import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
-import UploadZone from '@core/ui/file-upload/upload-zone';
+import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
+import FormGroup from '../../form-group';
+import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
-  StoreManagerFormInput,
-  storeManagerFormSchema,
-} from '@/validators/create-store-manager.schema';
+  SalesmanFormInput,
+  salesmanFormSchema,
+} from '@/validators/create-salesman.schema';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
-
-// a reusable form wrapper component
-function HorizontalFormBlockWrapper({
-  title,
-  description,
-  children,
-  className,
-  isModalView = true,
-}: React.PropsWithChildren<{
-  title: string;
-  description?: string;
-  className?: string;
-  isModalView?: boolean;
-}>) {
-  return (
-    <div
-      className={cn(
-        className,
-        isModalView ? '@5xl:grid @5xl:grid-cols-6' : ' '
-      )}
-    >
-      {isModalView && (
-        <div className="col-span-2 mb-6 pe-4 @5xl:mb-0">
-          <Title as="h6" className="font-semibold">
-            {title}
-          </Title>
-          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
-        </div>
-      )}
-
-      <div
-        className={cn(
-          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
-          isModalView ? 'col-span-4' : ' '
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
 
 // main category form component for create and update category
 export default function CreateSalesMan({
@@ -68,12 +28,12 @@ export default function CreateSalesMan({
 }: {
   id?: string;
   isModalView?: boolean;
-  initialValue?: StoreManagerFormInput;
+  initialValue?: SalesmanFormInput;
 }) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<StoreManagerFormInput> = (data) => {
+  const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     // set timeout ony required to display loading state of the create button
     setLoading(true);
     setTimeout(() => {
@@ -87,8 +47,8 @@ export default function CreateSalesMan({
   };
 
   return (
-    <Form<StoreManagerFormInput>
-      validationSchema={storeManagerFormSchema}
+    <Form<SalesmanFormInput>
+      validationSchema={salesmanFormSchema}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
@@ -100,26 +60,92 @@ export default function CreateSalesMan({
       {({ register, control, getValues, setValue, formState: { errors } }) => (
         <>
           <div className="flex-grow pb-10">
-            <div
-              className={cn(
-                'grid grid-cols-1',
-                isModalView
-                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
-                  : 'gap-5'
-              )}
-            >
-              <HorizontalFormBlockWrapper
-                title={'Add Sales Man'}
-                description={'Edit your sales man information from here'}
-                isModalView={isModalView}
+            <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
+              <FormGroup
+                title={'Name'}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
-                  label="Sales Man Name"
-                  placeholder="sales man name"
-                  {...register('name')}
-                  error={errors.name?.message}
+                  placeholder="First Name"
+                  {...register('first_name')}
+                  error={errors.first_name?.message}
+                  className="flex-grow"
                 />
-              </HorizontalFormBlockWrapper>
+                <Input
+                  placeholder="Last Name"
+                  {...register('last_name')}
+                  error={errors.last_name?.message}
+                  className="flex-grow"
+                />
+              </FormGroup>
+              <FormGroup
+                title="Email Address"
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
+                <Input
+                  className="col-span-full"
+                  prefix={
+                    <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
+                  }
+                  type="email"
+                  placeholder="georgia.young@example.com"
+                  {...register('email')}
+                  error={errors.email?.message}
+                />
+              </FormGroup>
+              <FormGroup
+                title={'Profile Picture'}
+                description={'This will be displayed on profile.'}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
+                <div className="flex flex-col gap-6 @container @3xl:col-span-2">
+                  <AvatarUploadNew
+                    name="images"
+                    setValue={setValue}
+                    getValues={getValues}
+                    error={errors?.images?.message as string}
+                  />
+                </div>
+              </FormGroup>
+              <FormGroup
+                title={'Username & Password'}
+                description={'This will be the login credential.'}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
+                <Input
+                  placeholder="Username"
+                  {...register('username')}
+                  error={errors.username?.message}
+                  className="flex-grow"
+                />
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <Password
+                      placeholder="Enter your password"
+                      helperText={
+                        getValues().password?.length < 8 &&
+                        'Your current password must be more than 8 characters'
+                      }
+                      value={value}
+                      onChange={onChange}
+                      error={errors.password?.message}
+                    />
+                  )}
+                />
+              </FormGroup>
+              <FormGroup
+                title={'Status'}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
+                <Switch
+                  label="Active"
+                  variant="flat"
+                  labelClassName="font-medium text-sm text-gray-900"
+                  {...register('is_active')}
+                />
+              </FormGroup>
             </div>
           </div>
 
@@ -129,15 +155,12 @@ export default function CreateSalesMan({
               isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
             )}
           >
-            {/* <Button variant="outline" className="w-full @xl:w-auto">
-              Save as Draft
-            </Button> */}
             <Button
               type="submit"
               isLoading={isLoading}
               className="w-full @xl:w-auto"
             >
-              {id ? 'Update' : 'Create'} Sales Man
+              {id ? 'Update' : 'Create'} Salesman
             </Button>
           </div>
         </>

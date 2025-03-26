@@ -3,12 +3,10 @@ import { messages } from '@/config/messages';
 import { fileSchema, validateEmail, validateNewPassword } from './common-rules';
 
 // form zod validation schema
-export const storeManagerFormSchema = z.object({
+export const deliveryManagerFormSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().optional(),
   email: validateEmail,
-  store_name: z.string().min(1, { message: messages.storeNameRequired }),
-  store_address: z.string().min(1, { message: messages.storeAddressRequired }),
   username: z.string().min(3),
   password: validateNewPassword,
   images: z.array(fileSchema).optional(),
@@ -16,4 +14,6 @@ export const storeManagerFormSchema = z.object({
 });
 
 // generate form types from zod validation schema
-export type StoreManagerFormInput = z.infer<typeof storeManagerFormSchema>;
+export type DeliveryManagerFormInput = z.infer<
+  typeof deliveryManagerFormSchema
+>;

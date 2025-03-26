@@ -34,7 +34,18 @@ const pageHeader = {
   ],
 };
 
-const salesmanData = { name: 'Sales Man' };
+const salesmanData = {
+  first_name: 'Sales Man',
+  email: '5Hf3H@example.com',
+  username: 'salesman',
+  password: 'passwordsss',
+  images: {
+    name: 'profile',
+    url: 'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/1.jpg',
+    size: 100,
+  },
+  is_active: true,
+};
 
 export default async function EditSalesmanPage({ params }: any) {
   const id = (await params).id;

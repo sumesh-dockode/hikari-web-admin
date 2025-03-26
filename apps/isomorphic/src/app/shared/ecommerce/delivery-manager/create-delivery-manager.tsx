@@ -129,9 +129,9 @@ export default function CreateDeliveryManager({
               isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
             )}
           >
-            <Button variant="outline" className="w-full @xl:w-auto">
+            {/* <Button variant="outline" className="w-full @xl:w-auto">
               Save as Draft
-            </Button>
+            </Button> */}
             <Button
               type="submit"
               isLoading={isLoading}

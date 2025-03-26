@@ -159,8 +159,8 @@ export const menuItems = [
         href: routes.eCommerce.storeManager,
       },
       {
-        name: 'Sales Man',
-        href: routes.eCommerce.salesMan,
+        name: 'Salesman',
+        href: routes.eCommerce.salesman,
       },
       {
         name: 'Delivery Manager',

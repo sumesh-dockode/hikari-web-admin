@@ -1,17 +1,16 @@
-import { routes } from '@/config/routes';
-import { metaObject } from '@/config/site.config';
-import SalesManTable from '@/app/shared/ecommerce/sales-man/list/table';
-import PageHeader from '@/app/shared/page-header';
 import Link from 'next/link';
+import { metaObject } from '@/config/site.config';
+import PageHeader from '@/app/shared/page-header';
 import { Button } from 'rizzui/button';
-import { PiPlusBold } from 'react-icons/pi';
+import { routes } from '@/config/routes';
+import CreateSalesMan from '@/app/shared/ecommerce/sales-man/create-sales-man';
 
 export const metadata = {
-  ...metaObject('Salesman'),
+  ...metaObject('Create Salesman'),
 };
 
 const pageHeader = {
-  title: 'Salesman',
+  title: 'Create Salesman',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -22,26 +21,26 @@ const pageHeader = {
       name: 'Salesman',
     },
     {
-      name: 'List',
+      name: 'Create',
     },
   ],
 };
 
-export default function SalesManPage() {
+export default function CreateSalesmanPage() {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <Link
-          href={routes.eCommerce.createSalesman}
-          className="w-full @lg:w-auto"
+          href={routes.eCommerce.salesman}
+          className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         >
-          <Button as="span" className="w-full @lg:w-auto">
-            <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-            Add Salesman
+          <Button as="span" className="w-full @lg:w-auto" variant="outline">
+            Cancel
           </Button>
         </Link>
       </PageHeader>
-      <SalesManTable />
+
+      <CreateSalesMan />
     </>
   );
 }

@@ -51,13 +51,13 @@ const HorizontalFormBlockWrapper = ({
           <Title as="h6" className="font-semibold">
             {title}
           </Title>
-          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
+          <Text className="mt-3 text-sm text-gray-500">{description}</Text>
         </div>
       )}
 
       <div
         className={cn(
-          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
+          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5 mt-3',
           isModalView ? 'col-span-4' : ' '
         )}
       >
@@ -125,7 +125,7 @@ export default function ServiceDetailsGallery({
                     error={errors?.status?.message}
                     placeholder="Select Service Status"
                     className="w-full @lg:w-[200px]"
-                    selectClassName="h-10 rounded-lg border-gray-300 bg-gray-100 hover:bg-gray-200 focus:ring-2 focus:ring-primary"
+                    selectClassName="h-10 rounded-lg "
                     dropdownClassName="p-2 border border-gray-200 shadow-lg rounded-lg"
                     onChange={(selectedOption: { value: string; label: string }) => {
                       field.onChange(selectedOption.value);
@@ -155,7 +155,7 @@ export default function ServiceDetailsGallery({
                     placeholder="product name"
                     {...register('name')}
                     error={errors?.name?.message}
-                    inputClassName="bg-gray-100"
+                    inputClassName=""
                     readOnly
                   />
                   <Input
@@ -163,7 +163,7 @@ export default function ServiceDetailsGallery({
                     placeholder="requested by"
                     {...register('requesteduser')}
                     error={errors.requesteduser?.message}
-                    inputClassName="bg-gray-100"
+                    inputClassName=""
                     readOnly
                   />
                   <Input
@@ -171,7 +171,7 @@ export default function ServiceDetailsGallery({
                     placeholder="Promo Code"
                     {...register('promocode')}
                     error={errors.promocode?.message}
-                    inputClassName="bg-gray-100"
+                    inputClassName=""
                     readOnly
                   />
                   <Input
@@ -179,7 +179,7 @@ export default function ServiceDetailsGallery({
                     placeholder="Selected Service"
                     {...register('selectedservices')}
                     error={errors.selectedservices?.message}
-                    inputClassName="bg-gray-100"
+                    inputClassName=""
                     readOnly
                   />
                 </HorizontalFormBlockWrapper>
@@ -187,9 +187,9 @@ export default function ServiceDetailsGallery({
             </div>
 
             {/* Right side - Image */}
-            <div className="w-full @lg:w-[40%] @xl:w-[35%]">
+            <div className="w-full @lg:w-[40%] @xl:w-[23%]">
               <div className="sticky top-4">
-                <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-gray-100">
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg ">
                   <Image
                     fill
                     priority

@@ -7,6 +7,7 @@ const productGallery = [
   'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/4.jpg',
 ];
 
+
 export default function ProductDetailsGallery() {
   return (
     <div className="grid grid-cols-2 gap-3 @md:gap-4 @xl:gap-5 @2xl:gap-7">

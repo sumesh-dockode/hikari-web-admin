@@ -38,7 +38,7 @@ export default function ServiceDetailPage({ params }: any) {
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
       {/* Container */}
-      <div className="@container px-5">
+      <div className="@container">
         {/* Status Dropdown at the Top */}
         <div className="flex justify-end mb-4">
           <ServiceDetailGallery service={ServiceData} />

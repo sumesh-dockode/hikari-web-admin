@@ -5,6 +5,10 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
+      name: string;
+      role: Role;
+      access_token: string;
+      refresh_token: string;
       // currentTeamId: string | null;
     } & DefaultSession['user'];
   }
@@ -15,5 +19,11 @@ declare module 'next-auth/jwt' {
   interface JWT {
     /** OpenID ID Token */
     idToken?: string;
+    id: string;
+    name: string;
+    role: Role;
+    access_token: string;
+    refresh_token: string;
+    exp?: number;
   }
 }

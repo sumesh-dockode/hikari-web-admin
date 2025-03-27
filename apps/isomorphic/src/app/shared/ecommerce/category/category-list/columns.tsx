@@ -7,23 +7,32 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Title, Tooltip } from 'rizzui';
-import { CategoryDataType } from './table';
-
+// import { CategoryDataType } from './table';
+export interface CategoryDataType {
+  id: string;
+  image: string;
+  icon_image: string;  // Changed from 'icon'
+  name: string;
+  group: string;      // Changed from 'slug'
+  products?: number;
+  description?: string;
+  // Add other API fields as needed
+}
 const columnHelper = createColumnHelper<CategoryDataType>();
 
 export const categoriesColumns = [
-  columnHelper.display({
-    id: 'checked',
-    size: 50,
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="ps-3.5"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'checked',
+  //   size: 50,
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       aria-label="Select row"
+  //       className="ps-3.5"
+  //       checked={row.getIsSelected()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
   columnHelper.display({
     id: 'image',
     size: 100,
@@ -44,17 +53,18 @@ export const categoriesColumns = [
     id: 'icon',
     size: 100,
     header: 'Icon',
-    cell: ({ row }) => {
-      const IconComponent = row.original.icon;
-
-      return (
-        <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
-          <IconComponent className="h-6 w-6 text-gray-700" />
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
+        <Image
+          src={row.original.icon_image}
+          alt={row.original.name}
+          width={24}
+          height={24}
+          className="h-6 w-6 object-contain"
+        />
+      </div>
+    ),
   }),
-
   columnHelper.accessor('name', {
     id: 'name',
     size: 200,

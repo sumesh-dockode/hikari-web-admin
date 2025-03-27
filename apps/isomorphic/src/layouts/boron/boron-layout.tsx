@@ -1,12 +1,16 @@
 import BoronHeader from '@/layouts/boron/boron-header';
 import BoronSidebar from '@/layouts/boron/boron-sidebar';
+import { useSession } from 'next-auth/react';
+import Providers from 'providers';
 
 export default function BoronLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // const session = useSession();
   return (
+    <Providers> 
     <main className="flex min-h-screen flex-grow">
       <BoronSidebar className="fixed hidden dark:bg-gray-50 xl:block" />
       <BoronHeader />
@@ -16,5 +20,6 @@ export default function BoronLayout({
         </div>
       </div>
     </main>
+    </Providers>
   );
 }

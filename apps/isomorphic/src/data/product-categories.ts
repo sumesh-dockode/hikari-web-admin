@@ -2,6 +2,7 @@ import ArmChairIcon from '@core/components/icons/arm-chair';
 import SofaIcon from '@core/components/icons/sofa';
 import ChestOfdrawers from '@core/components/icons/chestOfdrawers';
 import BedIcon from '@core/components/icons/bed';
+
 export const categories = [
   {
     id: '0o65741345',

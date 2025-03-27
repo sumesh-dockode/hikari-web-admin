@@ -40,17 +40,6 @@ export default function PromotionsTable() {
     },
   });
 
-  // const handleRowClick = (rowData: PromotionDataType) => {
-  //   setSelectedRow(rowData);
-  //   setIsModalOpen(true);
-  // };
-
-  // // Close modal and reset selected row
-  // const closeModal = () => {
-  //   setIsModalOpen(false);
-  //   setSelectedRow(null);
-  // };
-
   return (
     <>
       <Filters table={table} />

@@ -63,6 +63,12 @@ export type Product = {
   colors?: ProductColor[];
   sizes?: number[];
 };
+export type Service = {
+  id: number;
+  title: string;
+  description?: string;
+  thumbnail: string;
+};
 
 export type PosProduct = {
   id: number;

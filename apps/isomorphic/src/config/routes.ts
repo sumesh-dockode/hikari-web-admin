@@ -8,6 +8,7 @@ export const routes = {
     categories: '/categories',
     createCategory: '/categories/create',
     editCategory: (id: string) => `/categories/${id}/edit`,
+    serviceDetails: (id: string) => `/servicebooking/${id}/detail`,
     orders: '/orders',
     createOrder: '/orders/create',
     orderDetails: (id: string) => `/orders/${id}`,

@@ -6,7 +6,7 @@ export const ServiceData = [
     name: 'Bag',
     promocode: 'sale100',
     selectedservices: 'cleaning service',
-    additionalservicerequest: 'nil',
+    requesteduser: 'Jithin',
     status: 'Booking_initiated',
   },
   {
@@ -16,7 +16,7 @@ export const ServiceData = [
     name: 'Sunglass',
     promocode: 'NYka20',
     selectedservices: 'cleaning service',
-    additionalservicerequest: 'nil',
+    requesteduser: 'Jithin',
     status: 'confirm',
   },
   {
@@ -26,7 +26,7 @@ export const ServiceData = [
     name: 'Watch',
     promocode: 'offer20',
     selectedservices: 'Fabric and Leather Care',
-    additionalservicerequest: 'nil',
+    requesteduser: 'Jithin',
     status: 'service_started',
   },
   {
@@ -36,7 +36,7 @@ export const ServiceData = [
     name: 'Sneakers',
     promocode: 'coupon30',
     selectedservices: 'Fabric and Leather Care',
-    additionalservicerequest: 'nil',
+    requesteduser: 'Jithin',
     status: 'completed',
   },
   {
@@ -46,7 +46,7 @@ export const ServiceData = [
     name: 'Chair',
     promocode: 'apply20',
     selectedservices: 'Fabric and Leather Care',
-    additionalservicerequest: 'nil',
+    requesteduser: 'nil',
     status: 'completed',
   },
   {
@@ -56,7 +56,7 @@ export const ServiceData = [
     name: 'Tools',
     promocode: 'offer20',
     selectedservices: 'Fabric and Leather Care',
-    additionalservicerequest: 'nil',
+    requesteduser: 'nil',
     status: 'completed',
   },
 
@@ -67,7 +67,7 @@ export const ServiceData = [
     name: 'Kids',
     promocode: 'offer20',
     selectedservices: 'Fabric and Leather Care',
-    additionalservicerequest: 'nil',
+    requesteduser: 'nil',
     status: 'completed',
   },
 ];

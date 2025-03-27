@@ -1,34 +1,37 @@
 'use client';
 
 import { useState } from 'react';
-import { SubmitHandler } from 'react-hook-form';
-import { Button, Title } from 'rizzui';
+import toast from 'react-hot-toast';
+import isEmpty from 'lodash/isEmpty';
+import { PiShoppingCartSimple } from 'react-icons/pi';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { FormProvider, SubmitHandler, useForm } from 'react-hook-form';
+import { Product } from '@/types';
+import { Button, Title, Text } from 'rizzui';
+import { generateCartProduct } from '@/store/quick-cart/generate-cart-product';
+import { ServiceDetailsInput, serviceValidateSchema } from '@/validators/service-validate-schema';
 import { Form } from '@core/ui/form';
 import UploadZone from '@core/ui/file-upload/upload-zone';
-import {
-  PromotionFormInput,
-  promotionFormSchema,
-} from '@/validators/create-promotion.schema';
 
-export type PromotionModalProps = {
+export type ServiceModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  promotion?: PromotionFormInput;
+  service?: ServiceDetailsInput;
 };
 
-export default function PromotionModal({
+export default function ServiceDetailSummary({
   isOpen,
   onClose,
-  promotion,
-}: PromotionModalProps) {
+  service,
+}: ServiceModalProps) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<PromotionFormInput> = (data) => {
+  const onSubmit: SubmitHandler<ServiceDetailsInput> = (data) => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      console.log('Submitted Promotion Data ->', data);
+      console.log('Submitted service Data ->', data);
       setReset({ images: '' });
       onClose();
     }, 600);
@@ -36,23 +39,25 @@ export default function PromotionModal({
 
   if (!isOpen) return null;
 
+ 
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-2xl rounded-lg bg-white p-6 shadow-lg">
-        <Form<PromotionFormInput>
-          validationSchema={promotionFormSchema}
+        <Form<ServiceDetailsInput>
+          validationSchema={serviceValidateSchema}
           resetValues={reset}
           onSubmit={onSubmit}
           useFormProps={{
             mode: 'onChange',
-            defaultValues: promotion || {},
+            defaultValues: service || {},
           }}
           className="flex flex-col space-y-4"
         >
           {({ getValues, setValue }) => (
             <>
               <Title as="h6" className="font-semibold">
-                {promotion ? 'Edit Promotion' : 'Create Promotion'}
+                {service ? 'Edit service' : 'Create service'}
               </Title>
 
               <UploadZone
@@ -67,7 +72,7 @@ export default function PromotionModal({
                   Cancel
                 </Button>
                 <Button type="submit" isLoading={isLoading}>
-                  {promotion ? 'Update' : 'Create'}
+                  {service ? 'Update' : 'Create'}
                 </Button>
               </div>
             </>

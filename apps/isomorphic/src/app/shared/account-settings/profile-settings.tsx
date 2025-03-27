@@ -79,17 +79,18 @@ export default function ProfileSettingsView() {
                 </FormGroup>
 
                 <FormGroup
-                  title="Website"
+                  title=" email"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
                   <Input
-                    type="url"
+                    prefix={
+                      <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
+                    }
+                    type="email"
                     className="col-span-full"
-                    prefix="https://"
-                    prefixClassName="relative pe-2.5 before:w-[1px] before:h-[38px] before:absolute before:bg-gray-300 before:-top-[9px] before:right-0"
-                    placeholder="Enter your website url"
-                    {...register('website')}
-                    error={errors.website?.message}
+                    placeholder="georgia.young@example.com"
+                    {...register('email')}
+                    error={errors.email?.message}
                   />
                 </FormGroup>
 
@@ -108,7 +109,7 @@ export default function ProfileSettingsView() {
                   </div>
                 </FormGroup>
 
-                <FormGroup
+                {/* <FormGroup
                   title="Your Bio"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
@@ -125,9 +126,9 @@ export default function ProfileSettingsView() {
                       )}
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Job Title"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
@@ -157,9 +158,9 @@ export default function ProfileSettingsView() {
                       className="mt-3"
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Alternative contact email"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                   description="Enter an alternative email if you’d like to be contacted via a different email."
@@ -174,9 +175,9 @@ export default function ProfileSettingsView() {
                     {...register('email')}
                     error={errors.email?.message}
                   />
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Portfolio Projects"
                   description="Share a few snippets of your work"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
@@ -189,7 +190,7 @@ export default function ProfileSettingsView() {
                       error={errors?.portfolios?.message as string}
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
               </div>
               <FormFooter
                 // isLoading={isLoading}

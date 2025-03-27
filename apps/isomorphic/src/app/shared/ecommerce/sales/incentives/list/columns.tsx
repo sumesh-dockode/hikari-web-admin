@@ -4,11 +4,11 @@ import DeletePopover from '@core/components/delete-popover';
 import AvatarCard from '@core/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import { Checkbox, Flex, Text } from 'rizzui';
-import { SalesHistoryDataType } from './table';
+import { IncentivesDataType } from './table';
 
-const columnHelper = createColumnHelper<SalesHistoryDataType>();
+const columnHelper = createColumnHelper<IncentivesDataType>();
 
-export const SalesHistoryColumns = [
+export const IncentivesColumns = [
   columnHelper.display({
     id: 'select',
     size: 50,
@@ -60,18 +60,6 @@ export const SalesHistoryColumns = [
       <Text className="text-sm">{row.original.invoice_number}</Text>
     ),
   }),
-  columnHelper.display({
-    id: 'to',
-    size: 200,
-    header: 'To',
-    cell: ({ row }) => <Text className="text-sm">{row.original.to}</Text>,
-  }),
-  columnHelper.display({
-    id: 'from',
-    size: 200,
-    header: 'From',
-    cell: ({ row }) => <Text className="text-sm">{row.original.from}</Text>,
-  }),
   columnHelper.accessor('price', {
     id: 'price',
     size: 150,
@@ -99,8 +87,8 @@ export const SalesHistoryColumns = [
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
         <DeletePopover
-          title={`Delete the product`}
-          description={`Are you sure you want to delete this #${row.original.id} product?`}
+          title={`Delete the incentive`}
+          description={`Are you sure you want to delete this #${row.original.id} incentive?`}
           onDelete={() =>
             meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
           }

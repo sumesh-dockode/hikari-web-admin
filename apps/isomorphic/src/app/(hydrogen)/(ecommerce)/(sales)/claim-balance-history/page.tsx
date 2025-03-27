@@ -3,22 +3,22 @@ import PageHeader from '@/app/shared/page-header';
 import { productsData } from '@/data/products-data';
 import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/shared/export-button';
-import SalesHistoryTable from '@/app/shared/ecommerce/sales/sales-history/list/table';
+import ClaimBalanceHistoryTable from '@/app/shared/ecommerce/sales/claim-balance-history/list/table';
 
 export const metadata = {
-  ...metaObject('Sales History'),
+  ...metaObject('Claim Balance History'),
 };
 
 const pageHeader = {
-  title: 'Sales History',
+  title: 'Claim Balance History',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
       name: 'Home',
     },
     {
-      href: routes.eCommerce.salesHistory,
-      name: 'Sales History',
+      href: routes.eCommerce.claimBalanceHistory,
+      name: 'Claim Balance History',
     },
     {
       name: 'List',
@@ -26,7 +26,7 @@ const pageHeader = {
   ],
 };
 
-export default function SalesHistoryPage() {
+export default function ClaimBalanceHistoryPage() {
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
@@ -40,7 +40,7 @@ export default function SalesHistoryPage() {
         </div>
       </PageHeader>
 
-      <SalesHistoryTable pageSize={10} />
+      <ClaimBalanceHistoryTable pageSize={10} />
     </>
   );
 }

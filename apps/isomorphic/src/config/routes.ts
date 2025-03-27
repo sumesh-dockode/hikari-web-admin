@@ -31,7 +31,7 @@ export const routes = {
     createSalesman: '/salesman/create',
     editSalesMan: (id: number) => `/salesman/${id}/edit`,
     salesHistory: '/sales-history',
-    incentive: '/incentive',
+    incentives: '/incentives',
     claimBalanceHistory: '/claim-balance-history',
 
     deliveryManager: '/delivery-manager',

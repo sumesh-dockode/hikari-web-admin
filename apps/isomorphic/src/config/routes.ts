@@ -25,9 +25,15 @@ export const routes = {
     storeManager: '/store-manager',
     createStoreManager: '/store-manager/create',
     editStoreManager: (id: number) => `/store-manager/${id}/edit`,
+
+    //sales section
     salesman: '/salesman',
     createSalesman: '/salesman/create',
     editSalesMan: (id: number) => `/salesman/${id}/edit`,
+    salesHistory: '/sales-history',
+    incentive: '/incentive',
+    claimBalanceHistory: '/claim-balance-history',
+
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
     editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,

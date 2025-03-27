@@ -78,4 +78,6 @@ export const messages = {
   priceTypeIsRequired: 'Price Type is required',
   pricePerSquareRequired: 'Price Per Square is required',
   totalPriceIsRequired: 'Total Price is required',
+  storeNameRequired: 'Store Name is required',
+  storeAddressRequired: 'Store Address is required',
 };

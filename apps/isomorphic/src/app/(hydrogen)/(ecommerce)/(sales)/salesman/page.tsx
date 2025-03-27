@@ -1,10 +1,10 @@
 import { routes } from '@/config/routes';
 import { metaObject } from '@/config/site.config';
-import SalesManTable from '@/app/shared/ecommerce/sales-man/list/table';
 import PageHeader from '@/app/shared/page-header';
 import Link from 'next/link';
 import { Button } from 'rizzui/button';
 import { PiPlusBold } from 'react-icons/pi';
+import SalesManTable from '@/app/shared/ecommerce/sales/sales-man/list/table';
 
 export const metadata = {
   ...metaObject('Salesman'),

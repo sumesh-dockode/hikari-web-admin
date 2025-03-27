@@ -4,7 +4,7 @@ import { routes } from '@/config/routes';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from 'rizzui/button';
-import CreateSalesMan from '@/app/shared/ecommerce/sales-man/create-sales-man';
+import CreateSalesMan from '@/app/shared/ecommerce/sales/sales-man/create-sales-man';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -34,7 +34,18 @@ const pageHeader = {
   ],
 };
 
-const salesmanData = { name: 'Sales Man' };
+const salesmanData = {
+  first_name: 'Sales Man',
+  email: '5Hf3H@example.com',
+  username: 'salesman',
+  password: 'passwordsss',
+  images: {
+    name: 'profile',
+    url: 'https://isomorphic-furyroad.s3.amazonaws.com/public/products/details/1.jpg',
+    size: 100,
+  },
+  is_active: true,
+};
 
 export default async function EditSalesmanPage({ params }: any) {
   const id = (await params).id;

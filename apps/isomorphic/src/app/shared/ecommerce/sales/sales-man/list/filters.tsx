@@ -16,7 +16,7 @@ export default function Filters<TData extends Record<string, any>>({
     <Flex align="center" justify="between" className="mb-4">
       <Input
         type="search"
-        placeholder="Search by sales man name..."
+        placeholder="Search by salesman name..."
         value={table.getState().globalFilter ?? ''}
         onClear={() => table.setGlobalFilter('')}
         onChange={(e) => table.setGlobalFilter(e.target.value)}

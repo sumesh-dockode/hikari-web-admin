@@ -3,7 +3,7 @@ import { metaObject } from '@/config/site.config';
 import PageHeader from '@/app/shared/page-header';
 import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
-import CreateSalesMan from '@/app/shared/ecommerce/sales-man/create-sales-man';
+import CreateSalesMan from '@/app/shared/ecommerce/sales/sales-man/create-sales-man';
 
 export const metadata = {
   ...metaObject('Create Salesman'),

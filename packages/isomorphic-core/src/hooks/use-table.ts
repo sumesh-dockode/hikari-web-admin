@@ -70,7 +70,6 @@ export function useTable<T extends AnyObject>(
     return sortData(newData, sortConfig.key, sortConfig.direction);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortConfig, data]);
-
   function handleSort(key: string) {
     let direction = 'asc';
     if (sortConfig.key === key && sortConfig.direction === 'asc') {

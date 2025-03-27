@@ -15,7 +15,7 @@ const pageHeader = {
       name: 'E-Commerce',
     },
     {
-      href: routes.eCommerce.promotion,
+      href: routes.eCommerce.servicebooking,
       name: 'Service Booking',
     },
     {
@@ -29,7 +29,7 @@ export default function ServiceBookingPage() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <Link
-          href={routes.eCommerce.promotion}
+          href={routes.eCommerce.servicebooking}
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         ></Link>
       </PageHeader>

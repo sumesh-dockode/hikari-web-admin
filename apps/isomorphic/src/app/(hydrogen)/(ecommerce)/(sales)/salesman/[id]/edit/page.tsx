@@ -4,7 +4,7 @@ import { routes } from '@/config/routes';
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Button } from 'rizzui/button';
-import CreateSalesMan from '@/app/shared/ecommerce/sales-man/create-sales-man';
+import CreateSalesMan from '@/app/shared/ecommerce/sales/sales-man/create-sales-man';
 
 type Props = {
   params: Promise<{ id: string }>;

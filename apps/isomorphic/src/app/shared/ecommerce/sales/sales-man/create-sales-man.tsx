@@ -8,12 +8,12 @@ import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
-import FormGroup from '../../form-group';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
   SalesmanFormInput,
   salesmanFormSchema,
 } from '@/validators/create-salesman.schema';
+import FormGroup from '@/app/shared/form-group';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,

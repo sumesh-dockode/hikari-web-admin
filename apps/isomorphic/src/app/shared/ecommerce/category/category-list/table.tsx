@@ -1,25 +1,15 @@
 'use client';
 
-import { categories } from '@/data/product-categories';
+import {  CategoryDataType } from '@/data/product-categories';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import { categoriesColumns } from './columns';
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
-import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 import { useEffect } from 'react';
+import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 
-export interface CategoryDataType {
-  id: string;
-  image: string;
-  name: string;
-  products: number;
-  icon_component: string; 
-  is_deleted: string;
-  group: string;
-  parent?: string;
-}
 
 export default function CategoryTable() {
   const {
@@ -32,9 +22,13 @@ export default function CategoryTable() {
     isFetchingNextPage,
   } = usePaginatedCategories();
 
-const categories = data?.pages?.flatMap((page:any) => page.results) || [];
-  const { table, setData } = useTanStackTable<CategoryDataType|any>({
-    tableData: categories,
+  console.log('dataaaa >>>>>>>>', data);
+
+  const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+  console.log("categoriesData", categoriesAPIData);
+  
+  const { table, setData } = useTanStackTable<CategoryDataType | any>({
+    tableData: categoriesAPIData,
     columnConfig: categoriesColumns,
     options: {
       initialState: {
@@ -55,12 +49,13 @@ const categories = data?.pages?.flatMap((page:any) => page.results) || [];
     },
   });
   useEffect(() => {
-    if (categories.length > 0) {
-      setData(categories);
+    if (categoriesAPIData.length > 0) {
+      setData(categoriesAPIData);
     }
-  }, [categories, setData]);
+  }, [categoriesAPIData]);
+
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
   return (
     <>
@@ -76,11 +71,11 @@ const categories = data?.pages?.flatMap((page:any) => page.results) || [];
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />
       {hasNextPage && (
-        <div className="flex justify-center mt-4">
+        <div className="mt-4 flex justify-center">
           <button
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
-            className="px-4 py-2 bg-blue-500 text-white rounded disabled:opacity-50"
+            className="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
           >
             {isFetchingNextPage ? 'Loading more...' : 'Load More'}
           </button>

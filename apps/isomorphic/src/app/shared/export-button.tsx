@@ -10,6 +10,7 @@ type ExportButtonProps = {
   header: string;
   fileName: string;
   className?: string;
+  disabled?: boolean;
 };
 
 export default function ExportButton({
@@ -17,10 +18,12 @@ export default function ExportButton({
   header,
   fileName,
   className,
+  disabled = false,
 }: ExportButtonProps) {
   return (
     <Button
       variant="outline"
+      disabled={disabled}
       onClick={() => exportToCSV(data, header, fileName)}
       className={cn('w-full @lg:w-auto', className)}
     >

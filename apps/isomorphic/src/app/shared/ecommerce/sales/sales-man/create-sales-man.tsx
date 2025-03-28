@@ -3,23 +3,17 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
-import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
 import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
-import UploadZone from '@core/ui/file-upload/upload-zone';
-import {
-  StoreManagerFormInput,
-  storeManagerFormSchema,
-} from '@/validators/create-store-manager.schema';
-import FormGroup from '../../form-group';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
-  DeliveryManagerFormInput,
-  deliveryManagerFormSchema,
-} from '@/validators/create-delivery-manager.schema';
+  SalesmanFormInput,
+  salesmanFormSchema,
+} from '@/validators/create-salesman.schema';
+import FormGroup from '@/app/shared/form-group';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -27,24 +21,24 @@ const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
 });
 
 // main category form component for create and update category
-export default function CreateDeliveryManager({
+export default function CreateSalesMan({
   id,
   initialValue,
   isModalView = true,
 }: {
   id?: string;
   isModalView?: boolean;
-  initialValue?: DeliveryManagerFormInput;
+  initialValue?: SalesmanFormInput;
 }) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
 
-  const onSubmit: SubmitHandler<DeliveryManagerFormInput> = (data) => {
+  const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     // set timeout ony required to display loading state of the create button
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      console.log('create delivery manager data ->', data);
+      console.log('create sales man data ->', data);
       setReset({
         name: '',
         images: '',
@@ -53,8 +47,8 @@ export default function CreateDeliveryManager({
   };
 
   return (
-    <Form<DeliveryManagerFormInput>
-      validationSchema={deliveryManagerFormSchema}
+    <Form<SalesmanFormInput>
+      validationSchema={salesmanFormSchema}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
@@ -134,6 +128,7 @@ export default function CreateDeliveryManager({
                         getValues().password?.length < 8 &&
                         'Your current password must be more than 8 characters'
                       }
+                      value={value}
                       onChange={onChange}
                       error={errors.password?.message}
                     />
@@ -165,7 +160,7 @@ export default function CreateDeliveryManager({
               isLoading={isLoading}
               className="w-full @xl:w-auto"
             >
-              {id ? 'Update' : 'Create'} Delivery Manager
+              {id ? 'Update' : 'Create'} Salesman
             </Button>
           </div>
         </>

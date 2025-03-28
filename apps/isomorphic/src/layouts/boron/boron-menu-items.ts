@@ -150,6 +150,29 @@ export const menuItems = [
   //   icon: PiChatTeardropTextDuotone,
   // },
   {
+    name: 'Sales',
+    href: '#',
+    icon: PiScalesDuotone,
+    dropdownItems: [
+      {
+        name: 'Salesman',
+        href: routes.eCommerce.salesman,
+      },
+      {
+        name: 'Sales History',
+        href: routes.eCommerce.salesHistory,
+      },
+      {
+        name: 'Incentives',
+        href: routes.eCommerce.incentives,
+      },
+      {
+        name: 'Claim Balance History',
+        href: routes.eCommerce.claimBalanceHistory,
+      },
+    ],
+  },
+  {
     name: 'User Management',
     href: '#',
     icon: PiUserListDuotone,
@@ -157,10 +180,6 @@ export const menuItems = [
       {
         name: 'Store Manager',
         href: routes.eCommerce.storeManager,
-      },
-      {
-        name: 'Salesman',
-        href: routes.eCommerce.salesman,
       },
       {
         name: 'Delivery Manager',

@@ -7,32 +7,12 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Title, Tooltip } from 'rizzui';
-// import { CategoryDataType } from './table';
-export interface CategoryDataType {
-  id: string;
-  image: string;
-  icon_image: string;  // Changed from 'icon'
-  name: string;
-  group: string;      // Changed from 'slug'
-  products?: number;
-  description?: string;
-  // Add other API fields as needed
-}
+import { CategoryDataType } from '@/data/product-categories';
+
+
 const columnHelper = createColumnHelper<CategoryDataType>();
 
 export const categoriesColumns = [
-  // columnHelper.display({
-  //   id: 'checked',
-  //   size: 50,
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       aria-label="Select row"
-  //       className="ps-3.5"
-  //       checked={row.getIsSelected()}
-  //       onChange={row.getToggleSelectedHandler()}
-  //     />
-  //   ),
-  // }),
   columnHelper.display({
     id: 'image',
     size: 100,
@@ -83,7 +63,7 @@ export const categoriesColumns = [
   //     <Text className="truncate !text-sm">{row.original.description}</Text>
   //   ),
   // }),
- 
+
   columnHelper.display({
     id: 'products',
     size: 120,

@@ -6,8 +6,13 @@ import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Text, Title, Tooltip } from 'rizzui';
+import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
 import { SalesManDataType } from './table';
+
+const statusColors = {
+  invactive: '',
+  active: 'success',
+} as { [key: string]: string };
 
 const columnHelper = createColumnHelper<SalesManDataType>();
 
@@ -72,7 +77,26 @@ export const salesManColumns = [
     size: 150,
     header: 'Status',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">{row.original.status}</Text>
+      <>
+        {row.original.status === 'inactive' ? (
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-100/80 px-2.5 py-1">
+            <Badge renderAsDot />
+            <span className="text-xs font-semibold text-gray-900">
+              {row.original.status}
+            </span>
+          </div>
+        ) : (
+          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-green-lighter px-2.5 py-1">
+            <Badge
+              renderAsDot
+              color={statusColors[row.original.status] as any}
+            />
+            <span className="text-xs font-semibold text-green-dark">
+              {row.original.status}
+            </span>
+          </div>
+        )}
+      </>
     ),
   }),
 
@@ -86,7 +110,7 @@ export const salesManColumns = [
       },
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
-        <Tooltip content={'Edit sales man'} placement="top" color="invert">
+        <Tooltip content={'Edit Salesman'} placement="top" color="invert">
           <Link href={routes.eCommerce.editSalesMan(row.original.id)}>
             <ActionIcon size="sm" variant="outline">
               <PencilIcon className="h-4 w-4" />
@@ -95,7 +119,7 @@ export const salesManColumns = [
         </Tooltip>
         <DeletePopover
           title={`Delete the Sales man`}
-          description={`Are you sure you want to delete this #${row.original.id} sales man?`}
+          description={`Are you sure you want to delete this #${row.original.id} salesman?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
         />
       </div>

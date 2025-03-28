@@ -1,33 +1,18 @@
 'use client';
 
-import React from 'react';
 import { useSession } from 'next-auth/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { API_ROUTES } from '@/api';
+import { API_ROUTES } from '@/app/lib/api';
+import apiClient from '@/app/lib/apiClient';
 
 export default function usePaginatedCategories() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
 
   const fetchCategories = async (pageParam: number = 1) => {
     let url = `${API_ROUTES.categories}?page=${pageParam}`;
-    try {
-      const res = await fetch(url, {
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${session?.user?.accessToken}`,
-        },
-      });
+    const { data } = await apiClient.get(url);
 
-      if (!res.ok) {
-        throw new Error('Failed to fetch categories');
-      }
-
-      const data = await res.json();
-      console.log('Fetched Categories:', data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching categories:', error);
-    }
+    return data;
   };
 
   return useInfiniteQuery({

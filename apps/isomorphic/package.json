@@ -47,6 +47,7 @@
     "@uploadthing/react": "^7.1.5",
     "@wavesurfer/react": "^1.0.8",
     "ahooks": "^3.8.4",
+    "axios": "^1.8.4",
     "clsx": "^2.1.1",
     "core": "workspace:*",
     "date-arithmetic": "^4.1.0",

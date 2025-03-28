@@ -34,7 +34,7 @@ export default function CategoryTable() {
 
   console.log('dataaaa >>>>>>>>', data);
 
-  const categories = data?.pages?.flatMap((page: any) => page?.results) || [];
+  const categories = data?.pages?.flatMap((page: any) => page?.data) || [];
   const { table, setData } = useTanStackTable<CategoryDataType | any>({
     tableData: categories,
     columnConfig: categoriesColumns,

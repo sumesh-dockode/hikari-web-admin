@@ -48,6 +48,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'isomorphic-furyroad.vercel.app',
       },
+      {
+        protocol: 'https',
+        hostname: 'minglerqa.padichalo.com',
+      },
     ],
   },
   reactStrictMode: true,

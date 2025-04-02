@@ -64,12 +64,12 @@ export const categoriesColumns = [
   //   ),
   // }),
 
-  columnHelper.display({
-    id: 'products',
-    size: 120,
-    header: 'Products',
-    cell: ({ row }) => <div className="ps-6">{row.original.products}</div>,
-  }),
+  // columnHelper.display({
+  //   id: 'products',
+  //   size: 120,
+  //   header: 'Products',
+  //   cell: ({ row }) => <div className="ps-6">{row.original.products}</div>,
+  // }),
   columnHelper.display({
     id: 'action',
     size: 100,
@@ -79,8 +79,8 @@ export const categoriesColumns = [
         options: { meta },
       },
     }) => (
-      <div className="flex items-center justify-end gap-3 pe-4">
-        <Tooltip content={'Edit Category'} placement="top" color="invert">
+          <div className="flex items-center justify-end gap-3 pe-4">
+      <Tooltip content={'Edit Category'} placement="top" color="invert">
           <Link href={routes.eCommerce.editCategory(row.original.id)}>
             <ActionIcon size="sm" variant="outline">
               <PencilIcon className="h-4 w-4" />

@@ -1,10 +1,8 @@
 export interface CategoryDataType {
   id: string;
-  image: string;
+  image: any|null;
   name: string;
-  products: number;
-  icon_image: string;
-  is_deleted: string;
-  group: string;
-  parent?: string;
+  icon_image: any|null;
+  parent?: string|null;
+  is_deleted?: any|null;
 }

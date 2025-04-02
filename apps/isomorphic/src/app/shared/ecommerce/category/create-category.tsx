@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { SubmitHandler, Controller } from 'react-hook-form';
+import { SubmitHandler, Controller, useForm } from 'react-hook-form';
 import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
 import { Button, Input, Select, Text, Title } from 'rizzui';
@@ -18,6 +18,8 @@ import { useCategoryById } from '@/hooks/categories/useCategoryById';
 import { CategoryDataType } from '@/data/product-categories';
 import { useUpdateCategory } from '@/hooks/categories/useUpdateCategory';
 import toast from 'react-hot-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -88,6 +90,22 @@ export default function CreateCategory({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateCategory();
+  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
+  const form = useForm<CategoryFormInput>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: category || {},
+  });
+
+useEffect(()=>{
+  console.log("dataiiiiiiiiiiiiiii", data);
+  
+  if (data?.status === "success"){
+    Object.entries(data.data).forEach(([key, value]) => {
+      form.setValue(key as keyof CategoryFormInput, value as string);
+    });
+  }
+},[data])
+
   const onSubmit: SubmitHandler<CategoryFormInput> = (formData) => {
     console.log('formData', formData);
 
@@ -133,7 +151,7 @@ export default function CreateCategory({
     }
   }, [createStatus, updateStatus]);
   
-  
+
 
   return (
     <Form<CategoryFormInput>
@@ -205,9 +223,6 @@ export default function CreateCategory({
                 isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
               )}
             >
-              <Button variant="outline" className="w-full @xl:w-auto">
-                Save as Draft
-              </Button>
               <Button
                 type="submit"
                 isLoading={isLoading}

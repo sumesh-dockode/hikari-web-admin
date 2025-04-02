@@ -9,6 +9,7 @@ import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { useEffect } from 'react';
 import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
+import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 
 
 export default function CategoryTable() {
@@ -24,6 +25,7 @@ export default function CategoryTable() {
 
   console.log('dataaaa >>>>>>>>', data);
 
+  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
   const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
   console.log("categoriesData", categoriesAPIData);
   
@@ -39,7 +41,11 @@ export default function CategoryTable() {
       },
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          deleteCategory(row.id, {
+            onSuccess: () => {
+              setData((prev) => prev.filter((r) => r.id !== row.id));
+            },
+          });
         },
         handleMultipleDelete: (rows) => {
           setData((prev) => prev.filter((r) => !rows.includes(r)));
@@ -70,6 +76,7 @@ export default function CategoryTable() {
           container: 'border border-muted rounded-md',
           rowClassName: 'last:border-0',
         }}
+        
       />
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />

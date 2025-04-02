@@ -15,8 +15,8 @@ export function useUpdateCategory() {
     categoryData: CategoryDataType,
   ): Promise<CategoryDataType> => {
     if (!session) throw new Error("Session not found");
-    let url = `${API_ROUTES.categories}${categoryData.id}/`;
-      const { data } = await apiClient.get(url);
+    let url = `${API_ROUTES.categories}${categoryData.id}`;
+      const { data } = await apiClient.patch(url, categoryData);
 
 console.log("data", data);
 

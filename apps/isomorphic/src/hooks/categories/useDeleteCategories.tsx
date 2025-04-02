@@ -12,10 +12,8 @@ export function useDeleteCategory() {
 
 
     if (!session) throw new Error("Session not found");
-    let url = `${API_ROUTES.categories}${categoryId}/`;
-      const { data } = await apiClient.get(url);
-
-
+    let url = `${API_ROUTES.categories}${categoryId}`;
+      const { data } = await apiClient.delete(url);
     return data;
   };
 

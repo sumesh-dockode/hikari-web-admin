@@ -49,10 +49,13 @@ export default function CategoryTable() {
     },
   });
   useEffect(() => {
+    console.log("<<<<<<<<");
+    const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+
     if (categoriesAPIData.length > 0) {
       setData(categoriesAPIData);
     }
-  }, [categoriesAPIData]);
+  }, [data]);
 
   if (isLoading) {
     return <div>Loading...</div>;

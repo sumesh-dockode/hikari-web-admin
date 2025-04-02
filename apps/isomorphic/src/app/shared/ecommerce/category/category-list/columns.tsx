@@ -8,7 +8,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Title, Tooltip } from 'rizzui';
 import { CategoryDataType } from '@/data/product-categories';
-
+import fallback from "../../../../../../public/fallback.png"
 
 const columnHelper = createColumnHelper<CategoryDataType>();
 
@@ -21,7 +21,7 @@ export const categoriesColumns = [
       <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
         <Image
           alt={row.original.name}
-          src={row.original.image}
+          src={row.original.image||fallback}
           fill
           sizes="(max-width: 768px) 100vw"
           className="object-cover"
@@ -36,7 +36,7 @@ export const categoriesColumns = [
     cell: ({ row }) => (
       <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
         <Image
-          src={row.original.icon_image}
+          src={row.original.icon_image||fallback}
           alt={row.original.name}
           width={24}
           height={24}
@@ -55,21 +55,7 @@ export const categoriesColumns = [
       </Title>
     ),
   }),
-  // columnHelper.display({
-  //   id: 'description',
-  //   size: 250,
-  //   header: 'Description',
-  //   cell: ({ row }) => (
-  //     <Text className="truncate !text-sm">{row.original.description}</Text>
-  //   ),
-  // }),
 
-  // columnHelper.display({
-  //   id: 'products',
-  //   size: 120,
-  //   header: 'Products',
-  //   cell: ({ row }) => <div className="ps-6">{row.original.products}</div>,
-  // }),
   columnHelper.display({
     id: 'action',
     size: 100,

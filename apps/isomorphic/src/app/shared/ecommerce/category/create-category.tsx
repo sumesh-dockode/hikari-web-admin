@@ -194,6 +194,7 @@ export default function CreateCategory({
                     setValue={setValue}
                     className="col-span-full"
                   />
+                  
                 </HorizontalFormBlockWrapper>
               </div>
             </div>

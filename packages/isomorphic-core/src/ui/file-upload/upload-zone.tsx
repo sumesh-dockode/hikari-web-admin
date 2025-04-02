@@ -28,6 +28,7 @@ interface FileType {
 
 export default function UploadZone({ label, name, className, error, getValues, setValue }: UploadZoneProps) {
   const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
+console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
 
   useEffect(() => {
     setValue(name, files);
@@ -101,6 +102,8 @@ export default function UploadZone({ label, name, className, error, getValues, s
 
 function MediaPreview({ name, url }: { name: string; url: string }) {
   if (!url) return null;
+  console.log("url9999999999",url);
+  
   return name.endsWith(".pdf") ? (
     <object data={url} type="application/pdf" width="100%" height="100%">
       <p>
@@ -108,7 +111,7 @@ function MediaPreview({ name, url }: { name: string; url: string }) {
       </p>
     </object>
   ) : (
-    <Image fill src={url} alt={name} className="rounded-md object-contain" />
+    <Image fill src={url || ""} alt={name} className="rounded-md object-contain" />
   );
 }
 

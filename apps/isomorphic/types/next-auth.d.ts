@@ -5,15 +5,16 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
-      // currentTeamId: string | null;
+      accessToken: string; // Include access token
+      refreshToken: string; // Include refresh token
     } & DefaultSession['user'];
   }
 }
 
 declare module 'next-auth/jwt' {
-  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
   interface JWT {
-    /** OpenID ID Token */
     idToken?: string;
+    accessToken?: string; // Include access token
+    refreshToken?: string; // Include refresh token
   }
 }

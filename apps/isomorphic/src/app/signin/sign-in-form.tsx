@@ -11,8 +11,8 @@ import { routes } from '@/config/routes';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
 
 const initialValues: LoginSchema = {
-  username: 'admin',
-  password: 'admin',
+  username: '',
+  password: '',
   rememberMe: true,
 };
 

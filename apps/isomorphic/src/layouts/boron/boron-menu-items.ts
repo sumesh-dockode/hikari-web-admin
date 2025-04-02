@@ -163,8 +163,8 @@ export const menuItems = [
         href: routes.eCommerce.salesHistory,
       },
       {
-        name: 'Incentive',
-        href: routes.eCommerce.incentive,
+        name: 'Incentives',
+        href: routes.eCommerce.incentives,
       },
       {
         name: 'Claim Balance History',

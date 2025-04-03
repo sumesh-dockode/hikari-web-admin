@@ -91,17 +91,13 @@ export const authOptions: NextAuthOptions = {
             body: requestBody,
           });
 
-          console.log('res', res);
-          
           if (!res.ok) {
             throw new Error('Invalid credentials');
           }
 
           const responseData = (await res.json()) as AuthResponse;
-          console.log('responseData', responseData);
           if (responseData.status === 'success') {
             const authResponse = responseData.data;
-            console.log('authResponse', authResponse);
 
             return {
               id: authResponse.user.id,

@@ -10,7 +10,6 @@ const apiClient = axios.create({
   },
 });
 
-// 🔹 Request Interceptor: Attach Token Automatically
 apiClient.interceptors.request.use(
   async (config) => {
     const session = await getSession(); // Get session from next-auth

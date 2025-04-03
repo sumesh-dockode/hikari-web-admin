@@ -104,7 +104,7 @@ export default function AvatarUpload({
               )}
             >
               {isUploading ? (
-                <LoadingSpinner />
+                <LoadingSpinner/>
               ) : (
                 <PiPencilSimple className="h-5 w-5 text-white" />
               )}

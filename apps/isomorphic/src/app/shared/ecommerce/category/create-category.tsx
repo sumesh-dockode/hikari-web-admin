@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import { SubmitHandler, Controller } from 'react-hook-form';
+import { SubmitHandler, Controller, useForm } from 'react-hook-form';
 import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
 import { Button, Input, Select, Text, Title } from 'rizzui';
@@ -13,13 +13,18 @@ import {
   categoryFormSchema,
 } from '@/validators/create-category.schema';
 import UploadZone from '@core/ui/file-upload/upload-zone';
-
+import { useCreateCategories } from '@/hooks/categories/useCreateCategories';
+import { useCategoryById } from '@/hooks/categories/useCategoryById';
+import { CategoryDataType } from '@/data/product-categories';
+import { useUpdateCategory } from '@/hooks/categories/useUpdateCategory';
+import toast from 'react-hot-toast';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
-
 
 // a reusable form wrapper component
 function HorizontalFormBlockWrapper({
@@ -61,36 +66,92 @@ function HorizontalFormBlockWrapper({
     </div>
   );
 }
-
-// main category form component for create and update category
 export default function CreateCategory({
   id,
+  categoryId,
   category,
   isModalView = true,
 }: {
   id?: string;
+  categoryId?: string;
   isModalView?: boolean;
   category?: CategoryFormInput;
 }) {
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const { data, isFetching, status } = useCategoryById(categoryId);
+  const {
+    mutate: createCategories,
+    data: categoryData,
+    status: createStatus,
+  } = useCreateCategories();
+  const {
+    mutate: updateCategory,
+    data: updateResponseData,
+    status: updateStatus,
+  } = useUpdateCategory();
+  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
+  const form = useForm<CategoryFormInput>({
+    resolver: zodResolver(categoryFormSchema),
+    defaultValues: category || {},
+  });
 
-  const onSubmit: SubmitHandler<CategoryFormInput> = (data) => {
-    // set timeout ony required to display loading state of the create category button
+useEffect(()=>{
+  console.log("dataiiiiiiiiiiiiiii", data);
+  
+  if (data?.status === "success"){
+    Object.entries(data.data).forEach(([key, value]) => {
+      form.setValue(key as keyof CategoryFormInput, value as string);
+    });
+  }
+},[data])
+
+  const onSubmit: SubmitHandler<CategoryFormInput> = (formData) => {
+    console.log('formData', formData);
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('createCategory data ->', data);
-      setReset({
-        name: '',
-        slug: '',
-        type: '',
-        parentCategory: '',
-        description: '',
-        images: '',
-      });
-    }, 600);
+
+    const categoryData: CategoryDataType = {
+      id: categoryId || '',
+      name: formData.name || '',
+      image: formData.image?.[0]?.url || null,
+      icon_image: formData.icon_image?.[0]?.url || null,
+      parent: formData.parent || '',
+      // is_deleted: formData.is_deleted || '',
+    };
+
+  if (categoryId) {
+    updateCategory(categoryData);
+  } else {
+    createCategories(categoryData);
+  }
   };
+  useEffect(() => {
+    if (createStatus === "pending" || updateStatus === "pending") return;
+  
+    if ((createStatus === "success" && categoryData) || (updateStatus === "success" && updateResponseData)) {
+      toast.success(categoryId ? "Category updated successfully" : "Category created successfully");
+  
+      setReset({
+        id: '',
+        name: '',
+        image: null,
+        icon_image: null,
+        products: 0,
+        is_deleted: 'false',
+        group: '',
+        parent: '',
+      });
+  
+      setLoading(false);
+    } else if (createStatus === "error" || updateStatus === "error") {
+      toast.error("Category creation failed");
+      
+      setLoading(false);
+    }
+  }, [createStatus, updateStatus]);
+  
+
 
   return (
     <Form<CategoryFormInput>
@@ -103,75 +164,76 @@ export default function CreateCategory({
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
-      {({ register, control, getValues, setValue, formState: { errors } }) => (
-        <>
-          <div className="flex-grow pb-10">
+      {({ register, control, getValues, setValue, formState: { errors } }) => {
+        console.log("errors", errors);
+        return (
+          <>
+            <div className="flex-grow pb-10">
+              <div
+                className={cn(
+                  'grid grid-cols-1',
+                  isModalView
+                    ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
+                    : 'gap-5'
+                )}
+              >
+                <HorizontalFormBlockWrapper
+                  title={'Add new category:'}
+                  description={'Edit your category information from here'}
+                  isModalView={isModalView}
+                >
+                  <Input
+                    label="Category Name"
+                    placeholder="category name"
+                    {...register('name')}
+                    error={errors.name?.message}
+                  />
+                </HorizontalFormBlockWrapper>
+                <HorizontalFormBlockWrapper
+                  title="Upload new thumbnail image"
+                  description="Upload your product image gallery here"
+                  isModalView={isModalView}
+                >
+                  <UploadZone
+                    name="image"
+                    getValues={getValues}
+                    setValue={setValue}
+                    className="col-span-full"
+                  />
+                </HorizontalFormBlockWrapper>
+                <HorizontalFormBlockWrapper
+                  title="Upload new  icon"
+                  description="Upload your product icon here"
+                  isModalView={isModalView}
+                >
+                  <UploadZone
+                    name="icon_image"
+                    getValues={getValues}
+                    setValue={setValue}
+                    className="col-span-full"
+                  />
+                  
+                </HorizontalFormBlockWrapper>
+              </div>
+            </div>
+
             <div
               className={cn(
-                'grid grid-cols-1',
-                isModalView
-                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
-                  : 'gap-5'
+                'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col',
+                isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
               )}
             >
-              <HorizontalFormBlockWrapper
-                title={'Add new category:'}
-                description={'Edit your category information from here'}
-                isModalView={isModalView}
+              <Button
+                type="submit"
+                isLoading={isLoading}
+                className="w-full @xl:w-auto"
               >
-                <Input
-                  label="Category Name"
-                  placeholder="category name"
-                  {...register('name')}
-                  error={errors.name?.message}
-                />
-              </HorizontalFormBlockWrapper>
-              <HorizontalFormBlockWrapper
-                title="Upload new thumbnail image"
-                description="Upload your product image gallery here"
-                isModalView={isModalView}
-              >
-                <UploadZone
-                  name="images"
-                  getValues={getValues}
-                  setValue={setValue}
-                  className="col-span-full"
-                />
-              </HorizontalFormBlockWrapper>
-              <HorizontalFormBlockWrapper
-                title="Upload new  icon"
-                description="Upload your product icon here"
-                isModalView={isModalView}
-              >
-                <UploadZone
-                  name="icons"
-                  getValues={getValues}
-                  setValue={setValue}
-                  className="col-span-full"
-                />
-              </HorizontalFormBlockWrapper>
+                {id ? 'Update' : 'Create'} Category
+              </Button>
             </div>
-          </div>
-
-          <div
-            className={cn(
-              'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col',
-              isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
-            )}
-          >
-            <Button variant="outline" className="w-full @xl:w-auto">
-              Save as Draft
-            </Button>
-            <Button
-              type="submit"
-              isLoading={isLoading}
-              className="w-full @xl:w-auto"
-            >
-              {id ? 'Update' : 'Create'} Category
-            </Button>
-          </div>
-        </>
-      )}
+          </>
+        );
+      }}
     </Form>
   );
 }

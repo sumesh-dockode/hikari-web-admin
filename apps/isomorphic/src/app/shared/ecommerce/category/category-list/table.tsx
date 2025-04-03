@@ -1,6 +1,6 @@
 'use client';
 
-import { categories } from '@/data/product-categories';
+import {  CategoryDataType } from '@/data/product-categories';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import { categoriesColumns } from './columns';
@@ -8,18 +8,9 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { useEffect } from 'react';
-import usePaginatedCategories from '@/hooks/usePaginatedCategories';
+import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
+import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 
-export interface CategoryDataType {
-  id: string;
-  image: string;
-  name: string;
-  products: number;
-  icon_component: string;
-  is_deleted: string;
-  group: string;
-  parent?: string;
-}
 
 export default function CategoryTable() {
   const {
@@ -34,9 +25,12 @@ export default function CategoryTable() {
 
   console.log('dataaaa >>>>>>>>', data);
 
-  const categories = data?.pages?.flatMap((page: any) => page?.data) || [];
+  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
+  const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+  console.log("categoriesData", categoriesAPIData);
+  
   const { table, setData } = useTanStackTable<CategoryDataType | any>({
-    tableData: categories,
+    tableData: categoriesAPIData,
     columnConfig: categoriesColumns,
     options: {
       initialState: {
@@ -47,7 +41,11 @@ export default function CategoryTable() {
       },
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          deleteCategory(row.id, {
+            onSuccess: () => {
+              setData((prev) => prev.filter((r) => r.id !== row.id));
+            },
+          });
         },
         handleMultipleDelete: (rows) => {
           setData((prev) => prev.filter((r) => !rows.includes(r)));
@@ -57,10 +55,14 @@ export default function CategoryTable() {
     },
   });
   useEffect(() => {
-    if (categories.length > 0) {
-      setData(categories);
+    console.log("<<<<<<<<");
+    const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+
+    if (categoriesAPIData.length > 0) {
+      setData(categoriesAPIData);
     }
-  }, [categories]);
+  }, [data]);
+
   if (isLoading) {
     return <div>Loading...</div>;
   }
@@ -74,6 +76,7 @@ export default function CategoryTable() {
           container: 'border border-muted rounded-md',
           rowClassName: 'last:border-0',
         }}
+        
       />
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />

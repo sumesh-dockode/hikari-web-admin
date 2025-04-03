@@ -1,6 +1,6 @@
 'use client';
 
-import { categories } from '@/data/product-categories';
+
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TableFooter from '@core/components/table/footer';

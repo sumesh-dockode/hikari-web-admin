@@ -1,7 +1,10 @@
 import { routes } from '@/config/routes';
 import CategoryTable from '@/app/shared/ecommerce/category/category-list/table';
-import CategoryPageHeader from './category-page-header';
 import { metaObject } from '@/config/site.config';
+import PageHeader from '@/app/shared/page-header';
+import Link from 'next/link';
+import { Button } from 'rizzui/button';
+import { PiPlusBold } from 'react-icons/pi';
 
 export const metadata = {
   ...metaObject('Categories'),
@@ -27,10 +30,21 @@ const pageHeader = {
 export default function CategoriesPage() {
   return (
     <>
-      <CategoryPageHeader
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
+        <Link
+          href={routes.eCommerce.createCategory}
+          className="w-full @lg:w-auto"
+        >
+          <Button as="span" className="w-full @lg:w-auto">
+            <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
+            Add Category
+          </Button>
+        </Link>
+      </PageHeader>
+      {/* <CategoryPageHeader
         title={pageHeader.title}
         breadcrumb={pageHeader.breadcrumb}
-      />
+      /> */}
       <CategoryTable />
     </>
   );

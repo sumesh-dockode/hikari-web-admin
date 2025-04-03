@@ -4,25 +4,20 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
 import prettyBytes from "pretty-bytes";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useDropzone } from "@uploadthing/react";
-import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from "react-icons/pi";
-import { generateClientDropzoneAccept } from "uploadthing/client";
-import { useUploadThing } from "../../utils/uploadthing";
+import { useCallback, useEffect, useState } from "react";
+import { useDropzone, Accept } from "react-dropzone";
+import { PiTrashBold } from "react-icons/pi";
 import { Button, Text, FieldError } from "rizzui";
 import cn from "../../utils/class-names";
 import UploadIcon from "../../components/shape/upload";
-import { endsWith } from "lodash";
-import { FileWithPath } from "react-dropzone";
-import { ClientUploadedFileData } from "uploadthing/types";
 
 interface UploadZoneProps {
   label?: string;
   name: string;
-  getValues: any;
-  setValue: any;
   className?: string;
   error?: string;
+  getValues: any;
+  setValue: any;
 }
 
 interface FileType {
@@ -31,248 +26,92 @@ interface FileType {
   size: number;
 }
 
-export default function UploadZone({
-  label,
-  name,
-  className,
-  getValues,
-  setValue,
-  error,
-}: UploadZoneProps) {
-  const [files, setFiles] = useState<File[]>([]);
+export default function UploadZone({ label, name, className, error, getValues, setValue }: UploadZoneProps) {
+  const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
+console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
 
-  const onDrop = useCallback(
-    (acceptedFiles: FileWithPath[]) => {
-      console.log("acceptedFiles", acceptedFiles);
-      setFiles([
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        ),
-      ]);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [files]
-  );
+  useEffect(() => {
+    setValue(name, files);
+  }, [files, name, setValue]);
+
+  const convertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const newFiles = await Promise.all(
+      acceptedFiles.map(async (file) => ({
+        name: file.name,
+        size: file.size,
+        url: await convertToBase64(file),
+      }))
+    );
+    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+  }, []);
 
   function handleRemoveFile(index: number) {
-    // Make a copy of the files array
-    const updatedFiles = [...files];
-
-    // Remove the file at the specified index
-    updatedFiles.splice(index, 1);
-
-    // Update the state
-    setFiles(updatedFiles);
+    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
   }
-
-  const uploadedItems = useMemo(
-    () => (isEmpty(getValues(name)) ? [] : getValues(name)),
-    [getValues, name]
-  );
-
-  const notUploadedItems = useMemo(
-    () =>
-      files.filter(
-        (file) =>
-          !uploadedItems?.some(
-            (uploadedFile: FileType) => uploadedFile.name === file.name
-          )
-      ),
-    [files, uploadedItems]
-  );
-
-  const { startUpload, routeConfig, isUploading } = useUploadThing(
-    "generalMedia",
-    {
-      onClientUploadComplete: (
-        res: ClientUploadedFileData<any>[] | undefined
-      ) => {
-        console.log("res", res);
-        if (setValue) {
-          // const respondedUrls = res?.map((r) => r.url);
-          setFiles([]);
-          const respondedUrls = res?.map((r) => ({
-            name: r.name,
-            size: r.size,
-            url: r.url,
-          }));
-          setValue(name, respondedUrls);
-        }
-        toast.success(
-          <Text as="b" className="font-semibold">
-            portfolio Images updated
-          </Text>
-        );
-      },
-      onUploadError: (error: Error) => {
-        console.error(error);
-        toast.error(error.message);
-      },
-    }
-  );
-
-  const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept: { "image/*": [], "application/pdf": [] } as Accept,
   });
 
   return (
     <div className={cn("grid @container", className)}>
-      {label && (
-        <span className="mb-1.5 block font-semibold text-gray-900">
-          {label}
-        </span>
-      )}
-      <div
-        className={cn(
-          "rounded-md border-[1.8px]",
-          !isEmpty(files) &&
-            "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
-        )}
-      >
+      {label && <span className="mb-1.5 block font-semibold text-gray-900">{label}</span>}
+      <div className="rounded-md border-[1.8px]">
         <div
           {...getRootProps()}
-          className={cn(
-            "flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300",
-            isEmpty(files)
-              ? "justify-center"
-              : "flex-grow justify-center @xl:justify-start"
-          )}
+          className="flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300 justify-center"
         >
           <input {...getInputProps()} />
           <UploadIcon className="h-12 w-12" />
           <Text className="text-base font-medium">Drop or select file</Text>
         </div>
-
-        {!isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
-
-        {isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
-
-        {!isEmpty(files) && isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={files}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(files)}
-          />
-        )}
       </div>
-
-      {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
+      {!isEmpty(files) && (
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {uploadedItems.map((file: any, index: number) => (
-            <div key={index} className={cn("relative")}>
+          {files.map((file, index) => (
+            <div key={index} className="relative">
               <figure className="group relative h-40 rounded-md bg-gray-50">
                 <MediaPreview name={file.name} url={file.url} />
                 <button
                   type="button"
-                  className="absolute right-0 top-0 rounded-full bg-gray-700 p-1.5 transition duration-300"
+                  onClick={() => handleRemoveFile(index)}
+                  className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
                 >
-                  <PiCheckBold className="text-white" />
+                  <PiTrashBold className="text-white" />
                 </button>
               </figure>
               <MediaCaption name={file.name} size={file.size} />
             </div>
           ))}
-          {notUploadedItems.map((file: any, index: number) => (
-            <div key={index} className={cn("relative")}>
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview name={file.name} url={file.preview} />
-                {isUploading ? (
-                  <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
-                    <LoadingSpinner />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveFile(index)}
-                    className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
-                  >
-                    <PiTrashBold className="text-white" />
-                  </button>
-                )}
-              </figure>
-              <MediaCaption name={file.path} size={file.size} />
-            </div>
-          ))}
         </div>
       )}
-
       {error && <FieldError error={error} />}
     </div>
   );
 }
 
-function UploadButtons({
-  files,
-  onClear,
-  onUpload,
-  isLoading,
-}: {
-  files: any[];
-  isLoading: boolean;
-  onClear: () => void;
-  onUpload: () => void;
-}) {
-  return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-4 px-6 pb-5 @sm:flex-nowrap @xl:w-auto @xl:justify-end @xl:px-0 @xl:pb-0">
-      <Button
-        variant="outline"
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onClear}
-      >
-        <PiTrashBold />
-        Clear {files.length} files
-      </Button>
-      <Button
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onUpload}
-      >
-        <PiUploadSimpleBold /> Upload {files.length} files
-      </Button>
-    </div>
-  );
-}
-
 function MediaPreview({ name, url }: { name: string; url: string }) {
-  return endsWith(name, ".pdf") ? (
-    <object
-      data={url}
-      type="application/pdf"
-      width="100%"
-      height="100%"
-    >
+  if (!url) return null;
+  console.log("url9999999999",url);
+  
+  return name.endsWith(".pdf") ? (
+    <object data={url} type="application/pdf" width="100%" height="100%">
       <p>
         Alternative text - include a link <a href={url}>to the PDF!</a>
       </p>
     </object>
   ) : (
-    <Image
-      fill
-      src={url}
-      alt={name}
-      className="transform rounded-md object-contain"
-    />
+    <Image fill src={url || ""} alt={name} className="rounded-md object-contain" />
   );
 }
 
@@ -284,7 +123,6 @@ function MediaCaption({ name, size }: { name: string; size: number }) {
     </div>
   );
 }
-
 export function LoadingSpinner() {
   return (
     <svg
@@ -357,3 +195,4 @@ export function LoadingSpinner() {
     </svg>
   );
 }
+

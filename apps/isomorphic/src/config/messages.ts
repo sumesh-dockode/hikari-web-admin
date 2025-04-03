@@ -36,6 +36,8 @@ export const messages = {
   cardExpireIsRequired: 'Expire Date is required',
   cvcNumberIsRequired: 'CVC Number is required',
   catNameIsRequired: 'Category name is required',
+  catGroupIsRequired: 'Category group is required',
+  catParentIsRequired: 'Category parent is required',
   bookingNameIsRequired: 'Booking name is required',
   slugIsRequired: 'Slug is required',
   addressIsRequired: 'Address is required',

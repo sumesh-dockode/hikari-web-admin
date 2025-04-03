@@ -84,42 +84,13 @@ export const menuItems = [
   // label end
   {
     name: 'Products',
-    href: '#',
+    href: routes.eCommerce.products,
     icon: PiArmchairDuotone,
-    dropdownItems: [
-      { name: 'Products', href: routes.eCommerce.products },
-      {
-        name: 'Product Details',
-        href: routes.eCommerce.productDetails(DUMMY_ID),
-      },
-      {
-        name: 'Create Product',
-        href: routes.eCommerce.createProduct,
-      },
-      {
-        name: 'Edit Product',
-        href: routes.eCommerce.ediProduct(DUMMY_ID),
-      },
-    ],
   },
   {
     name: 'Categories',
-    href: '#',
+    href: routes.eCommerce.categories,
     icon: PiFolderDuotone,
-    dropdownItems: [
-      {
-        name: 'Categories',
-        href: routes.eCommerce.categories,
-      },
-      {
-        name: 'Create Category',
-        href: routes.eCommerce.createCategory,
-      },
-      {
-        name: 'Edit Category',
-        href: routes.eCommerce.editCategory(DUMMY_ID),
-      },
-    ],
   },
   {
     name: 'Orders',
@@ -192,32 +163,10 @@ export const menuItems = [
     href: routes.eCommerce.promotion,
     icon: MdOutlineLocalOffer,
   },
-
-  {
-    name: 'Shop',
-    href: routes.eCommerce.shop,
-    icon: PiShoppingBagDuotone,
-  },
   {
     name: 'Service Booking',
     href: routes.eCommerce.servicebooking,
     icon: MdMiscellaneousServices,
-  },
-  {
-    name: 'Cart',
-    href: routes.eCommerce.cart,
-    icon: PiShoppingCartDuotone,
-  },
-  {
-    name: 'Checkout & Payment',
-    href: routes.eCommerce.checkout,
-    icon: PiContactlessPaymentDuotone,
-  },
-
-  {
-    name: 'Profile',
-    href: routes.profile,
-    icon: PiUserCircleDuotone,
   },
 
   // label start

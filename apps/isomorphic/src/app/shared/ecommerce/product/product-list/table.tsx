@@ -11,6 +11,7 @@ import TableFooter from '@core/components/table/footer';
 import { TableClassNameProps } from '@core/components/table/table-types';
 import cn from '@core/utils/class-names';
 import { exportToCSV } from '@core/utils/export-to-csv';
+import { useEffect } from 'react';
 
 export default function ProductsTable({
   pageSize = 5,

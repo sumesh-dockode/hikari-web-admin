@@ -114,23 +114,6 @@ export const productsListColumns = [
             </ActionIcon>
           </Link>
         </Tooltip>
-        <Tooltip
-          size="sm"
-          content={'View Product'}
-          placement="top"
-          color="invert"
-        >
-          <Link href={routes.eCommerce.productDetails(row.original.id)}>
-            <ActionIcon
-              as="span"
-              size="sm"
-              variant="outline"
-              aria-label={'View Product'}
-            >
-              <EyeIcon className="h-4 w-4" />
-            </ActionIcon>
-          </Link>
-        </Tooltip>
         <DeletePopover
           title={`Delete the product`}
           description={`Are you sure you want to delete this #${row.original.id} product?`}

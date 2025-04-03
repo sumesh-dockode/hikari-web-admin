@@ -94,18 +94,8 @@ export const menuItems = [
   },
   {
     name: 'Orders',
-    href: '#',
+    href: routes.eCommerce.orders,
     icon: PiPackageDuotone,
-    dropdownItems: [
-      {
-        name: 'Orders',
-        href: routes.eCommerce.orders,
-      },
-      {
-        name: 'Order Details',
-        href: routes.eCommerce.orderDetails(DUMMY_ID),
-      },
-    ],
   },
   // {
   //   name: 'Reviews',

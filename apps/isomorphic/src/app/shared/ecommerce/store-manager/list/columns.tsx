@@ -56,6 +56,16 @@ export const storeManagerColumns = [
       </Title>
     ),
   }),
+  columnHelper.accessor('store_name', {
+    id: 'store_name',
+    size: 200,
+    header: 'Store Name',
+    cell: ({ getValue }) => (
+      <Title as="h6" className="!text-sm font-medium">
+        {getValue()}
+      </Title>
+    ),
+  }),
   columnHelper.accessor('email', {
     id: 'email',
     size: 150,

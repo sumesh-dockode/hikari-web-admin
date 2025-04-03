@@ -27,18 +27,18 @@ export const menuItems = [
     label: 'Pricing & Inventory',
     value: formParts.pricingInventory,
   },
-  {
-    label: 'Product Identifiers & Custom Fields',
-    value: formParts.productIdentifiers,
-  },
+  // {
+  //   label: 'Product Identifiers & Custom Fields',
+  //   value: formParts.productIdentifiers,
+  // },
   {
     label: 'Shipping',
     value: formParts.shipping,
   },
-  {
-    label: 'SEO',
-    value: formParts.seo,
-  },
+  // {
+  //   label: 'SEO',
+  //   value: formParts.seo,
+  // },
   {
     label: 'Variant Options',
     value: formParts.variantOptions,

@@ -11,7 +11,7 @@ import RepeatCustomerRate from '@/app/shared/ecommerce/dashboard/repeat-customer
 import UserLocation from '@/app/shared/ecommerce/dashboard/user-location';
 import PromotionalSales from '@/app/shared/ecommerce/dashboard/promotional-sales';
 import RecentOrder from '@/app/shared/ecommerce/dashboard/recent-order';
-import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
+// import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
 import { PiPlusBold } from 'react-icons/pi';
 import welcomeImg from '@public/shop-illustration.png';
 import HandWaveIcon from '@core/components/icons/hand-wave';

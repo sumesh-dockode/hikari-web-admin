@@ -90,7 +90,7 @@ export default function CreateCategory({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateCategory();
-  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
+ 
   const form = useForm<CategoryFormInput>({
     resolver: zodResolver(categoryFormSchema),
     defaultValues: category || {},

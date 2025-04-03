@@ -14,12 +14,12 @@ import ProductSummary from '@/app/shared/ecommerce/product/create-edit/product-s
 import { defaultValues } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 import ProductMedia from '@/app/shared/ecommerce/product/create-edit/product-media';
 import PricingInventory from '@/app/shared/ecommerce/product/create-edit/pricing-inventory';
-import ProductIdentifiers from '@/app/shared/ecommerce/product/create-edit/product-identifiers';
+// import ProductIdentifiers from '@/app/shared/ecommerce/product/create-edit/product-identifiers';
 import ShippingInfo from '@/app/shared/ecommerce/product/create-edit/shipping-info';
-import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
-import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
-import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
-import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
+// import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
+// import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
+// import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
+// import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
 import similiarProducts from '@/app/shared/ecommerce/product/create-edit/similiar-products';
 import FormFooter from '@core/components/form-footer';
 import {
@@ -28,17 +28,18 @@ import {
 } from '@/validators/create-product.schema';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
+import { useCreateProducts } from '@/hooks/products/useCreateProducts';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
   [formParts.media]: ProductMedia,
   [formParts.pricingInventory]: PricingInventory,
-  [formParts.productIdentifiers]: ProductIdentifiers,
+  // [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
-  [formParts.seo]: ProductSeo,
-  [formParts.deliveryEvent]: DeliveryEvent,
-  [formParts.variantOptions]: ProductVariants,
-  [formParts.tagsAndCategory]: ProductTaxonomies,
+  // [formParts.seo]: ProductSeo,
+  // [formParts.deliveryEvent]: DeliveryEvent,
+  // [formParts.variantOptions]: ProductVariants,
+  // [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.similiarProducts]: similiarProducts,
 };
 
@@ -55,6 +56,12 @@ export default function CreateEditProduct({
 }: IndexProps) {
   const { layout } = useLayout();
   const [isLoading, setLoading] = useState(false);
+  const {
+    mutate: createProducts,
+    data: productData,
+    status: createStatus,
+  } = useCreateProducts();
+
   const methods = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
     defaultValues: defaultValues(product),

@@ -34,11 +34,11 @@ export default function ProductsPage() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <div className="mt-4 flex items-center gap-3 @lg:mt-0">
-          <ExportButton
+          {/* <ExportButton
             data={productsData}
             fileName="product_data"
             header="ID,Name,Category,Product Thumbnail,SKU,Stock,Price,Status,Rating"
-          />
+          /> */}
           <Link
             href={routes.eCommerce.createProduct}
             className="w-full @lg:w-auto"

@@ -5,15 +5,15 @@ import { getRatings } from '@core/components/table-utils/get-ratings';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import { getStockStatus } from '@core/components/table-utils/get-stock-status';
 import { routes } from '@/config/routes';
-import { ProductType } from '@/data/products-data';
-import EyeIcon from '@core/components/icons/eye';
+import { productsData, productsDataType } from '@/data/products-data';
 import PencilIcon from '@core/components/icons/pencil';
-import AvatarCard from '@core/ui/avatar-card';
+// import AvatarCard from '@core/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
-
-const columnHelper = createColumnHelper<ProductType>();
+import AvatarCard from '@core/ui/avatar-card';
+import fallback from "../../../../../../public/fallback.png"
+const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
   columnHelper.display({
@@ -43,7 +43,7 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.image}
+        src={row.original.image || fallback}
         name={row.original.name}
         description={row.original.category}
         avatarProps={{
@@ -60,12 +60,12 @@ export const productsListColumns = [
     header: 'SKU',
     cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
   }),
-  columnHelper.accessor('stock', {
-    id: 'stock',
-    size: 200,
-    header: 'Stock',
-    cell: ({ row }) => getStockStatus(row.original.stock),
-  }),
+  // columnHelper.accessor('stock', {
+  //   id: 'stock',
+  //   size: 200,
+  //   header: 'Stock',
+  //   cell: ({ row }) => getStockStatus(row.original.stock),
+  // }),
   columnHelper.accessor('price', {
     id: 'price',
     size: 150,
@@ -74,19 +74,19 @@ export const productsListColumns = [
       <Text className="font-medium text-gray-700">${row.original.price}</Text>
     ),
   }),
-  columnHelper.display({
-    id: 'rating',
+  // columnHelper.display({
+  //   id: 'rating',
+  //   size: 200,
+  //   header: 'Rating',
+  //   cell: ({ row }) => getRatings(row.original.rating),
+  // }),
+    columnHelper.display({
+    id: 'category',
     size: 200,
-    header: 'Rating',
-    cell: ({ row }) => getRatings(row.original.rating),
+    header: 'Category',
+    cell: ({ row }) => getRatings(row.original.category),
   }),
-  columnHelper.accessor('status', {
-    id: 'status',
-    size: 120,
-    header: 'Status',
-    enableSorting: false,
-    cell: ({ row }) => getStatusBadge(row.original.status),
-  }),
+
   columnHelper.display({
     id: 'action',
     size: 120,

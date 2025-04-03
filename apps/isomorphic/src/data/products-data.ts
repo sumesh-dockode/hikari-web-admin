@@ -1,13 +1,13 @@
-export type ProductType = {
+export type productsDataType = {
   id: string;
   name: string;
-  category: string;
-  image: string;
+  category: any;
+  image: any;
   sku: string;
-  stock: number;
+  // stock: any;
   price: string;
-  status: string;
-  rating: number[];
+  // status: string;
+  // rating: any;
 };
 
 export const productsData = [

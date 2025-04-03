@@ -32,24 +32,7 @@ const pageHeader = {
 export default function OrdersPage() {
   return (
     <>
-      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
-        <div className="mt-4 flex items-center gap-3 @lg:mt-0">
-          <ExportButton
-            data={orderData}
-            fileName="order_data"
-            header="Order ID,Name,Email,Avatar,Items,Price,Status,Created At,Updated At"
-          />
-          <Link
-            href={routes.eCommerce.createProduct}
-            className="w-full @lg:w-auto"
-          >
-            <Button as="span" className="w-full @lg:w-auto">
-              <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-              Add Order
-            </Button>
-          </Link>
-        </div>
-      </PageHeader>
+      <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
 
       <OrdersTable />
     </>

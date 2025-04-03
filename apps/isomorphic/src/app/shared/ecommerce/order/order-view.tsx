@@ -11,11 +11,12 @@ import {
 } from '@/store/checkout';
 import OrderViewProducts from '@/app/shared/ecommerce/order/order-products/order-view-products';
 import { useCart } from '@/store/quick-cart/cart.context';
-import { Title, Text } from 'rizzui';
+import { Title, Text, Button } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { toCurrency } from '@core/utils/to-currency';
 import { formatDate } from '@core/utils/format-date';
 import usePrice from '@core/hooks/use-price';
+import { useState } from 'react';
 
 const orderStatus = [
   { id: 1, label: 'Order Pending' },
@@ -55,7 +56,7 @@ const transitions = [
   },
 ];
 
-const currentOrderStatus = 3;
+// const currentOrderStatus = 1;
 
 function WidgetCard({
   title,
@@ -101,6 +102,17 @@ export default function OrderView() {
   const orderNote = useAtomValue(orderNoteAtom);
   const billingAddress = useAtomValue(billingAddressAtom);
   const shippingAddress = useAtomValue(shippingAddressAtom);
+  const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
+  const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
+
+  const handleChangeStatus = (id: number) => {
+    setIsStatusChangeLoading(true);
+    setTimeout(() => {
+      setCurrentOrderStatus(id);
+    }, 2000);
+    setIsStatusChangeLoading(false);
+  };
+
   return (
     <div className="@container">
       <div className="flex flex-wrap justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
@@ -153,46 +165,6 @@ export default function OrderView() {
           </div>
 
           <div className="">
-            <Title
-              as="h3"
-              className="mb-3.5 text-base font-semibold @5xl:mb-5 @7xl:text-lg"
-            >
-              Transactions
-            </Title>
-
-            <div className="space-y-4">
-              {transitions.map((item) => (
-                <div
-                  key={item.paymentMethod.name}
-                  className="flex items-center justify-between rounded-lg border border-gray-100 px-5 py-5 font-medium shadow-sm transition-shadow @5xl:px-7"
-                >
-                  <div className="flex w-1/3 items-center">
-                    <div className="shrink-0">
-                      <Image
-                        src={item.paymentMethod.image}
-                        alt={item.paymentMethod.name}
-                        height={60}
-                        width={60}
-                        className="object-contain"
-                      />
-                    </div>
-                    <div className="flex flex-col ps-4">
-                      <Text as="span" className="font-lexend text-gray-700">
-                        Payment
-                      </Text>
-                      <span className="pt-1 text-[13px] font-normal text-gray-500">
-                        Via {item.paymentMethod.name}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="w-1/3 text-end">{item.price}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="">
             <div className="mb-3.5 @5xl:mb-5">
               <Title as="h3" className="text-base font-semibold @7xl:text-lg">
                 Balance
@@ -231,7 +203,8 @@ export default function OrderView() {
                     currentOrderStatus > item.id
                       ? 'before:bg-primary after:bg-primary'
                       : 'after:hidden',
-                    currentOrderStatus === item.id && 'before:bg-primary'
+                    currentOrderStatus === item.id && 'before:bg-primary',
+                    currentOrderStatus + 1 < item.id && 'text-gray-300'
                   )}
                 >
                   {currentOrderStatus >= item.id ? (
@@ -240,7 +213,18 @@ export default function OrderView() {
                     </span>
                   ) : null}
 
-                  {item.label}
+                  {currentOrderStatus + 1 !== item.id ? (
+                    item.label
+                  ) : (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      isLoading={isStatusChangeLoading}
+                      onClick={() => handleChangeStatus(item.id)}
+                    >
+                      {item.label}
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>

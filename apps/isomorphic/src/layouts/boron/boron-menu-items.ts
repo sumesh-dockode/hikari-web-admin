@@ -192,32 +192,10 @@ export const menuItems = [
     href: routes.eCommerce.promotion,
     icon: MdOutlineLocalOffer,
   },
-
-  {
-    name: 'Shop',
-    href: routes.eCommerce.shop,
-    icon: PiShoppingBagDuotone,
-  },
   {
     name: 'Service Booking',
     href: routes.eCommerce.servicebooking,
     icon: MdMiscellaneousServices,
-  },
-  {
-    name: 'Cart',
-    href: routes.eCommerce.cart,
-    icon: PiShoppingCartDuotone,
-  },
-  {
-    name: 'Checkout & Payment',
-    href: routes.eCommerce.checkout,
-    icon: PiContactlessPaymentDuotone,
-  },
-
-  {
-    name: 'Profile',
-    href: routes.profile,
-    icon: PiUserCircleDuotone,
   },
 
   // label start

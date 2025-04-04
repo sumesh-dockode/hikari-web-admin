@@ -1,9 +1,11 @@
 'use client';
 
 import DeletePopover from '@core/components/delete-popover';
+import ConfirmationPopover from '@core/components/confirmation-popover';
 import { createColumnHelper } from '@tanstack/react-table';
 import { Checkbox, Flex, Text } from 'rizzui';
 import { ClaimBalanceHistoryDataType } from './table';
+import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 
 const columnHelper = createColumnHelper<ClaimBalanceHistoryDataType>();
 
@@ -50,6 +52,13 @@ export const ClaimBalanceHistoryColumns = [
       <Text className="font-medium text-gray-700">${row.original.amount}</Text>
     ),
   }),
+  columnHelper.accessor('status', {
+    id: 'status',
+    size: 120,
+    header: 'Status',
+    enableSorting: false,
+    cell: ({ row }) => getStatusBadge(row.original.status),
+  }),
   columnHelper.display({
     id: 'action',
     size: 120,
@@ -60,6 +69,13 @@ export const ClaimBalanceHistoryColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
+        <ConfirmationPopover
+          title="Approve Claim"
+          description="Are you sure you want to approve this claim?"
+          onConfirm={() =>
+            meta?.handleApproveRow && meta?.handleApproveRow(row.original)
+          }
+        />
         <DeletePopover
           title={`Delete the history`}
           description={`Are you sure you want to delete this #${row.original.id} history?`}

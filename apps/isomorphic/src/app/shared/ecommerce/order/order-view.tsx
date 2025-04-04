@@ -18,12 +18,12 @@ import { formatDate } from '@core/utils/format-date';
 import usePrice from '@core/hooks/use-price';
 import { useState } from 'react';
 
-const orderStatus = [
-  { id: 1, label: 'Order Pending' },
-  { id: 2, label: 'Order Processing' },
-  { id: 3, label: 'Order At Local Facility' },
-  { id: 4, label: 'Order Out For Delivery' },
-  { id: 5, label: 'Order Completed' },
+const orderStatusActions = [
+  { id: 1, label: 'Ordered', actionLabel: '' },
+  { id: 2, label: 'Confirm', actionLabel: 'Mark as Confirmed' },
+  { id: 3, label: 'Packed', actionLabel: 'Mark as Packed' },
+  { id: 4, label: 'Shipped', actionLabel: 'Mark as Shipped' },
+  { id: 5, label: 'Received', actionLabel: 'Mark as Received' }, // No further action
 ];
 
 const transitions = [
@@ -109,8 +109,8 @@ export default function OrderView() {
     setIsStatusChangeLoading(true);
     setTimeout(() => {
       setCurrentOrderStatus(id);
-    }, 2000);
-    setIsStatusChangeLoading(false);
+      setIsStatusChangeLoading(false);
+    }, 1000);
   };
 
   return (
@@ -195,7 +195,7 @@ export default function OrderView() {
             childrenWrapperClass="py-5 @5xl:py-8 flex"
           >
             <div className="ms-2 w-full space-y-7 border-s-2 border-gray-100">
-              {orderStatus.map((item) => (
+              {orderStatusActions.map((item) => (
                 <div
                   key={item.id}
                   className={cn(
@@ -222,7 +222,7 @@ export default function OrderView() {
                       isLoading={isStatusChangeLoading}
                       onClick={() => handleChangeStatus(item.id)}
                     >
-                      {item.label}
+                      {item.actionLabel}
                     </Button>
                   )}
                 </div>

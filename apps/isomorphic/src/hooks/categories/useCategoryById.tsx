@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 export function useCategoryById(categoryId: any) {
   const {  status } = useSession();
   const fetchCategories = async () => {
-    let url = `${API_ROUTES.categories}${categoryId}/`;
+    let url = `${API_ROUTES.categories}${categoryId}`;
     const { data } = await apiClient.get(url);
 
     return data;

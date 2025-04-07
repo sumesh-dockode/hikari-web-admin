@@ -57,7 +57,7 @@ export default async function EditCategoryPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <CreateCategory id={id} category={categoryData} />
+      <CreateCategory  category={categoryData} categoryId={params.id} />
     </>
   );
 }

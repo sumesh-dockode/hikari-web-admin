@@ -84,8 +84,22 @@ export const menuItems = [
   // label end
   {
     name: 'Products',
-    href: routes.eCommerce.products,
+    href: "#",
     icon: PiArmchairDuotone,
+    dropdownItems: [
+      {
+        name: 'Products',
+        href: routes.eCommerce.products,
+      },
+      {
+        name: 'Product Variants',
+        href: routes.eCommerce.productVariants,
+      },
+      {
+        name: 'Product Specifications',
+        href: routes.eCommerce.productSpecifications,
+      },
+    ],
   },
   {
     name: 'Categories',

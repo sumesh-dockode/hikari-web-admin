@@ -5,7 +5,7 @@ import { env } from '@/env.mjs';
 import isEqual from 'lodash/isEqual';
 import { pagesOptions } from './pages-options';
 
-interface User {
+export interface User {
   id: string;
   name: string;
   role: string;
@@ -40,6 +40,7 @@ export const authOptions: NextAuthOptions = {
         user: {
           ...session.user,
           id: token.id as string,
+          role: token.role as string,
           accessToken: token.accessToken as string, // Expose access token
           refreshToken: token.refreshToken as string, // Expose refresh token
         },
@@ -48,6 +49,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = (user as User).id;
+        token.role = (user as User).role;
         token.accessToken = (user as User).access_token; // Store access token
         token.refreshToken = (user as User).refresh_token; // Store refresh token
       }

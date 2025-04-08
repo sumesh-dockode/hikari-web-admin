@@ -3,19 +3,23 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler } from 'react-hook-form';
-import { Button, Input, Text, Title } from 'rizzui';
+import { Button, Input, Loader, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import {
   CategoryFormInput,
   categoryFormSchema,
 } from '@/validators/create-category.schema';
-import UploadZone from '@core/ui/file-upload/upload-zone';
+import UploadZone, { LoadingSpinner } from '@core/ui/file-upload/upload-zone';
 import { useCreateCategories } from '@/hooks/categories/useCreateCategories';
 import { useCategoryById } from '@/hooks/categories/useCategoryById';
 import { useUpdateCategory } from '@/hooks/categories/useUpdateCategory';
 import toast from 'react-hot-toast';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { GetImageSize, omit } from '@/utils/utils';
+import PageLoader from '../../page-loader';
+import { useRouter } from 'next/navigation';
+import { routes } from '@/config/routes';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -61,14 +65,13 @@ function HorizontalFormBlockWrapper({
 }
 
 export default function CreateCategory({
-  id,
   categoryId,
   isModalView = true,
 }: {
-  id?: string;
   categoryId?: string;
   isModalView?: boolean;
 }) {
+  const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
   const { data, isLoading: isFetching } = useCategoryById(categoryId || '');
@@ -87,13 +90,21 @@ export default function CreateCategory({
 
   const onSubmit: SubmitHandler<CategoryFormInput> = (formData) => {
     setLoading(true);
-    const payload = {
+    let payload = {
       id: categoryId || '',
       name: formData.name || '',
       image: formData.image?.[0]?.url || null,
       icon_image: formData.icon_image?.[0]?.url || null,
       parent: formData.parent || '',
     };
+
+    if (payload.image?.includes('http')) {
+      payload = omit(payload, 'image');
+    }
+
+    if (payload.icon_image?.includes('http')) {
+      payload = omit(payload, 'icon_image');
+    }
 
     categoryId ? updateCategory(payload) : createCategories(payload);
   };
@@ -118,6 +129,8 @@ export default function CreateCategory({
         parent: '',
       });
 
+      push(routes.eCommerce.categories);
+
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
       toast.error('Something went wrong');
@@ -125,17 +138,39 @@ export default function CreateCategory({
     }
   }, [createStatus, updateStatus]);
 
-  const resetValues = {
-    name: data?.data?.name || '',
-    image: data?.data?.image ? [{ url: data.data.image }] : [],
-    icon_image: data?.data?.icon_image ? [{ url: data.data.icon_image }] : [],
-    parent: data?.data?.parent || '',
-  };
+  useEffect(() => {
+    const setImagesWithSize = async () => {
+      if (data?.status === 'success') {
+        const imageUrl = data?.data?.image;
+        const iconUrl = data?.data?.icon_image;
+
+        // const [imageSize, iconSize] = await Promise.all([
+        //   imageUrl ? GetImageSize(imageUrl) : 0,
+        //   iconUrl ? GetImageSize(iconUrl) : 0,
+        // ]);
+
+        setReset({
+          name: data.data.name || '',
+          image: imageUrl
+            ? [{ url: imageUrl, name: 'image', size: 100 }]
+            : [],
+          icon_image: iconUrl
+            ? [{ url: iconUrl, name: 'icon_image', size: 100 }]
+            : [],
+          parent: data?.data?.parent || '',
+        });
+      }
+    };
+
+    setImagesWithSize();
+  }, [data]);
+
+  if (isFetching) return <PageLoader />;
 
   return (
     <Form<CategoryFormInput>
       validationSchema={categoryFormSchema}
-      resetValues={resetValues}
+      resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
         mode: 'onChange',

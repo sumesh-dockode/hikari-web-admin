@@ -15,7 +15,7 @@ import DifferentBillingAddress from '@/app/shared/ecommerce/order/order-form/dif
 import { defaultValues } from '@/app/shared/ecommerce/order/order-form/form-utils';
 import CustomerInfo from '@/app/shared/ecommerce/order/order-form/customer-info';
 import AddressInfo from '@/app/shared/ecommerce/order/order-form/address-info';
-import { Text } from 'rizzui';
+import { Button, Text } from 'rizzui';
 import cn from '@core/utils/class-names';
 import OrderSummery from '@/app/shared/ecommerce/checkout/order-summery';
 import { useRouter } from 'next/navigation';
@@ -109,8 +109,21 @@ export default function CreateOrder({
 
           <div className="pb-7 pt-10 @container @5xl:col-span-4 @5xl:py-0 @6xl:col-span-3">
             <CustomerInfo />
-            <OrderSummery isLoading={isLoading} className="static" />
           </div>
+        </div>
+
+        <div
+          className={cn(
+            'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 py-1 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col'
+          )}
+        >
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            className="w-full @xl:w-auto"
+          >
+            Update Order
+          </Button>
         </div>
       </form>
     </FormProvider>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { getSession, signOut } from 'next-auth/react';
+import toast from 'react-hot-toast';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -31,6 +32,7 @@ apiClient.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       console.warn('Unauthorized, signing out...');
+      toast.error('Unauthorized, signing out...');
       await signOut(); // Logout user if token is invalid
     }
     return Promise.reject(error);

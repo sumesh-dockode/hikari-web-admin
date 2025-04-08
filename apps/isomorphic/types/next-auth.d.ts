@@ -5,6 +5,8 @@ declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
+      name: string;
+      role: string;
       accessToken: string; // Include access token
       refreshToken: string; // Include refresh token
     } & DefaultSession['user'];

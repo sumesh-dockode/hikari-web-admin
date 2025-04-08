@@ -12,56 +12,20 @@ import {
   useColorPresets,
 } from '@/layouts/settings/use-theme-color';
 import { usePresets } from '@/config/color-presets';
+import { useSession } from 'next-auth/react';
 
 export default function HeaderMenuRight() {
   const { colorPresetName } = useColorPresetName();
   const COLOR_PRESETS = usePresets();
   const { colorPresets } = useColorPresets();
+  const { data: session } = useSession();
 
   useApplyColorPreset<any>(colorPresets ?? COLOR_PRESETS[0].colors);
 
   return (
     <div className="ms-auto flex shrink-0 items-center gap-2 text-gray-700 xs:gap-3 xl:gap-5">
-      <MessagesDropdown>
-        <ActionIcon
-          aria-label="Messages"
-          variant="text"
-          className={cn(
-            'relative text-gray-200 hover:text-gray-0 dark:text-gray-700',
-            colorPresetName === 'black' &&
-              'hover:text-gray-0 dark:hover:text-gray-900'
-          )}
-        >
-          <PiChatText className="h-5 w-auto xl:h-5 3xl:h-6" />
-          <Badge
-            renderAsDot
-            color="success"
-            enableOutlineRing
-            className="absolute right-2.5 top-2.5 -translate-y-1/3 translate-x-1/2"
-          />
-        </ActionIcon>
-      </MessagesDropdown>
-      <NotificationDropdown>
-        <ActionIcon
-          aria-label="Notification"
-          variant="text"
-          className={cn(
-            'relative text-gray-200 hover:text-gray-0 dark:text-gray-700',
-            colorPresetName === 'black' &&
-              'hover:text-gray-0 dark:hover:text-gray-900'
-          )}
-        >
-          <PiBellRinging className="h-5 w-auto xl:h-5 3xl:h-6" />
-          <Badge
-            renderAsDot
-            color="warning"
-            enableOutlineRing
-            className="absolute right-2.5 top-2.5 -translate-y-1/3 translate-x-1/2"
-          />
-        </ActionIcon>
-      </NotificationDropdown>
       <ProfileMenu
-        username
+        user={session?.user || undefined}
         buttonClassName="w-[unset] sm:w-[unset] flex items-center gap-3 xl:ms-2"
         avatarClassName="!w-8 !h-8"
       />

@@ -34,15 +34,6 @@ const pageHeader = {
   ],
 };
 
-const categoryData = {
-  name: '',
-  slug: '',
-  parent: '',
-  description: '',
-  image: undefined,
-  icon_image: undefined,
-};
-
 export default async function EditCategoryPage({ params }: any) {
   const id = (await params).id;
   return (
@@ -57,7 +48,7 @@ export default async function EditCategoryPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <CreateCategory categoryId={params.id} />
+      <CreateCategory categoryId={id} />
     </>
   );
 }

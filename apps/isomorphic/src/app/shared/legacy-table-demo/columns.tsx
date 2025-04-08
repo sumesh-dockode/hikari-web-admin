@@ -157,7 +157,7 @@ export const getColumns = ({
     width: 300,
     render: (_: string, row: productsDataType) => (
       <AvatarCard
-        src={row.image}
+        src={row.images}
         name={row.name}
         description={row.category}
         avatarProps={{

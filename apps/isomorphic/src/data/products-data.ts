@@ -2,12 +2,13 @@ export type productsDataType = {
   id: string;
   name: string;
   category: any;
-  image: any;
-  sku: string;
+  images: string |any;
+  sku?: string;
   // stock: any;
-  price: string;
+  price?: number;
   // status: string;
   // rating: any;
+  
 };
 
 export const productsData = [

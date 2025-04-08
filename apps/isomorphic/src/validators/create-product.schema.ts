@@ -4,11 +4,12 @@ import { fileSchema } from './common-rules';
 import next from 'next';
 
 export const productFormSchema = z.object({
-  title: z.string().min(1, { message: messages.productNameIsRequired }),
+  id: z.string().optional(),
+  name: z.string().min(1, { message: messages.productNameIsRequired }),
   sku: z.string().optional(),
-  categoryName: z.string().min(1, { message: messages.catNameIsRequired }),
+  category: z.string().min(1, { message: messages.catNameIsRequired }),
   description: z.string().optional(),
-  productImages: z.array(fileSchema).optional(),
+  images: z.array(fileSchema).optional(),
   price: z.coerce.number().min(1, { message: messages.priceIsRequired }),
   customFields: z
     .array(

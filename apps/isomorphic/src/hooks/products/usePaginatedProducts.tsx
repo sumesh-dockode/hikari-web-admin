@@ -9,7 +9,7 @@ export default function usePaginatedProducts() {
   const { status } = useSession();
 
   const fetchProducts = async (pageParam: number = 1) => {
-    let url = `${API_ROUTES.products}?page=${pageParam}?page_size=10`;
+    let url = `${API_ROUTES.products}?page=${pageParam}&page_size=10`;
     const { data } = await apiClient.get(url);
 
     return data;

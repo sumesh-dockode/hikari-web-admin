@@ -43,7 +43,7 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.image || fallback}
+        src={row.original.images || fallback}
         name={row.original.name}
         description={row.original.category}
         avatarProps={{
@@ -80,7 +80,7 @@ export const productsListColumns = [
   //   header: 'Rating',
   //   cell: ({ row }) => getRatings(row.original.rating),
   // }),
-    columnHelper.display({
+  columnHelper.display({
     id: 'category',
     size: 200,
     header: 'Category',

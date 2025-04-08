@@ -74,6 +74,7 @@ export default function CreateCategory({
   const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(false);
   const { data, isLoading: isFetching } = useCategoryById(categoryId || '');
 
   const {
@@ -141,21 +142,24 @@ export default function CreateCategory({
   useEffect(() => {
     const setImagesWithSize = async () => {
       if (data?.status === 'success') {
+        setImageLoading(true);
         const imageUrl = data?.data?.image;
         const iconUrl = data?.data?.icon_image;
 
-        // const [imageSize, iconSize] = await Promise.all([
-        //   imageUrl ? GetImageSize(imageUrl) : 0,
-        //   iconUrl ? GetImageSize(iconUrl) : 0,
-        // ]);
+        const [imageSize, iconSize] = await Promise.all([
+          imageUrl ? GetImageSize(imageUrl) : 0,
+          iconUrl ? GetImageSize(iconUrl) : 0,
+        ]);
+
+        setImageLoading(false);
 
         setReset({
           name: data.data.name || '',
           image: imageUrl
-            ? [{ url: imageUrl, name: 'image', size: 100 }]
+            ? [{ url: imageUrl, name: 'image', size: imageSize }]
             : [],
           icon_image: iconUrl
-            ? [{ url: iconUrl, name: 'icon_image', size: 100 }]
+            ? [{ url: iconUrl, name: 'icon_image', size: iconSize }]
             : [],
           parent: data?.data?.parent || '',
         });

@@ -35,12 +35,12 @@ const pageHeader = {
 };
 
 const categoryData = {
-  name: 'Vegetables',
-  slug: 'vegetables',
-  type: 'Diet Foods',
-  parentCategory: 'Grocery',
-  description: 'Incredible Granite Ball',
-  images: undefined,
+  name: '',
+  slug: '',
+  parent: '',
+  description: '',
+  image: undefined,
+  icon_image: undefined,
 };
 
 export default async function EditCategoryPage({ params }: any) {
@@ -57,7 +57,7 @@ export default async function EditCategoryPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <CreateCategory  category={categoryData} categoryId={params.id} />
+      <CreateCategory categoryId={params.id} />
     </>
   );
 }

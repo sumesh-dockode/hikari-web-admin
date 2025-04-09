@@ -10,6 +10,16 @@ export type productsDataType = {
   // rating: any;
   
 };
+export type variantDataType = {
+  id: string;
+  name: string;
+  value: string;
+}
+export type variantValuesDataType = {
+  id: string;
+  name: string;
+  value: string;
+}
 
 export const productsData = [
   {

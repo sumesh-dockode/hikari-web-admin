@@ -8,6 +8,12 @@ import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import TrashIcon from '@core/components/icons/trash';
 import { Modal } from '@core/modal-views/modal';
+import { useCallback } from 'react';
+import {
+  variantOption,
+  productVariants,
+} from '@/app/shared/ecommerce/product/create-edit/form-utils';
+import SelectLoader from '@core/components/loader/select-loader';
 
 export default function ProductVariants({ className }: { className?: string }) {
   const {
@@ -22,35 +28,7 @@ export default function ProductVariants({ className }: { className?: string }) {
     control,
     name: 'productVariants',
   });
-
-  const colorOptions = [
-    { label: 'Red', value: 'red' },
-    { label: 'Black', value: 'black' },
-    { label: 'Blue', value: 'blue' },
-  ];
-
-  const materialOptions = [
-    { label: 'Leather', value: 'leather' },
-    { label: 'Fabric', value: 'fabric' },
-    { label: 'Velvet', value: 'velvet' },
-  ];
-  const seaterOptions = [
-    { label: '2 seater', value: '2 seater' },
-    { label: '3 seater', value: '3 seater' },
-    { label: '5 seater', value: '5 seater' },
-  ];
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [variantColor, setVariantColor] = useState('');
-  const [variantPrice, setVariantPrice] = useState('');
-
-  const handleAddProducts = () => {
-    if (!variantColor || !variantPrice) return;
-
-    append({ name: variantColor, value: parseFloat(variantPrice) });
-    setVariantColor('');
-    setVariantPrice('');
-    setIsModalOpen(false);
-  };
+  const addVariant = useCallback(() => append([...productVariants]), [append]);
 
   return (
     <>
@@ -61,17 +39,24 @@ export default function ProductVariants({ className }: { className?: string }) {
       >
         {fields.map((item, index) => (
           <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
-            <Input
-              label="Choose color"
-              placeholder="Color, Size, etc."
-              {...register(`productVariants.${index}.name`)}
-              className="w-full @2xl:w-auto @2xl:flex-grow"
+            <Controller
+              name={`productVariants.${index}.name`}
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Select
+                  options={variantOption}
+                  value={value}
+                  onChange={onChange}
+                  label="Variant Name"
+                  className="w-full @2xl:w-auto @2xl:flex-grow"
+                  getOptionValue={(option) => option.value}
+                />
+              )}
             />
             <Input
-              type="number"
-              label="Variant Price"
-              placeholder="150.00"
-              prefix="$"
+              type="text"
+              label="Variant Value"
+              placeholder="Variant Value"
               className="flex-grow"
               {...register(`productVariants.${index}.value`)}
             />
@@ -86,78 +71,14 @@ export default function ProductVariants({ className }: { className?: string }) {
             )}
           </div>
         ))}
-
         <Button
-          onClick={() => setIsModalOpen(true)}
+          onClick={addVariant}
           variant="outline"
           className="col-span-full ml-auto w-auto"
         >
           <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
         </Button>
       </FormGroup>
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        size="md"
-        overlayClassName="backdrop-blur"
-      >
-        <div className="space-y-4 p-4">
-          <Controller
-            control={control}
-            name={`productVariants color`}
-            render={({ field }) => (
-              <Select
-                label="Color"
-                options={colorOptions}
-                value={field.value}
-                onChange={field.onChange}
-                className="w-full"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name={`productVariants material`}
-            render={({ field }) => (
-              <Select
-                label="Material"
-                options={materialOptions}
-                value={field.value}
-                onChange={field.onChange}
-                className="w-full"
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name={`productVariants seater`}
-            render={({ field }) => (
-              <Select
-                label="Seater"
-                options={seaterOptions}
-                value={field.value}
-                onChange={field.onChange}
-                className="w-full"
-              />
-            )}
-          />
-          <Input
-            type="number"
-            label="Price"
-            prefix="$"
-            value={variantPrice}
-            onChange={(e) => setVariantPrice(e.target.value)}
-            placeholder="150.00"
-          />
-
-          <div className="flex justify-end gap-3 pt-4">
-            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleAddProducts}>Save Variant</Button>
-          </div>
-        </div>
-      </Modal>
     </>
   );
 }

@@ -57,7 +57,7 @@ export default async function EditProductPage({ params }: any) {
         </Link>
       </PageHeader>
 
-      <CreateEditProduct slug={slug} product={productData} />
+      <CreateEditProduct slug={slug}  />
     </>
   );
 }

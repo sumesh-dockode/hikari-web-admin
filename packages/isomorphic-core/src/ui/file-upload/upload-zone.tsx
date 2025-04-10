@@ -27,12 +27,16 @@ interface FileType {
 }
 
 export default function UploadZone({ label, name, className, error, getValues, setValue }: UploadZoneProps) {
-  const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
-console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
+  // const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
+  const files = getValues(name) || [];
+  console.log("getValues(icon_image)nnnnnnnnnnnnnn", getValues("icon_image"));
 
-  useEffect(() => {
-    setValue(name, files);
-  }, [files, name, setValue]);
+  // useEffect(() => {
+  //   const currentFiles = getValues(name);
+  //   if (currentFiles && currentFiles.length !== files.length) {
+  //     setFiles(currentFiles);
+  //   }
+  // }, [getValues, name]);
 
   const convertToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -51,11 +55,15 @@ console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
         url: await convertToBase64(file),
       }))
     );
-    setFiles((prevFiles) => [...prevFiles, ...newFiles]);
+    const updatedFiles = [...files, ...newFiles];
+    // setFiles(updatedFiles);
+    setValue(name, updatedFiles);
   }, []);
 
   function handleRemoveFile(index: number) {
-    setFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+    const updatedFiles = files.filter((_: any, i: number) => i !== index);
+    // setFiles(updatedFiles);
+    setValue(name, updatedFiles);
   }
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -65,7 +73,11 @@ console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
 
   return (
     <div className={cn("grid @container", className)}>
-      {label && <span className="mb-1.5 block font-semibold text-gray-900">{label}</span>}
+      {label && (
+        <span className="mb-1.5 block font-semibold text-gray-900">
+          {label}
+        </span>
+      )}
       <div className="rounded-md border-[1.8px]">
         <div
           {...getRootProps()}
@@ -78,8 +90,8 @@ console.log("getValues(icon_image)nnnnnnnnnnnnnn",getValues("icon_image"));
       </div>
       {!isEmpty(files) && (
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {files.map((file, index) => (
-            <div key={index} className="relative">
+          {files.map((file: FileType, index: number) => (
+            <div key={`${file.name}-${index}`} className="relative">
               <figure className="group relative h-40 rounded-md bg-gray-50">
                 <MediaPreview name={file.name} url={file.url} />
                 <button

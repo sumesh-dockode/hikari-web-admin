@@ -36,7 +36,7 @@ export function useTanStackTable<T extends Record<string, any>>({
   tableData,
   columnConfig,
 }: {
-  tableData: T[];
+  tableData: T[]|any;
   options?: ExtendTableOptions<T>;
   columnConfig: ColumnDef<T, any>[];
 }) {

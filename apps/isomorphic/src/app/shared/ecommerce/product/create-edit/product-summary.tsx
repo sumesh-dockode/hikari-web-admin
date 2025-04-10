@@ -47,22 +47,7 @@ export default function ProductSummary({ className }: { className?: string }) {
         error={errors.sku?.message as string}
       />
 
-      <Controller
-        name="type"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            dropdownClassName="h-auto"
-            options={typeOption}
-            value={value}
-            onChange={onChange}
-            label="Product Type"
-            error={errors?.type?.message as string}
-            getOptionValue={(option) => option.value}
-          />
-        )}
-      />
-
+    
       <Controller
         name="categories"
         control={control}

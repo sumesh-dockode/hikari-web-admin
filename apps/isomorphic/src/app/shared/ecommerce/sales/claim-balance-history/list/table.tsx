@@ -16,18 +16,21 @@ const claimBalanceHistoryData = [
     claimed_by: 'John Britas',
     date: '2023-06-01',
     amount: '10.00',
+    status: 'completed',
   },
   {
     id: 2,
     claimed_by: 'Anupama Das',
     date: '2023-06-02',
     amount: '120.00',
+    status: 'pending',
   },
   {
     id: 3,
     claimed_by: 'Shifna Disuza',
     date: '2023-06-03',
     amount: '40.00',
+    status: 'cancelled',
   },
 ];
 
@@ -69,6 +72,7 @@ export default function ClaimBalanceHistoryTable({
         handleMultipleDelete: (rows) => {
           setData((prev) => prev.filter((r) => !rows.includes(r)));
         },
+        handleApproveRow: (row) => {},
       },
       enableColumnResizing: false,
     },

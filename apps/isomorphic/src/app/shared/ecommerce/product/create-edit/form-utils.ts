@@ -22,41 +22,13 @@ export const productVariants = [
 
 export function defaultValues(product?: CreateProductInput) {
   return {
-    title: product?.title ?? '',
+    name: product?.name ?? '',
     sku: product?.sku ?? '',
-    type: product?.type ?? '',
-    categories: product?.categories ?? '',
+    category: product?.category ?? '',
     description: product?.description ?? '',
     price: product?.price ?? undefined,
-    costPrice: product?.costPrice ?? undefined,
-    retailPrice: product?.retailPrice ?? undefined,
-    salePrice: product?.salePrice ?? undefined,
-    inventoryTracking: product?.inventoryTracking ?? '',
-    currentStock: product?.currentStock ?? '',
-    lowStock: product?.lowStock ?? '',
-    productAvailability: product?.productAvailability ?? '',
-    productImages: product?.productImages ?? undefined,
-    tradeNumber: product?.tradeNumber ?? '',
-    manufacturerNumber: product?.manufacturerNumber ?? '',
-    brand: product?.brand ?? '',
-    upcEan: product?.upcEan ?? '',
-    customFields: isEmpty(product?.customFields)
-      ? customFields
-      : product?.customFields,
+    images: product?.images ?? undefined,
 
-    freeShipping: product?.freeShipping ?? false,
-    shippingPrice: product?.shippingPrice ?? undefined,
-    locationBasedShipping: product?.locationBasedShipping ?? false,
-    locationShipping: isEmpty(product?.locationShipping)
-      ? locationShipping
-      : product?.locationShipping,
-    pageTitle: product?.pageTitle ?? '',
-    metaDescription: product?.metaDescription ?? '',
-    metaKeywords: product?.metaKeywords ?? '',
-    productUrl: product?.productUrl ?? '',
-    isPurchaseSpecifyDate: product?.isPurchaseSpecifyDate ?? false,
-    isLimitDate: product?.isLimitDate ?? false,
-    dateFieldName: product?.dateFieldName ?? '',
     productVariants: isEmpty(product?.productVariants)
       ? productVariants
       : product?.productVariants,

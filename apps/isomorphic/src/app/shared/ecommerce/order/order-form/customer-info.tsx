@@ -6,6 +6,7 @@ import { DatePicker } from '@core/ui/datepicker';
 import PencilIcon from '@core/components/icons/pencil';
 import { Text, Title, Select, ActionIcon } from 'rizzui';
 import cn from '@core/utils/class-names';
+import { toCurrency } from '@core/utils/to-currency';
 
 interface CustomerInfoProps {
   className?: string;
@@ -72,60 +73,58 @@ export default function CustomerInfo({ className }: CustomerInfoProps) {
           >
             <PencilIcon className="h-3.5 w-3.5" />
           </ActionIcon>
-          <Text
-            as="p"
-            className="mt-3 flex flex-col font-semibold text-gray-700"
-          >
-            <span className="mb-2 font-normal">Order ID</span> COMP1502
-          </Text>
+          <div className="flex justify-between">
+            <Text
+              as="p"
+              className="mt-3 flex flex-col font-semibold text-gray-700"
+            >
+              <span className="mb-2 font-normal">Order ID</span> COMP1502
+            </Text>
+            <Text
+              as="p"
+              className="mt-3 flex flex-col items-end font-semibold text-gray-700"
+            >
+              <span className="mb-2 font-normal">Order Date</span> 10/10/2022
+            </Text>
+          </div>
+          <div className="flex justify-between">
+            <Text
+              as="p"
+              className="mt-3 flex flex-col font-semibold text-gray-700"
+            >
+              <span className="mb-2 font-normal">Payment Method</span> PayPal
+            </Text>
+            <Text
+              as="p"
+              className="align-end mt-3 flex flex-col items-end font-semibold text-gray-700"
+            >
+              <span className="mb-2 font-normal">Shipping Method</span> FedEx
+            </Text>
+          </div>
         </div>
         <div className="space-y-4 @lg:space-y-5 @2xl:space-y-6">
-          <Controller
-            name="paymentMethod"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Select
-                dropdownClassName="!z-0"
-                options={paymentOptions}
-                value={value}
-                onChange={onChange}
-                label="Payment Method"
-                error={errors?.paymentMethod?.message as string}
-                getOptionValue={(option) => option.label}
-              />
-            )}
-          />
-          <Controller
-            name="shippingMethod"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Select
-                dropdownClassName="!z-0"
-                options={shippingOption}
-                value={value}
-                onChange={onChange}
-                label="Shipping Method"
-                error={errors?.shippingMethod?.message as string}
-                getOptionValue={(option) => option.label}
-              />
-            )}
-          />
-          <Controller
-            name="orderDate"
-            control={control}
-            render={({ field: { value, onChange, onBlur } }) => (
-              <DatePicker
-                inputProps={{ label: 'Order date' }}
-                placeholderText="Select Date"
-                dateFormat="dd/MM/yyyy"
-                onChange={onChange}
-                onBlur={onBlur}
-                wrapperClassName="w-full"
-                //@ts-ignore
-                selected={value}
-              />
-            )}
-          />
+          <div className="mb-4 flex items-center justify-between last:mb-0">
+            Subtotal
+            <Text as="span" className="font-medium text-gray-900">
+              {toCurrency(0)}
+            </Text>
+          </div>
+          <div className="mb-4 flex items-center justify-between last:mb-0">
+            Tax
+            <Text as="span" className="font-medium text-gray-900">
+              {toCurrency(0)}
+            </Text>
+          </div>
+          <div className="mb-4 flex items-center justify-between last:mb-0">
+            Shipping
+            <Text as="span" className="font-medium text-gray-900">
+              {toCurrency(0)}
+            </Text>
+          </div>
+          <div className="flex items-center justify-between border-t border-muted py-4 text-base font-bold text-gray-1000">
+            Total
+            <Text>{toCurrency(0)}</Text>
+          </div>
         </div>
       </div>
     </div>

@@ -10,7 +10,8 @@ import Filters from './filters';
 import { useEffect } from 'react';
 import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
-
+import PageLoader from '@/app/shared/page-loader';
+import toast from 'react-hot-toast';
 
 export default function CategoryTable() {
   const {
@@ -23,12 +24,10 @@ export default function CategoryTable() {
     isFetchingNextPage,
   } = usePaginatedCategories();
 
-  console.log('dataaaa >>>>>>>>', data);
-
   const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
-  const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
-  console.log("categoriesData", categoriesAPIData);
-  
+  const categoriesAPIData =
+    data?.pages?.flatMap((page: any) => page?.data) || [];
+
   const { table, setData } = useTanStackTable<CategoryDataType | any>({
     tableData: categoriesAPIData,
     columnConfig: categoriesColumns,
@@ -43,7 +42,8 @@ export default function CategoryTable() {
         handleDeleteRow: (row) => {
           deleteCategory(row.id, {
             onSuccess: () => {
-              setData((prev) => prev.filter((r) => r.id !== row.id));
+              toast.success('Category deleted successfully');
+              // setData((prev) => prev.filter((r) => r.id !== row.id));
             },
           });
         },
@@ -55,17 +55,16 @@ export default function CategoryTable() {
     },
   });
   useEffect(() => {
-    console.log("<<<<<<<<");
-    const categoriesAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+    const categoriesAPIData =
+      data?.pages?.flatMap((page: any) => page?.data) || [];
 
     if (categoriesAPIData.length > 0) {
       setData(categoriesAPIData);
     }
   }, [data]);
 
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
+  if (isLoading) return <PageLoader />;
+
   return (
     <>
       <Filters table={table} />
@@ -76,7 +75,6 @@ export default function CategoryTable() {
           container: 'border border-muted rounded-md',
           rowClassName: 'last:border-0',
         }}
-        
       />
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />

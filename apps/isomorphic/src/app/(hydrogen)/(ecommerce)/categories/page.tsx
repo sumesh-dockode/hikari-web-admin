@@ -41,10 +41,6 @@ export default function CategoriesPage() {
           </Button>
         </Link>
       </PageHeader>
-      {/* <CategoryPageHeader
-        title={pageHeader.title}
-        breadcrumb={pageHeader.breadcrumb}
-      /> */}
       <CategoryTable />
     </>
   );

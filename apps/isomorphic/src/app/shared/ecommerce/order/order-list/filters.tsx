@@ -90,14 +90,15 @@ export default function Filters<TData extends Record<string, any>>({
           </Button>
         ) : null}
 
-        <Button
+        {/* <Button
           variant={'outline'}
+          disabled={true}
           onClick={() => setOpenDrawer(!openDrawer)}
           className="h-9 pe-3 ps-2.5"
         >
           <PiFunnel className="me-1.5 size-[18px]" strokeWidth={1.7} />
           Filters
-        </Button>
+        </Button> */}
 
         <ToggleColumns table={table} />
       </Flex>

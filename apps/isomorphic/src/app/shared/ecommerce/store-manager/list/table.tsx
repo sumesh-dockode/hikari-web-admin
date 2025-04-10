@@ -14,6 +14,7 @@ const storeManagerList = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
     name: 'Store Manager',
+    store_name: 'Furyroad',
     email: '1kTt2@example.com',
     phone: '(123) 456-7890',
     address: '123 Main St, Anytown, USA',
@@ -24,6 +25,7 @@ const storeManagerList = [
     image:
       'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
     name: 'Jane Smith',
+    store_name: 'JamesVillage',
     email: '5M0x3@example.com',
     phone: '(987) 654-3210',
     address: '456 Elm St, Anytown, USA',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,12 +14,7 @@ import ProductSummary from '@/app/shared/ecommerce/product/create-edit/product-s
 import { defaultValues } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 import ProductMedia from '@/app/shared/ecommerce/product/create-edit/product-media';
 import PricingInventory from '@/app/shared/ecommerce/product/create-edit/pricing-inventory';
-import ProductIdentifiers from '@/app/shared/ecommerce/product/create-edit/product-identifiers';
 import ShippingInfo from '@/app/shared/ecommerce/product/create-edit/shipping-info';
-import ProductSeo from '@/app/shared/ecommerce/product/create-edit/product-seo';
-import DeliveryEvent from '@/app/shared/ecommerce/product/create-edit/delivery-event';
-import ProductVariants from '@/app/shared/ecommerce/product/create-edit/product-variants';
-import ProductTaxonomies from '@/app/shared/ecommerce/product/create-edit/product-tags';
 import similiarProducts from '@/app/shared/ecommerce/product/create-edit/similiar-products';
 import FormFooter from '@core/components/form-footer';
 import {
@@ -28,17 +23,22 @@ import {
 } from '@/validators/create-product.schema';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
-
+import { useCreateProducts } from '@/hooks/products/useCreateProducts';
+import { productsDataType } from '@/data/products-data';
+import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
+import { useProductsById } from '@/hooks/products/useProductsById';
+import { Form } from '@core/ui/form';
+import ProductVariants from './product-variants';
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
   [formParts.media]: ProductMedia,
   [formParts.pricingInventory]: PricingInventory,
-  [formParts.productIdentifiers]: ProductIdentifiers,
+  // [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
-  [formParts.seo]: ProductSeo,
-  [formParts.deliveryEvent]: DeliveryEvent,
+  // [formParts.seo]: ProductSeo,
+  // [formParts.deliveryEvent]: DeliveryEvent,
   [formParts.variantOptions]: ProductVariants,
-  [formParts.tagsAndCategory]: ProductTaxonomies,
+  // [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.similiarProducts]: similiarProducts,
 };
 
@@ -46,31 +46,90 @@ interface IndexProps {
   slug?: string;
   className?: string;
   product?: CreateProductInput;
+  productId?: string;
 }
 
 export default function CreateEditProduct({
   slug,
   product,
   className,
+  productId,
 }: IndexProps) {
   const { layout } = useLayout();
+  const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
-  const methods = useForm<CreateProductInput>({
-    resolver: zodResolver(productFormSchema),
-    defaultValues: defaultValues(product),
-  });
+  const { data, isFetching, status } = useProductsById(productId);
+  const {
+    mutate: createProducts,
+    data: productData,
+    status: createStatus,
+  } = useCreateProducts();
+  const {
+    mutate: updateProducts,
+    data: updateResponseData,
+    status: updateStatus,
+  } = useUpdateProducts();
 
-  const onSubmit: SubmitHandler<CreateProductInput> = (data) => {
+  const form = useForm<CreateProductInput>({
+    resolver: zodResolver(productFormSchema),
+    defaultValues: product || {},
+  });
+  useEffect(() => {
+    console.log('dataiiiiiiiiiiiiiii', data);
+
+    if (data?.status === 'success') {
+      Object.entries(data.data).forEach(([key, value]) => {
+        form.setValue(key as keyof CreateProductInput, value as string);
+      });
+    }
+  }, [data]);
+  const onSubmit: SubmitHandler<CreateProductInput> = (formData) => {
+    console.log('formDataproduct-----', formData);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('product_data', data);
-      toast.success(
-        <Text as="b">Product successfully {slug ? 'updated' : 'created'}</Text>
-      );
-      methods.reset();
-    }, 600);
+
+    const productData: productsDataType = {
+      id: productId || '',
+      name: formData.name || '',
+      images: formData.images?.[0]?.url || null,
+      sku: formData.sku || '',
+      price: formData.price || 0,
+      category: formData.category || '',
+    };
+    if (productId) {
+      updateProducts(productData);
+    } else {
+      createProducts(productData);
+    }
   };
+
+  useEffect(() => {
+    if (createStatus === 'pending' || updateStatus === 'pending') return;
+
+    if (
+      (createStatus === 'success' && productData) ||
+      (updateStatus === 'success' && updateResponseData)
+    ) {
+      toast.success(
+        productId
+          ? 'product updated successfully'
+          : 'product created successfully'
+      );
+      setReset({
+        id: '',
+        name: '',
+        image: null,
+        sku: '',
+        price: '',
+        catagoryName: '',
+      });
+
+      setLoading(false);
+    } else if (createStatus === 'error' || updateStatus === 'error') {
+      toast.error('Product creation failed');
+
+      setLoading(false);
+    }
+  }, [createStatus, updateStatus]);
 
   return (
     <div className="@container">
@@ -79,9 +138,9 @@ export default function CreateEditProduct({
           layout === LAYOUT_OPTIONS.BERYLLIUM && 'z-[999] 2xl:top-[72px]'
         )}
       />
-      <FormProvider {...methods}>
+      <FormProvider {...form}>
         <form
-          onSubmit={methods.handleSubmit(onSubmit)}
+          onSubmit={form.handleSubmit(onSubmit)}
           className={cn(
             'relative z-[19] [&_label.block>span]:font-medium',
             className

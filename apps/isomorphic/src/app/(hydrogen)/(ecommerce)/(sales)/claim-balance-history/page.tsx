@@ -4,6 +4,7 @@ import { productsData } from '@/data/products-data';
 import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/shared/export-button';
 import ClaimBalanceHistoryTable from '@/app/shared/ecommerce/sales/claim-balance-history/list/table';
+import { productData } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 
 export const metadata = {
   ...metaObject('Claim Balance History'),

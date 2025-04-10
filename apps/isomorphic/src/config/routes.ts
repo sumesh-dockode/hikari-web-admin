@@ -1,3 +1,5 @@
+import { productVariants } from "@/app/shared/ecommerce/product/create-edit/form-utils";
+
 export const routes = {
   eCommerce: {
     dashboard: '/',
@@ -5,6 +7,8 @@ export const routes = {
     createProduct: '/products/create',
     productDetails: (slug: string) => `/products/${slug}`,
     ediProduct: (slug: string) => `/products/${slug}/edit`,
+    productVariants:  '/products/productvariants',
+    productSpecifications: `/specifications`,
     categories: '/categories',
     createCategory: '/categories/create',
     editCategory: (id: string) => `/categories/${id}/edit`,

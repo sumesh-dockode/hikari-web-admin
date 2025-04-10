@@ -218,7 +218,7 @@ export default function ProductVariantsPage() {
 
       {/* Variant List */}
       <div className="mt-8 space-y-4 px-6">
-        {variants.map((variant, index) => (
+        {variantsAPIData.map((variant: any, index: number) => (
           <div
             key={index}
             className="space-y-2 rounded border border-gray-200 p-4 shadow-sm"
@@ -235,9 +235,9 @@ export default function ProductVariantsPage() {
                 <PiPlusBold className="me-2 h-4 w-4" /> Add Value
               </Button>
             </div>
-            {variant.values.length > 0 && (
+            {variant.values?.length > 0 && (
               <div className="flex flex-wrap gap-2 pt-2">
-                {variant.values.map((value, idx) => (
+                {variant.values.map((value: any, idx: any) => (
                   <div key={idx} className="relative flex items-center">
                     {variant.name.toLowerCase() === 'color' ? (
                       <div
@@ -250,13 +250,17 @@ export default function ProductVariantsPage() {
                         {value}
                       </div>
                     )}
-                    <button
-                      onClick={() => handleRemoveValue(index, idx)}
-                      className="ml-1 text-xs text-gray-400 hover:text-red-500"
-                      title="Remove"
-                    >
-                      ×
-                    </button>
+                    {index >= variantsAPIData.length && (
+                      <button
+                        onClick={() =>
+                          handleRemoveValue(index - variantsAPIData.length, idx)
+                        }
+                        className="ml-1 text-xs text-gray-400 hover:text-red-500"
+                        title="Remove"
+                      >
+                        ×
+                      </button>
+                    )}
                   </div>
                 ))}
               </div>

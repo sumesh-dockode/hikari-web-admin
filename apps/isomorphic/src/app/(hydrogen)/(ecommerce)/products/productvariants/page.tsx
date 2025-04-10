@@ -8,6 +8,7 @@ import { Button } from 'rizzui/button';
 import { PiPlusBold } from 'react-icons/pi';
 import { Modal } from '@core/modal-views/modal';
 import { Input } from 'rizzui/input';
+import useVariants from '@/hooks/products/variants/useVariants';
 
 const pageHeader = {
   title: 'Product Variants',
@@ -28,6 +29,18 @@ const COLORS = [
 ];
 
 export default function ProductVariantsPage() {
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useVariants();
+
+  const variantsAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isValueModalOpen, setIsValueModalOpen] = useState(false);
   const [variantName, setVariantName] = useState('');
@@ -39,11 +52,20 @@ export default function ProductVariantsPage() {
   );
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [inputValue, setInputValue] = useState<string>('');
+  const [selectedVariantType, setSelectedVariantType] =
+    useState<string>('Color');
 
   const handleSaveVariant = () => {
-    if (variantName.trim() === '') return;
-    setVariants((prev) => [...prev, { name: variantName.trim(), values: [] }]);
+    const nameToSave =
+      selectedVariantType === 'Custom'
+        ? variantName.trim()
+        : selectedVariantType;
+
+    if (!nameToSave) return;
+
+    setVariants((prev) => [...prev, { name: nameToSave, values: [] }]);
     setVariantName('');
+    setSelectedVariantType('Color');
     setIsModalOpen(false);
   };
 
@@ -70,6 +92,7 @@ export default function ProductVariantsPage() {
     setVariants(updatedVariants);
     setIsValueModalOpen(false);
   };
+
   const handleRemoveValue = (variantIndex: number, valueIndex: number) => {
     const updatedVariants = [...variants];
     updatedVariants[variantIndex].values.splice(valueIndex, 1);
@@ -131,13 +154,30 @@ export default function ProductVariantsPage() {
       {/* Add Variant Modal */}
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="space-y-4 p-6">
-          <Input
-            type="text"
-            label="Enter the variant name"
-            placeholder="variant name"
-            value={variantName}
-            onChange={(e) => setVariantName(e.target.value)}
-          />
+          <label className="text-sm font-medium text-gray-700">
+            Choose a variant type
+          </label>
+          <select
+            value={selectedVariantType}
+            onChange={(e) => setSelectedVariantType(e.target.value)}
+            className="w-full rounded border-gray-300 px-3 py-2 text-sm"
+          >
+            <option value="Color">Color</option>
+            <option value="Material">Material</option>
+            <option value="Seater">Seater</option>
+            <option value="Custom">Custom</option>
+          </select>
+
+          {selectedVariantType === 'Custom' && (
+            <Input
+              type="text"
+              label="Enter custom variant name"
+              placeholder="e.g. Fabric, Height"
+              value={variantName}
+              onChange={(e) => setVariantName(e.target.value)}
+            />
+          )}
+
           <div className="flex justify-end gap-3 pt-4">
             <Button variant="outline" onClick={() => setIsModalOpen(false)}>
               Cancel

@@ -4,4 +4,5 @@ export const API_ROUTES = {
   products: `/ecom/admin/products/`,
   variants : `/ecom/admin/product-attributes/`,
   variantValues: `/ecom/admin/product-attribute-values/`,
+  orders: '/ecom/admin/orders/',
 };

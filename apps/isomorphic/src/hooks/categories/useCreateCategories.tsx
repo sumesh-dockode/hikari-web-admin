@@ -1,6 +1,6 @@
 "use client";
 
-import { API_ROUTES } from "@/api";
+import { API_ROUTES } from '@/app/lib/api';
 import apiClient from "@/app/lib/apiClient";
 import { CategoryDataType } from "@/data/product-categories";
 import { useMutation, useQueryClient } from "@tanstack/react-query";

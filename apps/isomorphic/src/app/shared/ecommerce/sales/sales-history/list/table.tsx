@@ -9,6 +9,8 @@ import cn from '@core/utils/class-names';
 import { exportToCSV } from '@core/utils/export-to-csv';
 import Filters from './filters';
 import { SalesHistoryColumns } from './columns';
+import { useState } from 'react';
+import { PaginationState } from '@tanstack/react-table';
 
 const salesData = [
   {
@@ -72,16 +74,17 @@ export default function SalesHistoryTable({
   classNames?: TableClassNameProps;
   paginationClassName?: string;
 }) {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const pageCount = 1;
+
   const { table, setData } = useTanStackTable<SalesHistoryDataType>({
     tableData: salesData,
     columnConfig: SalesHistoryColumns,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: pageSize,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
@@ -91,7 +94,16 @@ export default function SalesHistoryTable({
         },
       },
       enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
     },
+    pagination,
   });
 
   const selectedData = table

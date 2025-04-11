@@ -57,7 +57,7 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
               <Title as="h4" className="mb-0.5 text-sm font-medium">
                 {product.product_variant.product.name}
               </Title>
-              <Text className="mb-1 text-gray-500">
+              <Text className="text-xs text-gray-500">
                 Sku: {product.product_variant.sku}
               </Text>
               <Text className="text-xs text-gray-500">

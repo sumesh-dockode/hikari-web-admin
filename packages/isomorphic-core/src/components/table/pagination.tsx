@@ -30,18 +30,11 @@ export default function TablePagination<TData extends Record<string, any>>({
   table,
   showSelectedCount = false,
   className,
-  onPageChange,
 }: {
   table: ReactTableType<TData>;
   showSelectedCount?: boolean;
   className?: string;
-  onPageChange?: (pageIndex: number) => void;
 }) {
-  const handlePageChange = (pageIndex: number) => {
-    table.setPageIndex(pageIndex);
-    onPageChange?.(pageIndex);
-  };
-
   return (
     <Flex
       gap="6"
@@ -86,7 +79,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to first page"
-            onClick={() => handlePageChange(0)}
+            onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >
@@ -97,9 +90,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to previous page"
-            onClick={() =>
-              handlePageChange(table.getState().pagination.pageIndex - 1)
-            }
+            onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >
@@ -110,9 +101,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to next page"
-            onClick={() =>
-              handlePageChange(table.getState().pagination.pageIndex + 1)
-            }
+            onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >
@@ -123,7 +112,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to last page"
-            onClick={() => handlePageChange(table.getPageCount() - 1)}
+            onClick={() => () => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >

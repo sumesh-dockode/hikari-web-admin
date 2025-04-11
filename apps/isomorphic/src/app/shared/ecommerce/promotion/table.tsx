@@ -9,6 +9,7 @@ import Filters from '../review/filters';
 import { promotionData } from '@/data/promotion-data';
 import { PromotionColumn } from './columns';
 import PromotionModal from '../product/create-edit/promotion-modal';
+import { PaginationState } from '@tanstack/react-table';
 
 export type PromotionDataType = (typeof promotionData)[number];
 
@@ -17,17 +18,17 @@ export default function PromotionsTable() {
   // const [selectedRow, setSelectedRow] = useState<PromotionDataType | null>(
   //   null
   // );
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const pageCount = 1;
 
   const { table, setData } = useTanStackTable<PromotionDataType>({
     tableData: promotionData,
     columnConfig: PromotionColumn,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 10,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
@@ -37,7 +38,16 @@ export default function PromotionsTable() {
         },
       },
       enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
     },
+    pagination,
   });
 
   return (

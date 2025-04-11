@@ -2,13 +2,13 @@ export type productsDataType = {
   id: string;
   name: string;
   category: any;
-  images: string |any;
+  images: string | any;
   sku?: string;
+  description?: string;
   // stock: any;
   price?: number;
   // status: string;
   // rating: any;
-  
 };
 export type variantDataType = {
   id: string;

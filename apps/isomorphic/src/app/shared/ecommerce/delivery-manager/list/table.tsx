@@ -6,6 +6,8 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { DeliveryManagerColumns } from './columns';
+import { useState } from 'react';
+import { PaginationState } from '@tanstack/react-table';
 
 const storeManagerList = [
   {
@@ -33,16 +35,17 @@ const storeManagerList = [
 export type DeliveryManagerDataType = (typeof storeManagerList)[number];
 
 export default function DeliveryManagerTable() {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const pageCount = 1;
+
   const { table, setData } = useTanStackTable<DeliveryManagerDataType>({
     tableData: storeManagerList,
     columnConfig: DeliveryManagerColumns,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 10,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
@@ -52,7 +55,16 @@ export default function DeliveryManagerTable() {
         },
       },
       enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
     },
+    pagination,
   });
 
   return (

@@ -81,10 +81,6 @@ export function useTanStackTable<T extends Record<string, any>>({
     top: [],
     bottom: [],
   });
-  // const [pagination, setPagination] = React.useState<PaginationState>({
-  //   pageIndex: 0,
-  //   pageSize: 10,
-  // });
 
   // ===================================================================================================
   // these are custom functions dependent on dnd kit and react-table to handle Drag and Drop events

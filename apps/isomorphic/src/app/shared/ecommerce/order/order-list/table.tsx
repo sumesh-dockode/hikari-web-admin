@@ -11,6 +11,7 @@ import PageLoader from '@/app/shared/page-loader';
 import { useEffect, useState } from 'react';
 import { OrdersDataType } from '@/data/orders';
 import { OrderExpandedComponent } from './order-expanded-row';
+import { PaginationState } from '@tanstack/react-table';
 
 export default function OrderTable({
   className,
@@ -23,31 +24,29 @@ export default function OrderTable({
   hidePagination?: boolean;
   variant?: TableVariantProps;
 }) {
-  const [pagination, setPagination] = useState({
+  const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
   const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    usePaginatedOrders({
-      page: pagination.pageIndex + 1, // API usually uses 1-based indexing
-      pageSize: pagination.pageSize,
-    });
+    usePaginatedOrders(pagination);
+
+  const pageCount =
+    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
   const { table, setData } = useTanStackTable<OrdersDataType>({
     tableData: [],
     columnConfig: ordersColumns(),
     options: {
-      manualPagination: true, // Important for server-side pagination
-      pageCount: hasNextPage
-        ? pagination.pageIndex + 2
-        : pagination.pageIndex + 1,
       meta: {
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
         },
       },
       enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
       onPaginationChange: (updater) => {
         const nextPagination =
           typeof updater === 'function' ? updater(pagination) : updater;
@@ -82,17 +81,7 @@ export default function OrderTable({
           expandedComponent: OrderExpandedComponent,
         }}
       />
-      {!hidePagination && (
-        <TablePagination
-          table={table}
-          className="py-4"
-          onPageChange={(pageIndex) => {
-            if (pageIndex > pagination.pageIndex && hasNextPage) {
-              fetchNextPage();
-            }
-          }}
-        />
-      )}
+      {!hidePagination && <TablePagination table={table} className="py-4" />}
     </div>
   );
 }

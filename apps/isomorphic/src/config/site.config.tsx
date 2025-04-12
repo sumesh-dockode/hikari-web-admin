@@ -10,12 +10,12 @@ enum MODE {
 }
 
 export const siteConfig = {
-  title: 'Isomorphic - React Typescript Admin Dashboard Template',
+  title: 'Mingler',
   description: `Isomorphic the ultimate React TypeScript Admin Template. Streamline your admin dashboard development with our feature-rich, responsive, and highly customizable solution. Boost productivity and create stunning admin interfaces effortlessly.`,
   logo: logoImg,
   icon: logoIconImg,
   mode: MODE.LIGHT,
-  layout: LAYOUT_OPTIONS.HYDROGEN,
+  layout: LAYOUT_OPTIONS.BORON,
   // TODO: favicon
 };
 
@@ -25,13 +25,13 @@ export const metaObject = (
   description: string = siteConfig.description
 ): Metadata => {
   return {
-    title: title ? `${title} - Isomorphic Furyroad` : siteConfig.title,
+    title: title ? `${title} - Mingler` : siteConfig.title,
     description,
     openGraph: openGraph ?? {
-      title: title ? `${title} - Isomorphic Furyroad` : title,
+      title: title ? `${title} - Mingler` : title,
       description,
       url: 'https://isomorphic-furyroad.vercel.app',
-      siteName: 'Isomorphic Furyroad', // https://developers.google.com/search/docs/appearance/site-names
+      siteName: 'Mingler', // https://developers.google.com/search/docs/appearance/site-names
       images: {
         url: 'https://s3.amazonaws.com/redqteam.com/isomorphic-furyroad/itemdep/isobanner.png',
         width: 1200,

@@ -8,7 +8,8 @@ export const routes = {
     productDetails: (slug: string) => `/products/${slug}`,
     ediProduct: (slug: string) => `/products/${slug}/edit`,
     productVariants:  '/products/productvariants',
-    productSpecifications: `/specifications`,
+    editProductVariant:(id: number) => `/products/productvariants/${id}/edit`,
+    productSpecifications: `/products/productspecifications`,
     categories: '/categories',
     createCategory: '/categories/create',
     editCategory: (id: string) => `/categories/${id}/edit`,
@@ -37,7 +38,6 @@ export const routes = {
     salesHistory: '/sales-history',
     incentives: '/incentives',
     claimBalanceHistory: '/claim-balance-history',
-
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
     editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,

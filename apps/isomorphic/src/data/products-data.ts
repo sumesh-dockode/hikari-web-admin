@@ -11,16 +11,27 @@ export type productsDataType = {
   // rating: any;
 };
 export type variantDataType = {
-  id: string;
+  id: string | null;
   name: string;
-  value: string;
 }
 export type variantValuesDataType = {
-  id: string;
-  name: string;
-  value: string;
+  id: string|null;
+  name?: string;
+  value?: string;
+  attribute?: any;
 }
-
+export type specificationDataType = {
+  id?: string | null;
+  name?: any;
+  value?: string;
+  product?: any;
+}
+export type specificationValueDataType = {
+  id?: string | null;
+  name?: string;
+  value?: string;
+  product: any;
+}
 export const productsData = [
   {
     id: '0o02051402',

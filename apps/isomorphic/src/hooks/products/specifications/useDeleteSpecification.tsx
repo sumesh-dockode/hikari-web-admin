@@ -5,24 +5,27 @@ import { CategoryDataType } from '@/data/product-categories';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
-export function useDeleteVariants() {
+export function useDeleteSpecification() {
   const { data: session } = useSession();
 
-  const deleteVariant = async (variantId: any): Promise<void> => {
+  const deleteSpecification = async (specificationId: any): Promise<void> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.variants}${variantId}/`;
+    let url = `${API_ROUTES.specifications}${specificationId}/`;
     const { data } = await apiClient.delete(url);
     return data;
   };
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (variantId: number) => deleteVariant(variantId),
-    onSuccess: (_, variantId) => {
+    mutationFn: (specificationId: number) =>
+      deleteSpecification(specificationId),
+    onSuccess: (_, specificationId) => {
       queryClient.invalidateQueries({
-        queryKey: ['variantsList'],
+        queryKey: ['specificationsList'],
       });
-      queryClient.removeQueries({ queryKey: ['variants', variantId] });
+      queryClient.removeQueries({
+        queryKey: ['specifications', specificationId],
+      });
     },
   });
 }

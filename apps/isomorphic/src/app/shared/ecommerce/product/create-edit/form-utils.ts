@@ -19,6 +19,12 @@ export const productVariants = [
     value: '',
   },
 ];
+export const productSpecifications = [
+  {
+    label: '',
+    value: '',
+  },
+];
 
 export function defaultValues(product?: CreateProductInput) {
   return {

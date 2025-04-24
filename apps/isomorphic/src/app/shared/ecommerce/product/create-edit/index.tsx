@@ -29,6 +29,7 @@ import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
 import { useProductsById } from '@/hooks/products/useProductsById';
 import { Form } from '@core/ui/form';
 import ProductVariants from './product-variants';
+import ProductSpecification from './product-specification';
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
   [formParts.media]: ProductMedia,
@@ -38,6 +39,7 @@ const MAP_STEP_TO_COMPONENT = {
   // [formParts.seo]: ProductSeo,
   // [formParts.deliveryEvent]: DeliveryEvent,
   [formParts.variantOptions]: ProductVariants,
+  [formParts.productSpecifications]: ProductSpecification,
   // [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.similiarProducts]: similiarProducts,
 };

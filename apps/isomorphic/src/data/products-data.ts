@@ -14,6 +14,16 @@ export type variantDataType = {
   id: string | null;
   name: string;
 }
+export type ProductVariantDataType = {
+  id?: string | null;
+  variants?: any;
+  value?: string;
+  price?: number;
+  sku?: string;
+  image?: any;
+  stock: number;
+
+}
 export type variantValuesDataType = {
   id: string|null;
   name?: string;

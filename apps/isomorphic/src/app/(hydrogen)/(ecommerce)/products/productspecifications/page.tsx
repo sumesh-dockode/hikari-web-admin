@@ -159,16 +159,14 @@ export default function ProductSpecificationPage({
   };
 
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    const specificationData = {
-      name:
-        selectedSpecificationType === 'Custom'
-          ? formData.name
-          : selectedSpecificationType,
-    };
+    const specificationData =
+      selectedSpecificationType === 'Custom'
+        ? formData.name
+        : selectedSpecificationType;
 
     if (isEditMode && editingSpecification) {
       updateSpecification(
-        { id: editingSpecification.id, ...specificationData },
+        { id: editingSpecification.id, name: specificationData },
         {
           onSuccess: () => {
             setIsModalOpen(false);
@@ -199,62 +197,62 @@ export default function ProductSpecificationPage({
     }
   };
 
-  const onSubmitValue: SubmitHandler<ProductSpecificationValueFormInput> = (
-    data
-  ) => {
-    if (activeSpecificationId === null) return;
+  // const onSubmitValue: SubmitHandler<ProductSpecificationValueFormInput> = (
+  //   data
+  // ) => {
+  //   if (activeSpecificationId === null) return;
 
-    const currentSpecification = specificationAPIData.find(
-      (specification: any) => specification.id === activeSpecificationId
-    );
+  //   const currentSpecification = specificationAPIData.find(
+  //     (specification: any) => specification.id === activeSpecificationId
+  //   );
 
-    const valueToAdd =
-      currentSpecification?.name.toLowerCase() === 'color'
-        ? selectedColor
-        : data.value.trim();
+  //   const valueToAdd =
+  //     currentSpecification?.name.toLowerCase() === 'color'
+  //       ? selectedColor
+  //       : data.value.trim();
 
-    if (!valueToAdd) return;
-    if (isValueEditMode && editingValue) {
-      updateSpecificationValue(
-        {
-          id: editingValue.id,
-          value: valueToAdd,
-          product: activeSpecificationId,
-        },
-        {
-          onSuccess: () => {
-            setActiveSpecificationId(null);
-            resetValueForm();
-            setIsValueModalOpen(false);
-            setSelectedColor('');
-            setIsValueEditMode(false);
-            setEditingValue(null);
-            queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
-          },
-        }
-      );
-    } else {
-      createSpecificationValue(
-        {
-          value: valueToAdd,
-          product: activeSpecificationId,
-          // specification: activeSpecificationId
-        },
-        {
-          onSuccess: () => {
-            setActiveSpecificationId(null);
-            resetValueForm();
-            +setIsValueModalOpen(false);
-            setSelectedColor('');
-            queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
-          },
-          onError: (error) => {
-            console.error('Error creating specification value:', error);
-          },
-        }
-      );
-    }
-  };
+  //   if (!valueToAdd) return;
+  //   if (isValueEditMode && editingValue) {
+  //     updateSpecificationValue(
+  //       {
+  //         id: editingValue.id,
+  //         value: valueToAdd,
+  //         product: activeSpecificationId,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setActiveSpecificationId(null);
+  //           resetValueForm();
+  //           setIsValueModalOpen(false);
+  //           setSelectedColor('');
+  //           setIsValueEditMode(false);
+  //           setEditingValue(null);
+  //           queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
+  //         },
+  //       }
+  //     );
+  //   } else {
+  //     createSpecificationValue(
+  //       {
+  //         value: valueToAdd,
+  //         product: activeSpecificationId,
+  //         // specification: activeSpecificationId
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           setActiveSpecificationId(null);
+  //           resetValueForm();
+  //           +setIsValueModalOpen(false);
+  //           setSelectedColor('');
+  //           queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
+  //         },
+  //         onError: (error) => {
+  //           console.error('Error creating specification value:', error);
+  //         },
+  //       }
+  //     );
+  //   }
+  // };
 
   const getModalContent = () => {
     if (!activeSpecificationId) return null;
@@ -369,7 +367,7 @@ export default function ProductSpecificationPage({
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">Save Variant</Button>
+                  <Button type="submit">Save Specification</Button>
                 </div>
               </>
             )}
@@ -384,7 +382,7 @@ export default function ProductSpecificationPage({
           setSelectedColor('');
         }}
       >
-        <div className="p-6">
+        {/* <div className="p-6">
           <Form<ProductSpecificationValueFormInput>
             validationSchema={SpecificationValueSchema}
             // resetValues={reset}
@@ -448,7 +446,7 @@ export default function ProductSpecificationPage({
               </>
             )}
           </Form>
-        </div>
+        </div> */}
       </Modal>
       <Modal
         isOpen={deleteConfirmationOpen}
@@ -482,7 +480,7 @@ export default function ProductSpecificationPage({
               </div>
 
               <div className="flex gap-2">
-                <Button
+                {/* <Button
                   size="sm"
                   variant="outline"
                   onClick={() => {
@@ -490,7 +488,7 @@ export default function ProductSpecificationPage({
                   }}
                 >
                   <PiPlusBold className="me-2 h-4 w-4" /> Add Value
-                </Button>
+                </Button> */}
                 <Tooltip
                   size="sm"
                   content="Edit Variant"
@@ -514,7 +512,7 @@ export default function ProductSpecificationPage({
                   variant="outline"
                   aria-label="Delete Variant"
                   onClick={() => handleDeleteClick(specification.id)}
-                  className="hover:text-red-600"
+                  className="hover:text-black-900"
                 >
                   <TrashIcon className="size-4" />
                 </ActionIcon>

@@ -9,12 +9,11 @@ import TablePagination from '@core/components/table/pagination';
 import cn from '@core/utils/class-names';
 import { Input } from 'rizzui';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
-
-export type OrdersDataType = (typeof orderData)[number];
+import { OrdersDataType } from '@/data/orders';
 
 export default function RecentOrder({ className }: { className?: string }) {
   const { table, setData } = useTanStackTable<OrdersDataType>({
-    tableData: orderData,
+    tableData: [],
     columnConfig: ordersColumns(false),
     options: {
       initialState: {

@@ -79,7 +79,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to first page"
-            onClick={() => table.firstPage()}
+            onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >
@@ -112,7 +112,7 @@ export default function TablePagination<TData extends Record<string, any>>({
             rounded="lg"
             variant="outline"
             aria-label="Go to last page"
-            onClick={() => table.lastPage()}
+            onClick={() => () => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >

@@ -9,9 +9,11 @@ import Filters from './filters';
 import TableFooter from '@core/components/table/footer';
 import { TableClassNameProps } from '@core/components/table/table-types';
 import cn from '@core/utils/class-names';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import usePaginatedProducts from '@/hooks/products/usePaginatedProducts';
 import { useDeleteProducts } from '@/hooks/products/useDeleteProducts';
+import PageLoader from '@/app/shared/page-loader';
+import { PaginationState } from '@tanstack/react-table';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -37,6 +39,11 @@ export default function ProductsTable({
   onSelectionChange,
   enableRowSelection = false,
 }: ProductsTableProps) {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
   const {
     data,
     isLoading,
@@ -45,21 +52,16 @@ export default function ProductsTable({
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = usePaginatedProducts();
-  
+  } = usePaginatedProducts(pagination);
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
-  const productsAPIData = data?.pages?.flatMap((page: any) => page?.data) || [];
-  
+
+  const pageCount =
+    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+
   const { table, setData } = useTanStackTable<productsDataType>({
-    tableData: productsAPIData,
+    tableData: [],
     columnConfig: productsListColumns,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: pageSize,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           deleteProduct(row.id, {
@@ -78,9 +80,25 @@ export default function ProductsTable({
       },
       enableColumnResizing: false,
       enableRowSelection: enableRowSelection,
-    
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
     },
+    pagination,
   });
+
+  useEffect(() => {
+    if (data) {
+      const productsAPIData =
+        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      setData(productsAPIData);
+    }
+  }, [data]);
 
   // Get the selected rows
   const selectedData = table
@@ -94,22 +112,27 @@ export default function ProductsTable({
     }
   }, []);
 
+  if (isLoading) return <PageLoader />;
+
   return (
     <>
       {/* {!hideFilters && <Filters table={table} />} */}
-      <Table 
-        table={table} 
-        variant="modern" 
+      <Table
+        table={table}
+        variant="modern"
         classNames={{
           ...classNames,
           rowClassName: cn(
             classNames.rowClassName,
             'transition-colors',
             enableRowSelection ? 'cursor-pointer' : '',
-            table.getSelectedRowModel().rows.some(row => row.id === table.getRow(row.id).id) 
-              ? 'bg-gray-50' : ''
-          )
-        }} 
+            table
+              .getSelectedRowModel()
+              .rows.some((row) => row.id === table.getRow(row.id).id)
+              ? 'bg-gray-50'
+              : ''
+          ),
+        }}
       />
       {!hidePagination && (
         <TablePagination

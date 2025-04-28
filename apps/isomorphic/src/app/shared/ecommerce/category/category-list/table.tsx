@@ -7,13 +7,19 @@ import { categoriesColumns } from './columns';
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 import PageLoader from '@/app/shared/page-loader';
 import toast from 'react-hot-toast';
+import { PaginationState } from '@tanstack/react-table';
 
 export default function CategoryTable() {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
   const {
     data,
     isLoading,
@@ -22,28 +28,21 @@ export default function CategoryTable() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = usePaginatedCategories();
-
+  } = usePaginatedCategories(pagination);
   const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
-  const categoriesAPIData =
-    data?.pages?.flatMap((page: any) => page?.data) || [];
+
+  const pageCount =
+    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
   const { table, setData } = useTanStackTable<CategoryDataType | any>({
-    tableData: categoriesAPIData,
+    tableData: [],
     columnConfig: categoriesColumns,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 10,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           deleteCategory(row.id, {
             onSuccess: () => {
               toast.success('Category deleted successfully');
-              // setData((prev) => prev.filter((r) => r.id !== row.id));
             },
           });
         },
@@ -52,13 +51,22 @@ export default function CategoryTable() {
         },
       },
       enableColumnResizing: false,
-    },
-  });
-  useEffect(() => {
-    const categoriesAPIData =
-      data?.pages?.flatMap((page: any) => page?.data) || [];
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
 
-    if (categoriesAPIData.length > 0) {
+        setPagination(nextPagination);
+      },
+    },
+    pagination,
+  });
+
+  useEffect(() => {
+    if (data) {
+      const categoriesAPIData =
+        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
       setData(categoriesAPIData);
     }
   }, [data]);
@@ -78,17 +86,6 @@ export default function CategoryTable() {
       />
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />
-      {hasNextPage && (
-        <div className="mt-4 flex justify-center">
-          <button
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            className="rounded bg-blue-500 px-4 py-2 text-white disabled:opacity-50"
-          >
-            {isFetchingNextPage ? 'Loading more...' : 'Load More'}
-          </button>
-        </div>
-      )}
     </>
   );
 }

@@ -4,7 +4,6 @@ import { routes } from '@/config/routes';
 import { Button } from 'rizzui/button';
 import PageHeader from '@/app/shared/page-header';
 import ProductsTable from '@/app/shared/ecommerce/product/product-list/table';
-import { productsData } from '@/data/products-data';
 import { metaObject } from '@/config/site.config';
 import ExportButton from '@/app/shared/export-button';
 

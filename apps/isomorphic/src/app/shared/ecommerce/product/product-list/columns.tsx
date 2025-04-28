@@ -43,9 +43,9 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.images || fallback}
+        src={row.original.images}
         name={row.original.name}
-        description={row.original.category}
+        description={row.original.description}
         avatarProps={{
           name: row.original.name,
           size: 'lg',
@@ -58,7 +58,7 @@ export const productsListColumns = [
     id: 'sku',
     size: 150,
     header: 'SKU',
-    cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
+    cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
   }),
   // columnHelper.accessor('stock', {
   //   id: 'stock',
@@ -71,7 +71,7 @@ export const productsListColumns = [
     size: 150,
     header: 'Price',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.price}</Text>
+      <Text className="font-medium text-gray-700">{row.original.price}</Text>
     ),
   }),
   // columnHelper.display({
@@ -84,7 +84,7 @@ export const productsListColumns = [
     id: 'category',
     size: 200,
     header: 'Category',
-    cell: ({ row }) => getRatings(row.original.category),
+    cell: ({ row }) => row.original.category,
   }),
 
   columnHelper.display({

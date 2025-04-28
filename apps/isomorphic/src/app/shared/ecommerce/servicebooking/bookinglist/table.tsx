@@ -7,20 +7,23 @@ import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { ServiceData } from '@/data/service-booking-data';
 import { servicebookingColumn } from './columns';
+import { useState } from 'react';
+import { PaginationState } from '@tanstack/react-table';
 
 export type ServiceBookingDataType = (typeof ServiceData)[number];
 
 export default function ServiceBookingTable() {
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 10,
+  });
+
+  const pageCount = 1;
+
   const { table, setData } = useTanStackTable<ServiceBookingDataType>({
     tableData: ServiceData,
     columnConfig: servicebookingColumn,
     options: {
-      initialState: {
-        pagination: {
-          pageIndex: 0,
-          pageSize: 10,
-        },
-      },
       meta: {
         handleDeleteRow: (row) => {
           setData((prev) => prev.filter((r) => r.id !== row.id));
@@ -30,7 +33,16 @@ export default function ServiceBookingTable() {
         },
       },
       enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
     },
+    pagination,
   });
 
   return (

@@ -1,18 +1,18 @@
 import { useMemo } from 'react';
 // import { useRouter } from 'next/router';
 
-export const CURRENCY_CODE = 'USD';
+export const CURRENCY_CODE = "INR";
 export const CURRENCY_OPTIONS = {
-  formation: 'en-US',
+  formation: "en-IN", // Correct locale for India
   fractions: 2,
 };
-export const LOCALE = 'en';
+export const LOCALE = "en-IN";
 
 export function formatPrice({
   amount,
-  currencyCode,
-  locale,
-  fractions,
+  currencyCode = CURRENCY_CODE,
+  locale = LOCALE,
+  fractions = 2,
 }: {
   amount: number;
   currencyCode: string;
@@ -20,7 +20,7 @@ export function formatPrice({
   fractions: number;
 }) {
   const formatCurrency = new Intl.NumberFormat(locale, {
-    style: 'currency',
+    style: "currency",
     currency: currencyCode,
     maximumFractionDigits: fractions,
   });

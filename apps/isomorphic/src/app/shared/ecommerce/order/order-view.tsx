@@ -17,6 +17,10 @@ import { toCurrency } from '@core/utils/to-currency';
 import { formatDate } from '@core/utils/format-date';
 import usePrice from '@core/hooks/use-price';
 import { useState } from 'react';
+import { useParams } from 'next/navigation';
+import usePaginatedOrders from '@/hooks/orders/usePaginatedOrders';
+import { useOrderById } from '@/hooks/orders/useOrderById';
+import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
 
 const orderStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -24,36 +28,6 @@ const orderStatusActions = [
   { id: 3, label: 'Packed', actionLabel: 'Mark as Packed' },
   { id: 4, label: 'Shipped', actionLabel: 'Mark as Shipped' },
   { id: 5, label: 'Received', actionLabel: 'Mark as Received' }, // No further action
-];
-
-const transitions = [
-  {
-    id: 1,
-    paymentMethod: {
-      name: 'MasterCard',
-      image:
-        'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/master.png',
-    },
-    price: '$1575.00',
-  },
-  {
-    id: 2,
-    paymentMethod: {
-      name: 'PayPal',
-      image:
-        'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/paypal.png',
-    },
-    price: '$75.00',
-  },
-  {
-    id: 2,
-    paymentMethod: {
-      name: 'Stripe',
-      image:
-        'https://isomorphic-furyroad.s3.amazonaws.com/public/payment/stripe.png',
-    },
-    price: '$375.00',
-  },
 ];
 
 // const currentOrderStatus = 1;
@@ -90,27 +64,54 @@ function WidgetCard({
 }
 
 export default function OrderView() {
-  const { items, total, totalItems } = useCart();
-  const { price: subtotal } = usePrice(
-    items && {
-      amount: total,
-    }
-  );
-  const { price: totalPrice } = usePrice({
-    amount: total,
+  const { id } = useParams();
+  const { data } = useOrderById(id as string);
+  const {
+    data: orderAPIData,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedOrders({
+    pageIndex: 0,
+    pageSize: 10,
   });
+  const { mutate: updateOrderStatus, status } = useOrderStatusChange();
+
+  const ordersAPIData =
+    orderAPIData?.pages?.flatMap((page: any) => page?.data?.results) || [];
+
   const orderNote = useAtomValue(orderNoteAtom);
   const billingAddress = useAtomValue(billingAddressAtom);
   const shippingAddress = useAtomValue(shippingAddressAtom);
   const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
-  const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
+  // const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
 
-  const handleChangeStatus = (id: number) => {
-    setIsStatusChangeLoading(true);
-    setTimeout(() => {
-      setCurrentOrderStatus(id);
-      setIsStatusChangeLoading(false);
-    }, 1000);
+  const orderData = ordersAPIData?.find((order: any) => order.id === id);
+  const totalItems = orderData?.items?.length || 0;
+  const { price: totalPrice } = usePrice({
+    amount: parseFloat(orderData?.total_price || 0),
+  });
+  console.log('data', orderData);
+  const handleChangeStatus = (orderId: number) => {
+    const status = orderStatusActions.find(
+      (status) => status.id === orderId
+    )?.label;
+
+    if (status) {
+      const payload = {
+        status: status,
+        id: id as string,
+      };
+
+      updateOrderStatus(payload);
+    }
+    // }
+    // setIsStatusChangeLoading(true);
+    // setTimeout(() => {
+    //   setCurrentOrderStatus(id);
+    //   setIsStatusChangeLoading(false);
+    // }, 1000);
   };
 
   return (
@@ -118,8 +119,8 @@ export default function OrderView() {
       <div className="flex flex-wrap justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
           {/* October 22, 2022 at 10:30 pm */}
-          {formatDate(new Date(), 'MMMM D, YYYY')} at{' '}
-          {formatDate(new Date(), 'h:mm A')}
+          {formatDate(new Date(orderData?.created_at), 'MMMM D, YYYY')} at{' '}
+          {formatDate(new Date(orderData?.created_at), 'h:mm A')}
         </span>
         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
           {totalItems} Items
@@ -149,7 +150,7 @@ export default function OrderView() {
             <div className="border-t border-muted pt-7 @5xl:mt-3">
               <div className="ms-auto max-w-lg space-y-6">
                 <div className="flex justify-between font-medium">
-                  Subtotal <span>{subtotal}</span>
+                  Subtotal <span>{0}</span>
                 </div>
                 <div className="flex justify-between font-medium">
                   Store Credit <span>{toCurrency(0)}</span>
@@ -219,7 +220,7 @@ export default function OrderView() {
                     <Button
                       size="sm"
                       variant="outline"
-                      isLoading={isStatusChangeLoading}
+                      isLoading={status === 'pending'}
                       onClick={() => handleChangeStatus(item.id)}
                     >
                       {item.actionLabel}

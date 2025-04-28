@@ -34,18 +34,18 @@ export default function NotFound() {
           >
             Sorry, the page not found
           </Title>
-          <p className="mt-3 text-sm leading-loose text-gray-500 lg:mt-6 lg:text-base lg:leading-loose">
+          {/* <p className="mt-3 text-sm leading-loose text-gray-500 lg:mt-6 lg:text-base lg:leading-loose">
             We have been spending long hours in order to launch our new website.
             Join our
             <br className="hidden sm:inline-block" />
             mailing list or follow us on Facebook for get latest update.
-          </p>
+          </p> */}
           <Link href={'/'}>
             <Button
               as="span"
               size="xl"
-              color="primary"
-              className="mt-8 h-12 px-4 xl:h-14 xl:px-6"
+              // color="primary"
+              className="mt-8 h-12 bg-primary px-4 xl:h-14 xl:px-6"
             >
               <PiHouseLineBold className="mr-1.5 text-lg" />
               Back to home
@@ -53,7 +53,6 @@ export default function NotFound() {
           </Link>
         </div>
       </div>
-      <SocialItems />
     </div>
   );
 }

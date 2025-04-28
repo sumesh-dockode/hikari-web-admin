@@ -3,9 +3,9 @@
 import Table from '@core/components/table';
 import { orderData } from '@/data/order-data';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
-import { OrdersDataType } from '../../ecommerce/dashboard/recent-order';
 import { basicColumns } from './column';
 import { TableVariantProps } from 'rizzui';
+import { OrdersDataType } from '@/data/orders';
 
 export default function BasicTable({
   stickyHeader = false,
@@ -15,7 +15,7 @@ export default function BasicTable({
   variants?: TableVariantProps;
 }) {
   const { table, setData } = useTanStackTable<OrdersDataType>({
-    tableData: orderData,
+    tableData: [],
     columnConfig: basicColumns,
     options: {
       initialState: {

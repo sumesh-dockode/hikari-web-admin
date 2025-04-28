@@ -1,7 +1,7 @@
 'use client';
 
-import { OrdersDataType } from '@/app/shared/ecommerce/dashboard/recent-order';
 import { routes } from '@/config/routes';
+import { OrdersDataType } from '@/data/orders';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 import TableAvatar from '@core/ui/avatar-card';
@@ -20,17 +20,18 @@ export const ordersColumns = (expanded: boolean = true) => {
       header: 'Order Id',
       cell: ({ row }) => <>#{row.original.id}</>,
     }),
-    columnHelper.accessor('name', {
-      id: 'customer',
+    columnHelper.accessor('user', {
+      id: 'user',
       size: 300,
       header: 'Customer',
       enableSorting: false,
       cell: ({ row }) => (
-        <TableAvatar
-          src={row.original.avatar}
-          name={row.original.name}
-          description={row.original.email}
-        />
+        <Text>{row.original.user}</Text>
+        // <TableAvatar
+        //   src={row.original.avatar}
+        //   name={row.original.name}
+        //   description={row.original.email}
+        // />
       ),
     }),
     columnHelper.display({
@@ -38,28 +39,26 @@ export const ordersColumns = (expanded: boolean = true) => {
       size: 150,
       header: 'Items',
       cell: ({ row }) => (
-        <Text className="font-medium text-gray-700">{row.original.items}</Text>
+        <Text className="font-medium text-gray-700">
+          {row.original.items?.length || 0}
+        </Text>
       ),
     }),
-    columnHelper.accessor('price', {
-      id: 'price',
+    columnHelper.accessor('total_price', {
+      id: 'total_price',
       size: 150,
       header: 'Price',
       cell: ({ row }) => (
-        <Text className="font-medium text-gray-700">${row.original.price}</Text>
+        <Text className="font-medium text-gray-700">
+          {row.original.total_price}
+        </Text>
       ),
     }),
-    columnHelper.accessor('createdAt', {
-      id: 'createdAt',
+    columnHelper.accessor('created_at', {
+      id: 'created_at',
       size: 200,
       header: 'Created',
-      cell: ({ row }) => <DateCell date={new Date(row.original.createdAt)} />,
-    }),
-    columnHelper.accessor('updatedAt', {
-      id: 'updatedAt',
-      size: 200,
-      header: 'Modified',
-      cell: ({ row }) => <DateCell date={new Date(row.original.updatedAt)} />,
+      cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
     }),
     columnHelper.accessor('status', {
       id: 'status',

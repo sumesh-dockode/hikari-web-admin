@@ -29,7 +29,6 @@ interface FileType {
 export default function UploadZone({ label, name, className, error, getValues, setValue }: UploadZoneProps) {
   // const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
   const files = getValues(name) || [];
-  console.log("getValues(icon_image)nnnnnnnnnnnnnn", getValues("icon_image"));
 
   // useEffect(() => {
   //   const currentFiles = getValues(name);

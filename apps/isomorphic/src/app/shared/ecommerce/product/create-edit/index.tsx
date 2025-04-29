@@ -92,10 +92,11 @@ export default function CreateEditProduct({
     const productData: productsDataType = {
       id: productId || '',
       name: formData.name || '',
-      images: formData.images?.[0]?.url || null,
+      // images: formData.images?.[0]?.url || null,
       sku: formData.sku || '',
       price: formData.price || 0,
       category: formData.category || '',
+      description: formData.description || '',
     };
     if (productId) {
       updateProducts(productData);
@@ -154,7 +155,12 @@ export default function CreateEditProduct({
                 key={key}
                 name={formParts[key as keyof typeof formParts]}
               >
-                {<Component className="pt-7 @2xl:pt-9 @3xl:pt-11" />}
+                {
+                  <Component
+                    className="pt-7 @2xl:pt-9 @3xl:pt-11"
+                    productId={''}
+                  />
+                }
               </Element>
             ))}
           </div>

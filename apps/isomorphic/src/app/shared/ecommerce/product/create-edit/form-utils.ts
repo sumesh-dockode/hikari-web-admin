@@ -33,12 +33,12 @@ export function defaultValues(product?: CreateProductInput) {
     category: product?.category ?? '',
     description: product?.description ?? '',
     price: product?.price ?? undefined,
-    images: product?.images ?? undefined,
+    // images: product?.images ?? undefined,
 
     productVariants: isEmpty(product?.productVariants)
       ? productVariants
       : product?.productVariants,
-    tags: product?.tags ?? [],
+    // tags: product?.tags ?? [],
   };
 }
 

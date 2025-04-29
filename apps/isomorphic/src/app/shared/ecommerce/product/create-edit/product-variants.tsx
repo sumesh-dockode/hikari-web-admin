@@ -35,9 +35,12 @@ export default function ProductVariants({ className }: { className?: string }) {
   >([]);
   const {
     mutate: createProductVariant,
-    data: productVariantData,
+    data: productvariantData,
     status: createStatus,
   } = useCreateProductVariant();
+
+  console.log('Mutation status:', createStatus);
+  console.log('Mutation data:', productvariantData);
   const { data: variantsData } = useVariants();
   const { data: variantValuesData } = useVariantValue();
 
@@ -79,23 +82,20 @@ export default function ProductVariants({ className }: { className?: string }) {
       { variantId: '', valueId: '' },
     ]);
   };
-
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
-    console.log('Submitting:', formData);
-
-    const formattedVariants = formData.variants.map(
-      ({ variantId, valueId }) => ({
-        variants: variantId,
-        value: valueId,
-      })
-    );
+    console.log('Form submitted with data:', formData);
 
     createProductVariant({
-      variants: formattedVariants,
-      price: parseFloat(formData.price),
+      // variants: formattedVariants,
       sku: formData.sku,
-      stock: parseInt(formData.stock, 10),
+      price: formData.price,
+      stock: formData.stock,
+      variants: formData.variants.map((v) => ({
+        variantId: v.variantId,
+        valueId: v.valueId,
+      })),
     });
+
     setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
     setIsModalOpen(false);
   };
@@ -116,7 +116,7 @@ export default function ProductVariants({ className }: { className?: string }) {
         </Button>
       </FormGroup>
 
-      <table className="w-full overflow-hidden rounded-md border border-gray-200 text-center text-sm shadow-sm">
+      {/* <table className="w-full overflow-hidden rounded-md border border-gray-200 text-center text-sm shadow-sm">
         <thead className="bg-gray-50 font-semibold text-gray-700">
           <tr>
             <th className="border-b px-4 py-3">Variant Name</th>
@@ -131,7 +131,7 @@ export default function ProductVariants({ className }: { className?: string }) {
             </tr>
           ))}
         </tbody>
-      </table>
+      </table> */}
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <Form<VariantFormInput>
@@ -142,8 +142,9 @@ export default function ProductVariants({ className }: { className?: string }) {
             resolver: zodResolver(variantSchema),
             defaultValues: {
               variants: addedVariantAttributes,
-              price: '',
+              price: 1,
               sku: '',
+              stock: 1,
             },
           }}
         >
@@ -268,7 +269,9 @@ export default function ProductVariants({ className }: { className?: string }) {
                 >
                   Cancel
                 </Button>
-                <Button type="submit">Save Variant</Button>
+                <Button type="submit" variant="outline">
+                  Save Variant
+                </Button>
               </div>
             </div>
           )}

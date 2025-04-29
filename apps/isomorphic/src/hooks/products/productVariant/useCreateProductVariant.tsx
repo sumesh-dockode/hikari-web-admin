@@ -2,9 +2,7 @@
 
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
-import {
-  ProductVariantDataType,
-} from '@/data/products-data';
+import { ProductVariantDataType } from '@/data/products-data';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
@@ -18,7 +16,7 @@ export function useCreateProductVariant() {
 
     console.log('productvariantData----', productVariantData);
 
-    let url = `${API_ROUTES.specifications}`;
+    let url = `${API_ROUTES.productvariants}`;
     const { data } = await apiClient.post(url, productVariantData);
 
     return data as Promise<ProductVariantDataType>;
@@ -29,7 +27,7 @@ export function useCreateProductVariant() {
     mutationFn: (data: ProductVariantDataType) => createProductVariant(data),
     onSuccess: (response) => {
       queryClient.setQueryData(
-        ['specifications', response.id?.toString()],
+        ['productvariants', response.id?.toString()],
         response
       );
     },

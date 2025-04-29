@@ -453,8 +453,10 @@ export default function ProductSpecificationPage({
         onClose={() => setDeleteConfirmationOpen(false)}
       >
         <div className="p-6">
-          <h2 className="mb-4 text-lg font-semibold">Delete Variant</h2>
-          <p className="mb-6">Are you sure you want to delete this variant?</p>
+          <h2 className="mb-4 text-lg font-semibold">Delete Specification</h2>
+          <p className="mb-6">
+            Are you sure you want to delete this specification?
+          </p>
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
@@ -491,7 +493,7 @@ export default function ProductSpecificationPage({
                 </Button> */}
                 <Tooltip
                   size="sm"
-                  content="Edit Variant"
+                  content="Edit Specification"
                   placement="top"
                   color="invert"
                 >
@@ -499,7 +501,7 @@ export default function ProductSpecificationPage({
                     as="span"
                     size="sm"
                     variant="outline"
-                    aria-label="Edit Variant"
+                    aria-label="Edit Specification"
                     onClick={() => handleEditSpecification(specification)}
                     className="hover:text-gray-700"
                   >
@@ -510,7 +512,7 @@ export default function ProductSpecificationPage({
                 <ActionIcon
                   size="sm"
                   variant="outline"
-                  aria-label="Delete Variant"
+                  aria-label="Delete Specification"
                   onClick={() => handleDeleteClick(specification.id)}
                   className="hover:text-black-900"
                 >

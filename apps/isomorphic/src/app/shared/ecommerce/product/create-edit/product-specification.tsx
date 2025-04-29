@@ -1,149 +1,205 @@
 'use client';
-import { useState } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import { Input, Button, ActionIcon, Select } from 'rizzui';
+
+import { useEffect, useState } from 'react';
+import { Input, Button, Select, Modal } from 'rizzui';
 import { PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
-import TrashIcon from '@core/components/icons/trash';
-import { Modal } from '@core/modal-views/modal';
-import { useCallback } from 'react';
+import { Form } from '@core/ui/form';
 import {
-  variantOption,
-  productVariants,
-  productSpecifications,
-} from '@/app/shared/ecommerce/product/create-edit/form-utils';
-import SelectLoader from '@core/components/loader/select-loader';
+  ProductSpecificationFormInput,
+  SpecificationSchema,
+} from '@/validators/product-specification-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, SubmitHandler } from 'react-hook-form';
+import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
+import useSpecifications from '@/hooks/products/specifications/useSpecifications';
 
-export default function ProductSpecification({
+interface Specification {
+  id?: string;
+  name?: string;
+  specification?: string;
+  product?: string;
+  value?: string;
+}
+
+interface SpecificationValue {
+  specification: string;
+  product: string;
+  value: string;
+}
+
+export default function ProductSpecifications({
   className,
+  productId,
 }: {
   className?: string;
+  productId: string; // Add this prop
 }) {
-  const {
-    control,
-    register,
-    setValue,
-    getValues,
-    formState: { errors },
-  } = useFormContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'productSpecifications',
-  });
-  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
-    null
+  const [specifications, setSpecifications] = useState<SpecificationValue[]>(
+    []
   );
-  const addSpecification = useCallback(
-    () => append([...productSpecifications]),
-    [append]
-  );
+  const [specificationOptions, setSpecificationOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
 
-  const handleAddSpecification = useCallback(() => {
-    const newVariant = {
-      name: getValues('newSpecificationName'),
-      value: getValues('newSpecificationValue'),
+  const {
+    mutate: createProductSpecificationValue,
+    data: specificationValueData,
+    status: createStatus,
+  } = useCreateSpecificationValue();
+  const { data: specificationsData } = useSpecifications();
+
+  useEffect(() => {
+    if (specificationsData?.pages) {
+      const options = specificationsData.pages.flatMap((page) =>
+        page.data.results.map((spec: Specification) => ({
+          value: spec.id,
+          label: spec.name,
+        }))
+      );
+      setSpecificationOptions(options);
+    }
+  }, [specificationsData]);
+
+  const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (data) => {
+    console.log('Form submitted with:', data);
+    const selectedSpec = specificationOptions.find(
+      (opt) => opt.value === data.specification
+    );
+
+    const newSpecification = {
+      specification: data.specification,
+      product: selectedSpec?.label || '',
+      value: data.value,
     };
-    append(newVariant);
-    setIsModalOpen(false);
-    // Reset modal fields
-    setValue('newSpecificationName', '');
-    setValue('newSpecificationValue', '');
-    setSelectedVariantId(null);
-  }, [append, getValues, setValue]);
+
+    createProductSpecificationValue(
+      {
+        specification: data.specification,
+        value: data.value,
+        product: productId,
+      },
+      {
+        onSuccess: () => {
+          setSpecifications((prev) => [...prev, newSpecification]);
+          setIsModalOpen(false);
+        },
+      }
+    );
+  };
+  const removeSpecification = (index: number) => {
+    setSpecifications((prev) => prev.filter((_, i) => i !== index));
+  };
 
   return (
     <>
       <FormGroup
-        title="Specification Options"
+        title="Product Specifications"
         description="Add your product specifications here"
         className={cn(className)}
       >
-        {fields.map((item, index) => (
-          <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
-            <Controller
-              name={`productSpecifications.${index}.name`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  options={productSpecifications}
-                  value={value}
-                  onChange={onChange}
-                  label="Specification Name"
-                  className="w-full @2xl:w-auto @2xl:flex-grow"
-                  getOptionValue={(option) => option.value}
-                />
-              )}
-            />
-            <Input
-              type="number"
-              label="Specification Value"
-              placeholder="150.00"
-              className="flex-grow"
-              prefix={'$'}
-              {...register(`productVariants.${index}.value`)}
-            />
-            {fields.length > 1 && (
-              <ActionIcon
-                onClick={() => remove(index)}
-                variant="flat"
-                className="mt-7 shrink-0"
-              >
-                <TrashIcon className="h-4 w-4" />
-              </ActionIcon>
-            )}
-          </div>
-        ))}
         <Button
-          onClick={addSpecification}
+          onClick={() => setIsModalOpen(true)}
           variant="outline"
           className="col-span-full ml-auto w-auto"
         >
           <PiPlusBold className="me-2 h-4 w-4" /> Add Specification
         </Button>
+
+        {specifications.length > 0 && (
+          <table className="mt-4 w-full overflow-hidden rounded-md border border-gray-200 text-left text-sm shadow-sm">
+            <thead className="bg-gray-50 font-semibold text-gray-700">
+              <tr>
+                <th className="border-b px-4 py-3">Specification</th>
+                <th className="border-b px-4 py-3">Value</th>
+                <th className="border-b px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {specifications.map((spec, index) => (
+                <tr key={index} className="border-b bg-white even:bg-gray-50">
+                  <td className="px-4 py-3">{spec.product}</td>
+                  <td className="px-4 py-3">{spec.value}</td>
+                  <td className="px-4 py-3">
+                    <Button
+                      variant="text"
+                      onClick={() => removeSpecification(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </FormGroup>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <div className="p-4">
-          <h2 className="mb-4 text-lg font-bold">Add New Specification</h2>
-          <div className="space-y-4">
-            <Controller
-              name="newSpecificationName"
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  options={variantOption}
-                  value={value}
-                  onChange={onChange}
-                  label="Specification Name"
-                  className="w-full"
-                  getOptionValue={(option) => option.value}
+        <Form<ProductSpecificationFormInput>
+          validationSchema={SpecificationSchema}
+          onSubmit={onSubmit}
+          useFormProps={{
+            mode: 'onSubmit',
+            resolver: zodResolver(SpecificationSchema),
+            defaultValues: {
+              specification: '',
+              value: '',
+            },
+          }}
+        >
+          {({ register, control, formState: { errors } }) => (
+            <div className="space-y-5 p-4">
+              <h2 className="text-lg font-bold">Add New Specification</h2>
+
+              <div className="grid gap-4">
+                <Controller
+                  name="specification"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={specificationOptions}
+                      label="Specification Name"
+                      className="w-full"
+                      error={errors.specification?.message}
+                      getOptionValue={(option) => option.value}
+                      displayValue={(selected) =>
+                        specificationOptions.find((r) => r.value === selected)
+                          ?.label ?? ''
+                      }
+                      onChange={(selectedValue) =>
+                        field.onChange(selectedValue)
+                      }
+                      value={field.value}
+                    />
+                  )}
                 />
-              )}
-            />
-            <Controller
-              name={`productVariants`}
-              control={control}
-              render={({ field: { onChange, value } }) => (
-                <Select
-                  options={variantOption}
-                  value={value}
-                  onChange={onChange}
-                  label="Specification Value"
-                  className="w-full @2xl:w-auto @2xl:flex-grow"
-                  getOptionValue={(option) => option.value}
+
+                <Input
+                  label="Value"
+                  placeholder="Enter specification value"
+                  {...register('value')}
+                  error={errors.value?.message}
                 />
-              )}
-            />
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddSpecification}>Add Specification</Button>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setIsModalOpen(false)}
+                  type="button"
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Save Specification</Button>
+              </div>
             </div>
-          </div>
-        </div>
+          )}
+        </Form>
       </Modal>
     </>
   );

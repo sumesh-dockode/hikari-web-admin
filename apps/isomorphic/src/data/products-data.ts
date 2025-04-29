@@ -2,11 +2,11 @@ export type productsDataType = {
   id: string;
   name: string;
   category: any;
-  images: string | any;
+  images?: string | any;
   sku?: string;
   description?: string;
   // stock: any;
-  price?: number;
+  price?: number|any;
   // status: string;
   // rating: any;
 };
@@ -40,7 +40,8 @@ export type specificationValueDataType = {
   id?: string | null;
   name?: string;
   value?: string;
-  product: any;
+  product?: any;
+  specification?: any;
 }
 export const productsData = [
   {

@@ -82,4 +82,5 @@ export const messages = {
   totalPriceIsRequired: 'Total Price is required',
   storeNameRequired: 'Store Name is required',
   storeAddressRequired: 'Store Address is required',
+  userNameRequired: 'User Name is required',
 };

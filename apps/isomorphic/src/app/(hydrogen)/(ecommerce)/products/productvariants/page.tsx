@@ -53,7 +53,7 @@ const COLORS = [
   '#000000',
 ];
 
-export default function ProductVariantsPage({ variantId }: { variantId: any }) {
+export default function ProductVariantsPage() {
   const queryClient = useQueryClient();
   const {
     data,
@@ -79,7 +79,7 @@ export default function ProductVariantsPage({ variantId }: { variantId: any }) {
     data: updateValueResponseData,
     status: updateValueStatus,
   } = useUpdateVariantValue();
-  const { isLoading: isFetching } = useVariantsById(variantId || '');
+  // const { isLoading: isFetching } = useVariantsById(variantId || '');
   const {
     mutate: createVariants,
     data: variantData,
@@ -148,7 +148,7 @@ export default function ProductVariantsPage({ variantId }: { variantId: any }) {
     setInputValue('');
     setIsValueModalOpen(true);
   };
-  console.log('variantId', variantId);
+  // console.log('variantId', variantId);
   const onSubmitValue: SubmitHandler<ProductVariantValueFormInput> = (data) => {
     if (activeVariantId === null) return;
 

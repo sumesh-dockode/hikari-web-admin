@@ -18,7 +18,7 @@ export function useCreateSpecificationValue() {
   ): Promise<specificationValueDataType> => {
     if (!session) throw new Error('Session not found');
 
-    console.log('variantData----', specificationValueData);
+    console.log('specificationValueData---', specificationValueData);
 
     let url = `${API_ROUTES.specificationValues}`;
     const { data } = await apiClient.post(url, specificationValueData);

@@ -39,14 +39,10 @@ const pageHeader = {
   ],
 };
 
-export default function ProductSpecificationPage({
-  specificationId,
-}: {
-  specificationId: any;
-}) {
+export default function ProductSpecificationPage() {
   const queryClient = useQueryClient();
   const { data, isLoading, isError, error } = useSpecifications();
-  const { isLoading: isFetching } = useSpecificationById(specificationId || '');
+  // const { isLoading: isFetching } = useSpecificationById(specificationId || '');
   const {
     mutate: createSpecifications,
     data: specificationData,

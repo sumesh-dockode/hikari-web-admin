@@ -33,7 +33,7 @@ import ProductSpecification from './product-specification';
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
   [formParts.media]: ProductMedia,
-  [formParts.pricingInventory]: PricingInventory,
+  // [formParts.pricingInventory]: PricingInventory,
   // [formParts.productIdentifiers]: ProductIdentifiers,
   [formParts.shipping]: ShippingInfo,
   // [formParts.seo]: ProductSeo,
@@ -71,6 +71,9 @@ export default function CreateEditProduct({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateProducts();
+  const [createdProductId, setCreatedProductId] = useState<string | null>(
+    productId || null
+  );
 
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
@@ -86,22 +89,33 @@ export default function CreateEditProduct({
     }
   }, [data]);
   const onSubmit: SubmitHandler<CreateProductInput> = (formData) => {
-    console.log('formDataproduct-----', formData);
     setLoading(true);
 
-    const productData: productsDataType = {
+    const productPayload: productsDataType = {
       id: productId || '',
       name: formData.name || '',
-      // images: formData.images?.[0]?.url || null,
       sku: formData.sku || '',
       price: formData.price || 0,
       category: formData.category || '',
       description: formData.description || '',
     };
-    if (productId) {
-      updateProducts(productData);
+
+    if (createdProductId) {
+      updateProducts(productPayload);
     } else {
-      createProducts(productData);
+      createProducts(productPayload, {
+        onSuccess: (response) => {
+          if (response?.id) {
+            setCreatedProductId(response.id);
+          }
+          setLoading(false);
+          toast.success('Product created successfully');
+        },
+        onError: () => {
+          toast.error('Product creation failed');
+          setLoading(false);
+        },
+      });
     }
   };
 
@@ -150,24 +164,32 @@ export default function CreateEditProduct({
           )}
         >
           <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => (
-              <Element
-                key={key}
-                name={formParts[key as keyof typeof formParts]}
-              >
-                {
+            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => {
+              const isSpecOrVariant =
+                key === formParts.variantOptions ||
+                key === formParts.productSpecifications;
+
+              if (isSpecOrVariant && !createdProductId) return null;
+
+              return (
+                <Element
+                  key={key}
+                  name={formParts[key as keyof typeof formParts]}
+                >
                   <Component
                     className="pt-7 @2xl:pt-9 @3xl:pt-11"
-                    productId={''}
+                    productId={createdProductId || ''}
                   />
-                }
-              </Element>
-            ))}
+                </Element>
+              );
+            })}
           </div>
 
           <FormFooter
             isLoading={isLoading}
-            submitBtnText={slug ? 'Update Product' : 'Create Product'}
+            submitBtnText={
+              createdProductId ? 'Update Product' : 'Create Product'
+            }
           />
         </form>
       </FormProvider>

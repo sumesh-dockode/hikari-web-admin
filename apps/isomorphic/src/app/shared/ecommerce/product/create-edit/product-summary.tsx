@@ -12,6 +12,7 @@ import {
 import dynamic from 'next/dynamic';
 import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
+import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 // const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
 //   ssr: false,
 //   loading: () => <SelectLoader />,
@@ -47,21 +48,11 @@ export default function ProductSummary({ className }: { className?: string }) {
         error={errors.sku?.message as string}
       />
 
-    
-      <Controller
-        name="categories"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            options={categoryOption}
-            value={value}
-            onChange={onChange}
-            label="Categories"
-            error={errors?.categories?.message as string}
-            getOptionValue={(option) => option.value}
-            dropdownClassName="h-auto"
-          />
-        )}
+      <Input
+        label="Categories"
+        placeholder="Categories"
+        {...register('categories')}
+        error={errors.categories?.message as string}
       />
 
       <Controller
@@ -76,33 +67,6 @@ export default function ProductSummary({ className }: { className?: string }) {
             labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
           />
         )}
-      />
-      <Controller
-        name="Material"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <MultiSelect
-            value={value}
-            clearable={true}
-            searchable={true}
-            options={materialOptions}
-            onChange={onChange}
-            onClear={() => {}}
-            label="Select Material"
-          />
-        )}
-      />
-      <Input
-        label="Dimentions"
-        placeholder="Dimentions"
-        {...register('dimensions')}
-        error={errors.title?.message as string}
-      />
-      <Textarea
-        label="Care Instructions"
-        placeholder="Enter your instructions"
-        className="col-span-full"
-        {...register('careInstructions')}
       />
     </FormGroup>
   );

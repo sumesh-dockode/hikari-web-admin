@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import QuillLoader from '@core/components/loader/quill-loader';
@@ -14,11 +14,30 @@ import {
   salesmanFormSchema,
 } from '@/validators/create-salesman.schema';
 import FormGroup from '@/app/shared/form-group';
+import { omit } from '@/utils/utils';
+import toast from 'react-hot-toast';
+import { routes } from '@/config/routes';
+import PageLoader from '@/app/shared/page-loader';
+import { useRouter } from 'next/navigation';
+import { useSalesManById } from '@/hooks/sales/salesman/useSalesManById';
+import { useCreateSalesMan } from '@/hooks/sales/salesman/useCreateSalesMan';
+import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
+
+export const salesmanDefaultValues = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  role: '',
+  username: '',
+  password: '',
+  images: undefined,
+  is_active: true,
+};
 
 // main category form component for create and update category
 export default function CreateSalesMan({
@@ -30,21 +49,72 @@ export default function CreateSalesMan({
   isModalView?: boolean;
   initialValue?: SalesmanFormInput;
 }) {
+  const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const {
+    data,
+    isLoading: isFetching,
+    error: fetchError,
+  } = useSalesManById(id || '');
+  const {
+    mutate: createSalesMan,
+    data: salesmanData,
+    status: createStatus,
+  } = useCreateSalesMan();
+
+  const {
+    mutate: updateSalesMan,
+    data: updateResponseData,
+    status: updateStatus,
+  } = useUpdateSalesMan();
 
   const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
-    // set timeout ony required to display loading state of the create button
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('create sales man data ->', data);
-      setReset({
-        name: '',
-        images: '',
-      });
-    }, 600);
+    let payload = {
+      id: id || '',
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      email: data.email || '',
+      role: data.role || '',
+      username: data.username || '',
+      password: data.password || '',
+      images: data.images?.url || undefined,
+      is_active: data.is_active || false,
+    };
+
+    if (payload.images?.includes('http')) {
+      payload = omit(payload, 'images');
+    }
+
+    id ? updateSalesMan(payload) : createSalesMan(payload);
   };
+
+  useEffect(() => {
+    if (createStatus === 'pending' || updateStatus === 'pending') return;
+
+    if (
+      (createStatus === 'success' && salesmanData) ||
+      (updateStatus === 'success' && updateResponseData)
+    ) {
+      toast.success(
+        id ? 'Salesman updated successfully' : 'Salesman created successfully'
+      );
+
+      setReset(salesmanDefaultValues);
+
+      push(routes.eCommerce.categories);
+
+      setLoading(false);
+    } else if (createStatus === 'error' || updateStatus === 'error') {
+      toast.error('Something went wrong');
+      setLoading(false);
+    }
+  }, [createStatus, updateStatus]);
+
+  if (isFetching) return <PageLoader />;
+
+  if (fetchError) throw fetchError;
 
   return (
     <Form<SalesmanFormInput>

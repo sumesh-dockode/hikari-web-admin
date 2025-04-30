@@ -10,6 +10,7 @@ import { PiTrashBold } from "react-icons/pi";
 import { Button, Text, FieldError } from "rizzui";
 import cn from "../../utils/class-names";
 import UploadIcon from "../../components/shape/upload";
+import { convertToBase64 } from "@core/utils/image-to-base64";
 
 interface UploadZoneProps {
   label?: string;
@@ -26,7 +27,14 @@ interface FileType {
   size: number;
 }
 
-export default function UploadZone({ label, name, className, error, getValues, setValue }: UploadZoneProps) {
+export default function UploadZone({
+  label,
+  name,
+  className,
+  error,
+  getValues,
+  setValue,
+}: UploadZoneProps) {
   // const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
   const files = getValues(name) || [];
 
@@ -36,15 +44,6 @@ export default function UploadZone({ label, name, className, error, getValues, s
   //     setFiles(currentFiles);
   //   }
   // }, [getValues, name]);
-
-  const convertToBase64 = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result as string);
-      reader.onerror = (error) => reject(error);
-    });
-  };
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const newFiles = await Promise.all(

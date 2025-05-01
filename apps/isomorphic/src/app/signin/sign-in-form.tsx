@@ -65,7 +65,7 @@ export default function SignInForm() {
             />
             <div className="flex justify-end pb-2">
               <Link
-                href={routes.auth.forgotPassword1}
+                href={routes.forgotPassword}
                 className="h-auto p-0 text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
               >
                 Forget Password?

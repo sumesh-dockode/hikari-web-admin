@@ -12,7 +12,7 @@ import {
 } from '@/validators/reset-password.schema';
 
 const initialValues = {
-  email: '',
+  username: '',
   password: '',
   confirmPassword: '',
 };
@@ -40,14 +40,14 @@ export default function ForgetPasswordForm() {
         {({ register, formState: { errors } }) => (
           <div className="space-y-6">
             <Input
-              type="email"
+              type="text"
               size="lg"
-              label="Email"
-              placeholder="Enter your email"
+              label="Username"
+              placeholder="Enter your username"
               className="[&>label>span]:font-medium"
               inputClassName="text-sm"
-              {...register('email')}
-              error={errors.email?.message}
+              {...register('username')}
+              error={errors.username?.message}
             />
             <Password
               label="Password"
@@ -76,7 +76,7 @@ export default function ForgetPasswordForm() {
       <Text className="mt-6 text-center text-[15px] leading-loose text-gray-500 lg:mt-8 lg:text-start xl:text-base">
         Don’t want to reset your password?{' '}
         <Link
-          href={routes.auth.signIn1}
+          href={routes.signIn}
           className="font-bold text-gray-700 transition-colors hover:text-blue"
         >
           Sign In

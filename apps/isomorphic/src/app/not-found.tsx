@@ -34,12 +34,6 @@ export default function NotFound() {
           >
             Sorry, the page not found
           </Title>
-          {/* <p className="mt-3 text-sm leading-loose text-gray-500 lg:mt-6 lg:text-base lg:leading-loose">
-            We have been spending long hours in order to launch our new website.
-            Join our
-            <br className="hidden sm:inline-block" />
-            mailing list or follow us on Facebook for get latest update.
-          </p> */}
           <Link href={'/'}>
             <Button
               as="span"

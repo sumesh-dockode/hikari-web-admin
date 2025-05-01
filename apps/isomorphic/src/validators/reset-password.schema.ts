@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { messages } from '@/config/messages';
 import {
-  validateEmail,
+  validateUserName,
   validatePassword,
   validateConfirmPassword,
 } from './common-rules';
@@ -9,7 +9,7 @@ import {
 // form zod validation schema
 export const resetPasswordSchema = z
   .object({
-    email: validateEmail,
+    username: validateUserName,
     password: validatePassword,
     confirmPassword: validateConfirmPassword,
   })

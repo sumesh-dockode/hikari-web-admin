@@ -26,7 +26,7 @@ apiClient.interceptors.request.use(
   }
 );
 
-// 🔹 Response Interceptor: Handle Token Expiry & Errors
+// Response Interceptor: Handle Token Expiry & Errors
 apiClient.interceptors.response.use(
   (response) => response, // ✅ Return response if successful
   async (error) => {
@@ -34,6 +34,8 @@ apiClient.interceptors.response.use(
       console.warn('Unauthorized, signing out...');
       toast.error('Unauthorized, signing out...');
       await signOut(); // Logout user if token is invalid
+    } else if (error.response?.status === 404) {
+      toast.error('Page Not Found');
     }
     return Promise.reject(error);
   }

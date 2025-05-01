@@ -7,6 +7,7 @@ import cn from "../../utils/class-names";
 import UploadIcon from "../../components/shape/upload";
 import { FieldError, Text } from "rizzui";
 import { Path, UseFormSetValue, UseFormGetValues } from "react-hook-form";
+import { convertToBase64 } from "@core/utils/image-to-base64";
 
 interface ImageFile {
   url: string;
@@ -30,21 +31,24 @@ export default function AvatarUploadNew<T extends Record<string, any>>({
   error,
 }: UploadZoneProps<T>) {
   const [image, setImage] = useState<string | null>(null);
+  const files = (getValues(name) as ImageFile) || null;
+  console.log("files", files);
+  // useEffect(() => {
+  //   // Load the image from React Hook Form (if it exists)
+  //   const formValue = getValues(name) as ImageFile | undefined;
+  //   if (formValue?.url) {
+  //     setImage(formValue.url);
+  //   } else {
+  //     setImage(null);
+  //   }
+  // }, [getValues, name]);
 
-  useEffect(() => {
-    // Load the image from React Hook Form (if it exists)
-    const formValue = getValues(name) as ImageFile | undefined;
-    if (formValue?.url) {
-      setImage(formValue.url);
-    } else {
-      setImage(null);
-    }
-  }, [getValues, name]);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
+      const imageUrl = await convertToBase64(file);
       setImage(imageUrl);
       setValue(name, {
         url: imageUrl,
@@ -57,14 +61,14 @@ export default function AvatarUploadNew<T extends Record<string, any>>({
   return (
     <div className={cn("grid gap-5", className)}>
       <div className="relative grid h-40 w-40 place-content-center rounded-full border-[1.8px]">
-        {image ? (
+        {files ? (
           <>
             <figure className="absolute inset-0 rounded-full">
               <Image
                 fill
                 objectFit="cover"
                 alt="user avatar"
-                src={image}
+                src={files?.url || ""}
                 className="rounded-full object-cover"
               />
             </figure>

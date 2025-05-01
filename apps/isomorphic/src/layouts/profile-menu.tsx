@@ -19,8 +19,6 @@ export default function ProfileMenu({
   avatarClassName?: string;
   user?: Session['user'];
 }) {
-  console.log('user', user);
-
   return (
     <ProfileMenuPopover>
       <Popover.Trigger>

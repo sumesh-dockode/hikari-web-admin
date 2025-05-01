@@ -7,4 +7,5 @@ export const API_ROUTES = {
   orders: '/ecom/admin/orders/',
   singleOrder: '/ecom/orders/',
   orderStatusChange: '/ecom/orders/{id}/status/',
+  salesman: '/ecom/admin/salesman/',
 };

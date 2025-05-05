@@ -58,7 +58,7 @@ export default function SalesManTable() {
     data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
   const { table, setData } = useTanStackTable<SalesManDataType>({
-    tableData: storeManagerList,
+    tableData: [],
     columnConfig: salesManColumns,
     options: {
       meta: {

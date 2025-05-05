@@ -88,4 +88,7 @@ export const messages = {
   totalPriceIsRequired: 'Total Price is required',
   storeNameRequired: 'Store Name is required',
   storeAddressRequired: 'Store Address is required',
+  productSkuIsRequired: 'Product Sku is required',
+  nextDayDeliveryRequired: 'Next Day Delivery is required',
+  
 };

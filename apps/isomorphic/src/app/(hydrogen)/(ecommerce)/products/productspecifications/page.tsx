@@ -116,7 +116,7 @@ export default function ProductSpecificationPage() {
   } = useForm<ProductSpecificationFormInput>({
     resolver: zodResolver(SpecificationSchema),
     defaultValues: {
-      name: '',
+      value: '',
     },
   });
 
@@ -157,7 +157,7 @@ export default function ProductSpecificationPage() {
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
     const specificationData =
       selectedSpecificationType === 'Custom'
-        ? formData.name
+        ? formData.value
         : selectedSpecificationType;
 
     if (isEditMode && editingSpecification) {
@@ -193,62 +193,6 @@ export default function ProductSpecificationPage() {
     }
   };
 
-  // const onSubmitValue: SubmitHandler<ProductSpecificationValueFormInput> = (
-  //   data
-  // ) => {
-  //   if (activeSpecificationId === null) return;
-
-  //   const currentSpecification = specificationAPIData.find(
-  //     (specification: any) => specification.id === activeSpecificationId
-  //   );
-
-  //   const valueToAdd =
-  //     currentSpecification?.name.toLowerCase() === 'color'
-  //       ? selectedColor
-  //       : data.value.trim();
-
-  //   if (!valueToAdd) return;
-  //   if (isValueEditMode && editingValue) {
-  //     updateSpecificationValue(
-  //       {
-  //         id: editingValue.id,
-  //         value: valueToAdd,
-  //         product: activeSpecificationId,
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           setActiveSpecificationId(null);
-  //           resetValueForm();
-  //           setIsValueModalOpen(false);
-  //           setSelectedColor('');
-  //           setIsValueEditMode(false);
-  //           setEditingValue(null);
-  //           queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
-  //         },
-  //       }
-  //     );
-  //   } else {
-  //     createSpecificationValue(
-  //       {
-  //         value: valueToAdd,
-  //         product: activeSpecificationId,
-  //         // specification: activeSpecificationId
-  //       },
-  //       {
-  //         onSuccess: () => {
-  //           setActiveSpecificationId(null);
-  //           resetValueForm();
-  //           +setIsValueModalOpen(false);
-  //           setSelectedColor('');
-  //           queryClient.invalidateQueries({ queryKey: ['specificationValue'] });
-  //         },
-  //         onError: (error) => {
-  //           console.error('Error creating specification value:', error);
-  //         },
-  //       }
-  //     );
-  //   }
-  // };
 
   const getModalContent = () => {
     if (!activeSpecificationId) return null;
@@ -318,9 +262,9 @@ export default function ProductSpecificationPage() {
               mode: 'onChange',
               defaultValues: isEditMode
                 ? {
-                    name: editingSpecification?.name || '',
+                    value: editingSpecification?.name || '',
                   }
-                : { name: '' },
+                : { value: '' },
               resolver: zodResolver(SpecificationSchema),
             }}
             className="space-y-4 p-6"
@@ -346,11 +290,11 @@ export default function ProductSpecificationPage() {
                       type="text"
                       label="Enter custom variant name"
                       placeholder="e.g. Fabric, Height"
-                      {...register('name')}
+                      {...register('value')}
                     />
-                    {errors.name && (
+                    {errors.value && (
                       <p className="mt-1 text-xs text-red-500">
-                        {errors.name?.message}
+                        {errors.value?.message}
                       </p>
                     )}
                   </div>
@@ -378,71 +322,7 @@ export default function ProductSpecificationPage() {
           setSelectedColor('');
         }}
       >
-        {/* <div className="p-6">
-          <Form<ProductSpecificationValueFormInput>
-            validationSchema={SpecificationValueSchema}
-            // resetValues={reset}
-            onSubmit={onSubmitValue}
-            useFormProps={{
-              mode: 'onChange',
-              defaultValues: {
-                value: '',
-              },
-              resolver: zodResolver(SpecificationValueSchema),
-            }}
-            className="space-y-4 p-6"
-          >
-            {({ register, formState: { errors } }) => (
-              <>
-                {getModalContent()}{' '}
-                {specificationAPIData
-                  ?.find(
-                    (specification: any) =>
-                      specification.id === activeSpecificationId
-                  )
-                  ?.name.toLowerCase() !== 'color' && (
-                  <div>
-                    <Input
-                      type="text"
-                      label="Enter value"
-                      placeholder="e.g. Blue, Leather, 3-seater"
-                      {...register('value')}
-                    />
-                    {errors.value && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.value.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    type="button"
-                    onClick={() => setIsValueModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={
-                      specificationAPIData
-                        ?.find(
-                          (specification: any) =>
-                            specification.id === activeSpecificationId
-                        )
-                        ?.name.toLowerCase() === 'color'
-                        ? !selectedColor
-                        : false
-                    }
-                  >
-                    Save Value
-                  </Button>
-                </div>
-              </>
-            )}
-          </Form>
-        </div> */}
+       
       </Modal>
       <Modal
         isOpen={deleteConfirmationOpen}

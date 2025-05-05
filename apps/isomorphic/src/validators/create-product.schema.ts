@@ -5,24 +5,17 @@ import next from 'next';
 
 export const productFormSchema = z.object({
   id: z.string().optional(),
-  name: z.string().min(1, { message: messages.productNameIsRequired }),
-  sku: z.string().optional(),
+  title: z.string().min(1, { message: messages.productNameIsRequired }),
+  sku: z.string().min(1, { message: messages.productSkuIsRequired }),
   category: z.string().min(1, { message: messages.catNameIsRequired }),
-  description: z.string().optional(),
+  description: z.string().min(1, { message: messages.descriptionIsRequired }),
   // images: z.array(fileSchema).optional(),
   price: z
+    .string()
+    .min(1, { message: messages.variantpriceIsRequired }),
+    stock: z
     .number()
-    .min(1, { message: messages.variantpriceIsRequired })
-    .refine((val) => !isNaN(Number(val)), 'Price must be a number'),
-  // customFields: z
-  //   .array(
-  //     z.object({
-  //       label: z.string().optional(),
-  //       value: z.string().optional(),
-  //     })
-  //   )
-  //   .optional(),
-
+    .min(1, { message: messages.variantStockIsRequired }),
   is_next_day_shipping_available: z.boolean().optional(),
   similar_products:z.array(z.string()).optional(),
   productVariants: z
@@ -34,9 +27,7 @@ export const productFormSchema = z.object({
     )
     .optional(),
   slug: z.string().optional(),
-  stock: z
-     .number()
-     .min(1, { message: messages.variantStockIsRequired })
+ 
 });
 
 export type CreateProductInput = z.infer<typeof productFormSchema>;

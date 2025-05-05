@@ -11,7 +11,6 @@ import FormNav, {
   formParts,
 } from '@/app/shared/ecommerce/product/create-edit/form-nav';
 import ProductSummary from '@/app/shared/ecommerce/product/create-edit/product-summary';
-import { defaultValues } from '@/app/shared/ecommerce/product/create-edit/form-utils';
 import ProductMedia from '@/app/shared/ecommerce/product/create-edit/product-media';
 import PricingInventory from '@/app/shared/ecommerce/product/create-edit/pricing-inventory';
 import ShippingInfo from '@/app/shared/ecommerce/product/create-edit/shipping-info';
@@ -24,23 +23,22 @@ import {
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 import { useCreateProducts } from '@/hooks/products/useCreateProducts';
-import { productsDataType } from '@/data/products-data';
 import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
 import { useProductsById } from '@/hooks/products/useProductsById';
+import { productsDataType } from '@/data/products-data';
 import { Form } from '@core/ui/form';
 import ProductVariants from './product-variants';
 import ProductSpecification from './product-specification';
+import { log } from 'console';
+import { useRouter } from 'next/navigation';
+
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
   [formParts.media]: ProductMedia,
-  // [formParts.pricingInventory]: PricingInventory,
-  // [formParts.productIdentifiers]: ProductIdentifiers,
+  [formParts.pricingInventory]: PricingInventory,
   [formParts.shipping]: ShippingInfo,
-  // [formParts.seo]: ProductSeo,
-  // [formParts.deliveryEvent]: DeliveryEvent,
   [formParts.variantOptions]: ProductVariants,
   [formParts.productSpecifications]: ProductSpecification,
-  // [formParts.tagsAndCategory]: ProductTaxonomies,
   [formParts.similiarProducts]: similiarProducts,
 };
 
@@ -60,7 +58,13 @@ export default function CreateEditProduct({
   const { layout } = useLayout();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
-  const { data, isFetching, status } = useProductsById(productId);
+  // const [createdProductId, setCreatedProductId] = useState<string | null>(
+  //   slug || null
+  // );
+  console.log('slug', slug);
+  // console.log('createdProductId', createdProductId);
+
+  const { data, isFetching } = useProductsById(slug);
   const {
     mutate: createProducts,
     data: productData,
@@ -71,45 +75,90 @@ export default function CreateEditProduct({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateProducts();
-  const [createdProductId, setCreatedProductId] = useState<string | null>(
-    productId || null
-  );
 
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
-    defaultValues: product || {},
+    defaultValues: {
+      title: '',
+      sku: '',
+      price: "",
+      category: '',
+      stock: 0,
+      description: '',
+      is_next_day_shipping_available: false,
+      ...product,
+    },
   });
-  useEffect(() => {
-    console.log('dataiiiiiiiiiiiiiii', data);
 
+  const router = useRouter();
+  // Populate form if editing an existing product
+  useEffect(() => {
+    console.log('data', data);
     if (data?.status === 'success') {
-      Object.entries(data.data).forEach(([key, value]) => {
-        form.setValue(key as keyof CreateProductInput, value as string);
+      form.reset({
+        title: data.data.name || '',
+        sku: data.data.sku || '',
+        price: data.data.price || 0,
+        stock: data.data.stock || 0,
+        category: data.data.category || '',
+        description: data.data.description || '',
+        is_next_day_shipping_available:
+          data.data.is_next_day_shipping_available || false,
       });
     }
   }, [data]);
+
   const onSubmit: SubmitHandler<CreateProductInput> = (formData) => {
     setLoading(true);
 
-    const productPayload: productsDataType = {
-      id: productId || '',
-      name: formData.name || '',
-      sku: formData.sku || '',
-      price: formData.price || 0,
-      category: formData.category || '',
-      description: formData.description || '',
+    const basePayload = {
+      name: formData.title,
+      sku: formData.sku,
+      price: formData.price,
+      stock: formData.stock,
+      category: formData.category,
+      description: formData.description,
+      is_next_day_shipping_available: formData.is_next_day_shipping_available,
     };
-
-    if (createdProductId) {
-      updateProducts(productPayload);
-    } else {
-      createProducts(productPayload, {
+    if (slug) {
+      // Update existing product
+      const productPayload: productsDataType = {
+        id: slug,
+        ...basePayload,
+      };
+      updateProducts(productPayload, {
         onSuccess: (response) => {
           if (response?.id) {
-            setCreatedProductId(response.id);
+            setLoading(false);
+            setReset({
+              id: '',
+              name: '',
+              image: null,
+              sku: '',
+              price: 0,
+              catagoryName: '',
+              description: '',
+              is_next_day_shipping_available: false,
+              stock: 0,
+            });
+            toast.success('Product updated successfully');
+            router.push(`/products`);
           }
+        },
+        onError: () => {
+          toast.error('Product updation failed');
           setLoading(false);
-          toast.success('Product created successfully');
+        },
+      });
+    } else {
+      // Create new product
+      createProducts(basePayload as productsDataType, {
+        onSuccess: (response) => {
+          if (response?.id) {
+            setLoading(false);
+            toast.success('Product created successfully');
+            router.push(`/products/${response.id}/edit`);
+          }
         },
         onError: () => {
           toast.error('Product creation failed');
@@ -118,35 +167,6 @@ export default function CreateEditProduct({
       });
     }
   };
-
-  useEffect(() => {
-    if (createStatus === 'pending' || updateStatus === 'pending') return;
-
-    if (
-      (createStatus === 'success' && productData) ||
-      (updateStatus === 'success' && updateResponseData)
-    ) {
-      toast.success(
-        productId
-          ? 'product updated successfully'
-          : 'product created successfully'
-      );
-      setReset({
-        id: '',
-        name: '',
-        image: null,
-        sku: '',
-        price: '',
-        catagoryName: '',
-      });
-
-      setLoading(false);
-    } else if (createStatus === 'error' || updateStatus === 'error') {
-      toast.error('Product creation failed');
-
-      setLoading(false);
-    }
-  }, [createStatus, updateStatus]);
 
   return (
     <div className="@container">
@@ -164,32 +184,37 @@ export default function CreateEditProduct({
           )}
         >
           <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
-            {Object.entries(MAP_STEP_TO_COMPONENT).map(([key, Component]) => {
-              const isSpecOrVariant =
-                key === formParts.variantOptions ||
-                key === formParts.productSpecifications;
+            {Object.entries(MAP_STEP_TO_COMPONENT)
+              .filter(([key]) => {
+                const isSpecOrVariant =
+                  key === formParts.variantOptions ||
+                  key === formParts.productSpecifications;
 
-              if (isSpecOrVariant && !createdProductId) return null;
+                // Filter out spec/variant components if product hasn't been created
+                if (!slug && isSpecOrVariant) {
+                  return false;
+                }
 
-              return (
+                return true;
+              })
+              .map(([key, Component]) => (
                 <Element
                   key={key}
                   name={formParts[key as keyof typeof formParts]}
                 >
                   <Component
                     className="pt-7 @2xl:pt-9 @3xl:pt-11"
-                    productId={createdProductId || ''}
+                    productId={slug || ''}
                   />
                 </Element>
-              );
-            })}
+              ))}
+
+           
           </div>
 
           <FormFooter
             isLoading={isLoading}
-            submitBtnText={
-              createdProductId ? 'Update Product' : 'Create Product'
-            }
+            submitBtnText={slug ? 'Update Product' : 'Create Product'}
           />
         </form>
       </FormProvider>

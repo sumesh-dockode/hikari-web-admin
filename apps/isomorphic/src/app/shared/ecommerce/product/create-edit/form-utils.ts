@@ -28,11 +28,12 @@ export const productSpecifications = [
 
 export function defaultValues(product?: CreateProductInput) {
   return {
-    name: product?.name ?? '',
+    title: product?.title ?? '',
     sku: product?.sku ?? '',
     category: product?.category ?? '',
     description: product?.description ?? '',
-    price: product?.price ?? undefined,
+    price: product?.price ?? 0,
+    stock: product?.stock ?? 0,
     // images: product?.images ?? undefined,
 
     productVariants: isEmpty(product?.productVariants)

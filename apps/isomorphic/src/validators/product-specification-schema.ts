@@ -1,8 +1,8 @@
 import { z } from 'zod';
 export const SpecificationSchema = z.object({
   id: z.string().optional(),
-  name: z.string(),
-  product: z.string().min(1, "Product is required"),
+  // name: z.string(),
+  // product: z.string().min(1, "Product is required"),
   specification: z.string().min(1, 'Specification is required'),
   value: z.string().min(1, 'Value is required'),
 

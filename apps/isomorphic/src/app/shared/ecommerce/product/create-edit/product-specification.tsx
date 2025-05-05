@@ -11,7 +11,7 @@ import {
   SpecificationSchema,
 } from '@/validators/product-specification-schema';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Controller, SubmitHandler } from 'react-hook-form';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
 import useSpecifications from '@/hooks/products/specifications/useSpecifications';
 
@@ -34,7 +34,7 @@ export default function ProductSpecifications({
   productId,
 }: {
   className?: string;
-  productId: string; // Add this prop
+  productId: string;
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [specifications, setSpecifications] = useState<SpecificationValue[]>(
@@ -62,23 +62,36 @@ export default function ProductSpecifications({
       setSpecificationOptions(options);
     }
   }, [specificationsData]);
-
-  const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (data) => {
-    console.log('Form submitted with:', data);
+  const {
+    register,
+    control,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<ProductSpecificationFormInput>({
+    resolver: zodResolver(SpecificationSchema),
+    defaultValues: {
+      specification: '',
+      value: '',
+    },
+  });
+  console.log('errors', errors);
+  const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
+    console.log('Form submitted with:', formData);
     const selectedSpec = specificationOptions.find(
-      (opt) => opt.value === data.specification
+      (opt) => opt.value === formData.specification
     );
 
     const newSpecification = {
-      specification: data.specification,
+      specification: formData.specification,
       product: selectedSpec?.label || '',
-      value: data.value,
+      value: formData.value,
     };
 
     createProductSpecificationValue(
       {
-        specification: data.specification,
-        value: data.value,
+        specification: formData.specification,
+        value: formData.value,
         product: productId,
       },
       {
@@ -89,6 +102,7 @@ export default function ProductSpecifications({
       }
     );
   };
+
   const removeSpecification = (index: number) => {
     setSpecifications((prev) => prev.filter((_, i) => i !== index));
   };
@@ -114,7 +128,7 @@ export default function ProductSpecifications({
               <tr>
                 <th className="border-b px-4 py-3">Specification</th>
                 <th className="border-b px-4 py-3">Value</th>
-                <th className="border-b px-4 py-3">Actions</th>
+                {/* <th className="border-b px-4 py-3">Actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -122,15 +136,15 @@ export default function ProductSpecifications({
                 <tr key={index} className="border-b bg-white even:bg-gray-50">
                   <td className="px-4 py-3">{spec.product}</td>
                   <td className="px-4 py-3">{spec.value}</td>
-                  <td className="px-4 py-3">
+                  {/* <td className="px-4 py-3">
                     <Button
                       variant="text"
                       onClick={() => removeSpecification(index)}
                       className="text-red-500 hover:text-red-700"
                     >
-                      Remove
+                      <FiTrash className="h-4 w-4" />
                     </Button>
-                  </td>
+                  </td> */}
                 </tr>
               ))}
             </tbody>
@@ -139,7 +153,7 @@ export default function ProductSpecifications({
       </FormGroup>
 
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <Form<ProductSpecificationFormInput>
+        {/* <Form<ProductSpecificationFormInput>
           validationSchema={SpecificationSchema}
           onSubmit={onSubmit}
           useFormProps={{
@@ -150,56 +164,63 @@ export default function ProductSpecifications({
               value: '',
             },
           }}
-        >
-          {({ register, control, formState: { errors } }) => (
-            <div className="space-y-5 p-4">
-              <h2 className="text-lg font-bold">Add New Specification</h2>
+        > */}
+        <>
+          <div className="space-y-5 p-4">
+            <h2 className="text-lg font-bold">Add New Specification</h2>
 
-              <div className="grid gap-4">
-                <Controller
-                  name="specification"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={specificationOptions}
-                      label="Specification Name"
-                      className="w-full"
-                      error={errors.specification?.message}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) =>
-                        specificationOptions.find((r) => r.value === selected)
-                          ?.label ?? ''
-                      }
-                      onChange={(selectedValue) =>
-                        field.onChange(selectedValue)
-                      }
-                      value={field.value}
-                    />
-                  )}
-                />
+            <div className="grid gap-4">
+              <Controller
+                name="specification"
+                control={control}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={specificationOptions}
+                    label="Specification Name"
+                    className="w-full"
+                    error={errors.specification?.message}
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      specificationOptions.find((r) => r.value === selected)
+                        ?.label ?? ''
+                    }
+                    onChange={(selectedValue) => field.onChange(selectedValue)}
+                    value={field.value}
+                  />
+                )}
+              />
 
-                <Input
-                  label="Value"
-                  placeholder="Enter specification value"
-                  {...register('value')}
-                  error={errors.value?.message}
-                />
-              </div>
-
-              <div className="flex justify-end gap-2 pt-4">
-                <Button
-                  variant="outline"
-                  onClick={() => setIsModalOpen(false)}
-                  type="button"
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Save Specification</Button>
-              </div>
+              <Input
+                label="Value"
+                placeholder="Enter specification value"
+                {...register('value')}
+                error={errors.value?.message}
+              />
             </div>
-          )}
-        </Form>
+
+            <div className="flex justify-end gap-2 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => setIsModalOpen(false)}
+                type="button"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleSubmit(onSubmit)();
+                }}
+              >
+                Save Specification
+              </Button>
+            </div>
+          </div>
+        </>
+        {/* </Form> */}
       </Modal>
     </>
   );

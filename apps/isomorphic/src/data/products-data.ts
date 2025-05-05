@@ -5,8 +5,9 @@ export type productsDataType = {
   images?: string | any;
   sku?: string;
   description?: string;
-  // stock: any;
-  price?: number|any;
+  stock?: number;
+  price?: string;
+  is_next_day_shipping_available?: boolean;
   // status: string;
   // rating: any;
 };
@@ -16,14 +17,16 @@ export type variantDataType = {
 }
 export type ProductVariantDataType = {
   id?: string | null;
+  product?: string;  // Add product field here
   variants?: any;
+  attributes?:any;
   value?: string;
   price?: number;
   sku?: string;
   image?: any;
   stock: number;
-
 }
+
 export type variantValuesDataType = {
   id: string|null;
   name?: string;

@@ -21,6 +21,7 @@ import { useParams } from 'next/navigation';
 import usePaginatedOrders from '@/hooks/orders/usePaginatedOrders';
 import { useOrderById } from '@/hooks/orders/useOrderById';
 import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
+import PageLoader from '../../page-loader';
 
 const orderStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -65,7 +66,7 @@ function WidgetCard({
 
 export default function OrderView() {
   const { id } = useParams();
-  const { data } = useOrderById(id as string);
+  const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
   const {
     data: orderAPIData,
     isLoading,
@@ -113,6 +114,7 @@ export default function OrderView() {
     //   setIsStatusChangeLoading(false);
     // }, 1000);
   };
+  if (isLoadingOrder) return <PageLoader />;
 
   return (
     <div className="@container">

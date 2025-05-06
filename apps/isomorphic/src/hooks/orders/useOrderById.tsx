@@ -13,5 +13,8 @@ export function useOrderById(id: string) {
       return data;
     },
     enabled: status === 'authenticated',
+    throwOnError(error, query) {
+      throw error;
+    },
   });
 }

@@ -6,3 +6,8 @@ export interface OrdersDataType {
   created_at: string;
   user?: number;
 }
+
+export interface OrderStatusChangeDataType {
+  id: string;
+  status: string;
+}

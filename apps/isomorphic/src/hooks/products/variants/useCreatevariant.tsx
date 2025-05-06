@@ -1,10 +1,10 @@
 'use client';
 
-import { API_ROUTES } from '@/api';
-import apiClient from '@/app/lib/apiClient';
-import { variantDataType } from '@/data/products-data';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSession } from 'next-auth/react';
+import { API_ROUTES } from '@/app/lib/api';
+import apiClient from "@/app/lib/apiClient";
+import { variantDataType } from "@/data/products-data";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useSession } from "next-auth/react";
 
 export function useCreateVariants() {
   const session = useSession();

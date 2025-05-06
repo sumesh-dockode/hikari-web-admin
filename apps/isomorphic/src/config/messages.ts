@@ -90,5 +90,5 @@ export const messages = {
   storeAddressRequired: 'Store Address is required',
   productSkuIsRequired: 'Product Sku is required',
   nextDayDeliveryRequired: 'Next Day Delivery is required',
-  
+  userNameRequired: 'User Name is required',
 };

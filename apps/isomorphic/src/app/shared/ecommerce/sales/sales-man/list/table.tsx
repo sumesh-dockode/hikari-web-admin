@@ -6,8 +6,12 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { salesManColumns } from './columns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
+import usePaginatedSalesMan from '@/hooks/sales/salesman/usePaginatedSalesMan';
+import { useDeleteSalesMan } from '@/hooks/sales/salesman/useDeleteSalesMan';
+import toast from 'react-hot-toast';
+import PageLoader from '@/app/shared/page-loader';
 
 const storeManagerList = [
   {
@@ -39,16 +43,31 @@ export default function SalesManTable() {
     pageIndex: 0,
     pageSize: 10,
   });
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedSalesMan(pagination);
+  const { mutate: deleteSalesman, status: deleteStatus } = useDeleteSalesMan();
 
-  const pageCount = 1;
+  const pageCount =
+    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
   const { table, setData } = useTanStackTable<SalesManDataType>({
-    tableData: storeManagerList,
+    tableData: [],
     columnConfig: salesManColumns,
     options: {
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          deleteSalesman(row.id, {
+            onSuccess: () => {
+              toast.success('Salesman deleted successfully');
+            },
+          });
         },
         handleMultipleDelete: (rows) => {
           setData((prev) => prev.filter((r) => !rows.includes(r)));
@@ -66,6 +85,16 @@ export default function SalesManTable() {
     },
     pagination,
   });
+
+  useEffect(() => {
+    if (data) {
+      const salesManAPIData =
+        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      setData(salesManAPIData);
+    }
+  }, [data]);
+
+  if (isLoading) return <PageLoader />;
 
   return (
     <>

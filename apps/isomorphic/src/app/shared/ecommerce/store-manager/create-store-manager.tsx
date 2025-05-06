@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import SelectLoader from '@core/components/loader/select-loader';
@@ -25,11 +25,31 @@ import {
 import FormGroup from '../../form-group';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
+import { useRouter } from 'next/navigation';
+import { useStoreManagerById } from '@/hooks/storeManager/useStoreManagerById';
+import { useCreateStoreManager } from '@/hooks/storeManager/useCreateStoreManager';
+import { useUpdateStoreManager } from '@/hooks/storeManager/useUpdateStoreManager';
+import { omit } from '@/utils/utils';
+import { routes } from '@/config/routes';
+import toast from 'react-hot-toast';
+import PageLoader from '../../page-loader';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
+
+const DefaultValues = {
+  first_name: '',
+  last_name: '',
+  email: '',
+  username: '',
+  password: '',
+  images: '',
+  is_active: false,
+  store_name: '',
+  store_address: '',
+};
 
 // main category form component for create and update category
 export default function CreateStoreManager({
@@ -41,21 +61,73 @@ export default function CreateStoreManager({
   isModalView?: boolean;
   initialValue?: StoreManagerFormInput;
 }) {
+  const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const {
+    data,
+    isLoading: isFetching,
+    error: fetchError,
+  } = useStoreManagerById(id || '');
+  const {
+    mutate: createStoreManager,
+    data: storeManagerData,
+    status: createStatus,
+  } = useCreateStoreManager();
+
+  const {
+    mutate: updateStoreManager,
+    data: updateResponseData,
+    status: updateStatus,
+  } = useUpdateStoreManager();
 
   const onSubmit: SubmitHandler<StoreManagerFormInput> = (data) => {
-    // set timeout ony required to display loading state of the create button
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('create store manager data ->', data);
-      setReset({
-        name: '',
-        images: '',
-      });
-    }, 600);
+    let payload = {
+      id: id || null,
+      first_name: data.first_name || '',
+      last_name: data.last_name || '',
+      email: data.email || '',
+      username: data.username || '',
+      password: data.password || '',
+      images: data.images?.url || undefined,
+      is_active: data.is_active || false,
+      store_name: data.store_name || '',
+      store_address: data.store_address || '',
+    };
+
+    if (payload.images?.includes('http')) {
+      payload = omit(payload, 'images');
+    }
+
+    id ? updateStoreManager(payload) : createStoreManager(payload);
   };
+
+  useEffect(() => {
+    if (createStatus === 'pending' || updateStatus === 'pending') return;
+
+    if (
+      (createStatus === 'success' && storeManagerData) ||
+      (updateStatus === 'success' && updateResponseData)
+    ) {
+      toast.success(
+        id ? 'Salesman updated successfully' : 'Salesman created successfully'
+      );
+
+      setReset(DefaultValues);
+
+      push(routes.eCommerce.categories);
+
+      setLoading(false);
+    } else if (createStatus === 'error' || updateStatus === 'error') {
+      toast.error('Something went wrong');
+      setLoading(false);
+    }
+  }, [createStatus, updateStatus]);
+
+  if (isFetching) return <PageLoader />;
+
+  if (fetchError) throw fetchError;
 
   return (
     <Form<StoreManagerFormInput>

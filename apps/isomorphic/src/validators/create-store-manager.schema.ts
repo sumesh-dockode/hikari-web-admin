@@ -1,17 +1,23 @@
 import { z } from 'zod';
 import { messages } from '@/config/messages';
-import { fileSchema, validateEmail, validateNewPassword } from './common-rules';
+import {
+  fileSchema,
+  validateEmail,
+  validateNewPassword,
+  validateUserName,
+} from './common-rules';
 
 // form zod validation schema
 export const storeManagerFormSchema = z.object({
+  id: z.string().optional(),
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().optional(),
   email: validateEmail,
   store_name: z.string().min(1, { message: messages.storeNameRequired }),
   store_address: z.string().min(1, { message: messages.storeAddressRequired }),
-  username: z.string().min(3),
+  username: validateUserName,
   password: validateNewPassword,
-  images: z.array(fileSchema).optional(),
+  images: fileSchema.optional(),
   is_active: z.boolean().optional(),
 });
 

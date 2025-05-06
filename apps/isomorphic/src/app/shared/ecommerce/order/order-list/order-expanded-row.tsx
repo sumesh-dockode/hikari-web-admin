@@ -14,9 +14,9 @@ export interface OrderItem {
       id: string;
       name: string;
       slug: string;
-      image?: string;
     };
     sku: string;
+    images?: string[];
   };
   quantity: number;
   price: string;
@@ -48,7 +48,12 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
               <Image
                 fill
                 className="object-cover"
-                src={product.product_variant.product.image || noImage}
+                src={
+                  product.product_variant.images &&
+                  product.product_variant.images.length > 0
+                    ? product.product_variant.images[0]
+                    : noImage
+                }
                 alt={product.product_variant.product.name}
                 sizes=""
               />

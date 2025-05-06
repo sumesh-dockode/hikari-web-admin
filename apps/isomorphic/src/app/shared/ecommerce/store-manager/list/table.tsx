@@ -7,8 +7,12 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { storeManagerColumns } from './columns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
+import { useDeleteStoreManager } from '@/hooks/storeManager/useDeleteStoreManager';
+import PageLoader from '@/app/shared/page-loader';
+import toast from 'react-hot-toast';
 
 const storeManagerList = [
   {
@@ -43,15 +47,32 @@ export default function StoreManagerTable() {
     pageSize: 10,
   });
 
-  const pageCount = 1;
+  const {
+    data,
+    isLoading,
+    isError,
+    error,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePaginatedStoreManager(pagination);
+  const { mutate: deleteStoreManager, status: deleteStatus } =
+    useDeleteStoreManager();
+
+  const pageCount =
+    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
   const { table, setData } = useTanStackTable<StoreManagerDataType>({
-    tableData: storeManagerList,
+    tableData: [],
     columnConfig: storeManagerColumns,
     options: {
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          deleteStoreManager(row.id, {
+            onSuccess: () => {
+              toast.success('Store Manager deleted successfully');
+            },
+          });
         },
         handleMultipleDelete: (rows) => {
           setData((prev) => prev.filter((r) => !rows.includes(r)));
@@ -69,6 +90,16 @@ export default function StoreManagerTable() {
     },
     pagination,
   });
+
+  useEffect(() => {
+    if (data) {
+      const APIData =
+        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      setData(APIData);
+    }
+  }, [data]);
+
+  if (isLoading) return <PageLoader />;
 
   return (
     <>

@@ -21,7 +21,6 @@ import { ActionIcon } from 'rizzui/action-icon';
 import PencilIcon from '@core/components/icons/pencil';
 import { useQueryClient } from '@tanstack/react-query';
 import useSpecifications from '@/hooks/products/specifications/useSpecifications';
-import { useSpecificationById } from '@/hooks/products/specifications/useSpecificationById';
 import { useCreateSpecifications } from '@/hooks/products/specifications/useCreateSpecification';
 import { useUpdateSpecification } from '@/hooks/products/specifications/useUpdateSpecification';
 import { useDeleteSpecification } from '@/hooks/products/specifications/useDeleteSpecification';

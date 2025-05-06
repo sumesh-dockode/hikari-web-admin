@@ -9,6 +9,7 @@ type ErrorBoundaryState = {
   hasError: boolean;
   error: Error | null;
   statusCode?: number;
+  showDetails?: boolean;
 };
 
 class ErrorBoundary extends React.Component<
@@ -17,7 +18,12 @@ class ErrorBoundary extends React.Component<
 > {
   constructor(props: any) {
     super(props);
-    this.state = { hasError: false, error: null, statusCode: undefined };
+    this.state = {
+      hasError: false,
+      error: null,
+      statusCode: undefined,
+      showDetails: false,
+    };
   }
 
   static getDerivedStateFromError() {
@@ -57,38 +63,67 @@ class ErrorBoundary extends React.Component<
 
   render() {
     if (this.state.hasError) {
-      const message = this.getFriendlyMessage(
-        this.state.statusCode,
-        this.state.error?.message
-      );
+      const message = this.state.statusCode
+        ? this.getFriendlyMessage(
+            this.state.statusCode,
+            this.state.error?.message
+          )
+        : null;
 
       return (
-        <div className="flex grow items-center px-6 xl:px-10">
-          <div className="mx-auto text-center">
+        <div className="flex h-full flex-grow items-center justify-center px-6 xl:px-10">
+          <div className="flex flex-col items-center space-y-4 text-center">
             <Image
               src={PageEaten}
               alt="not found"
               className="mx-auto mb-8 aspect-[360/326] max-w-[256px] xs:max-w-[370px] lg:mb-12 2xl:mb-16"
             />
-            <Title
-              as="h1"
-              className="text-[22px] font-bold leading-normal text-gray-1000 lg:text-3xl"
-            >
-              {message}
-            </Title>
-            <Button
-              size="xl"
-              className="mt-8 h-12 bg-primary px-4 xl:h-14 xl:px-6"
-              onClick={() =>
-                this.setState({
-                  hasError: false,
-                  error: null,
-                  statusCode: undefined,
-                })
-              }
-            >
-              Try Again
-            </Button>
+            {message ? (
+              <Title
+                as="h1"
+                className="text-[22px] font-bold leading-normal text-gray-1000 lg:text-3xl"
+              >
+                {message}
+              </Title>
+            ) : (
+              <>
+                <h1 className="text-lg font-semibold text-gray-800 lg:text-2xl">
+                  Something went wrong!
+                </h1>
+                <p className="text-md text-gray-600">
+                  Something seriously went wrong somewhere. Check the logs.
+                </p>
+              </>
+            )}
+            {this.state.showDetails && (
+              <p className="mt-2 text-sm text-red-500">
+                {this.state.error?.message}
+              </p>
+            )}
+            <div className="flex w-full max-w-xs justify-between gap-4">
+              <Button
+                onClick={() =>
+                  this.setState({ showDetails: !this.state.showDetails })
+                }
+                variant="outline"
+                size="lg"
+              >
+                {this.state.showDetails ? 'Hide Details' : 'Show Details'}
+              </Button>
+              <Button
+                size="lg"
+                className="bg-primary"
+                onClick={() =>
+                  this.setState({
+                    hasError: false,
+                    error: null,
+                    statusCode: undefined,
+                  })
+                }
+              >
+                Try Again
+              </Button>
+            </div>
           </div>
         </div>
       );

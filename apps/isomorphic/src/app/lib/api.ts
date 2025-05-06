@@ -12,4 +12,6 @@ export const API_ROUTES = {
   orderStatusChange: '/ecom/orders/{id}/status/',
   salesman: '/ecom/admin/salesman/',
   storeManager: '/ecom/admin/store-manager/',
+  serviceStatusChange: '/ecom/service-booking/{id}/service-status/',
+  services: '/service/admin/services/',
 };

@@ -1,21 +1,12 @@
 'use client';
 
 import Image from 'next/image';
-import { useAtomValue } from 'jotai';
-import isEmpty from 'lodash/isEmpty';
 import { PiCheckBold } from 'react-icons/pi';
-import {
-  billingAddressAtom,
-  orderNoteAtom,
-  shippingAddressAtom,
-} from '@/store/checkout';
 import OrderViewProducts from '@/app/shared/ecommerce/order/order-products/order-view-products';
-import { useCart } from '@/store/quick-cart/cart.context';
-import { Title, Text, Button } from 'rizzui';
+import { Title, Text, Button, Avatar } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { toCurrency } from '@core/utils/to-currency';
 import { formatDate } from '@core/utils/format-date';
-import usePrice from '@core/hooks/use-price';
 import { useState } from 'react';
 import { useParams } from 'next/navigation';
 import usePaginatedOrders from '@/hooks/orders/usePaginatedOrders';
@@ -25,10 +16,10 @@ import PageLoader from '../../page-loader';
 
 const orderStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
-  { id: 2, label: 'Confirm', actionLabel: 'Mark as Confirmed' },
-  { id: 3, label: 'Packed', actionLabel: 'Mark as Packed' },
-  { id: 4, label: 'Shipped', actionLabel: 'Mark as Shipped' },
-  { id: 5, label: 'Received', actionLabel: 'Mark as Received' }, // No further action
+  { id: 2, label: 'Confirmed', actionLabel: 'Mark as Confirmed' },
+  // { id: 3, label: 'Packed', actionLabel: 'Mark as Packed' },
+  { id: 3, label: 'Shipped', actionLabel: 'Mark as Shipped' },
+  { id: 4, label: 'Delivered', actionLabel: 'Mark as Delivered' }, // No further action
 ];
 
 // const currentOrderStatus = 1;
@@ -82,17 +73,12 @@ export default function OrderView() {
   const ordersAPIData =
     orderAPIData?.pages?.flatMap((page: any) => page?.data?.results) || [];
 
-  const orderNote = useAtomValue(orderNoteAtom);
-  const billingAddress = useAtomValue(billingAddressAtom);
-  const shippingAddress = useAtomValue(shippingAddressAtom);
   const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
   // const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
 
   const orderData = ordersAPIData?.find((order: any) => order.id === id);
   const totalItems = orderData?.items?.length || 0;
-  const { price: totalPrice } = usePrice({
-    amount: parseFloat(orderData?.total_price || 0),
-  });
+  const totalPrice = parseFloat(orderData?.total_price || 0);
   console.log('data', orderData);
   const handleChangeStatus = (orderId: number) => {
     const status = orderStatusActions.find(
@@ -114,7 +100,7 @@ export default function OrderView() {
     //   setIsStatusChangeLoading(false);
     // }, 1000);
   };
-  if (isLoadingOrder) return <PageLoader />;
+  if (isLoading) return <PageLoader />;
 
   return (
     <div className="@container">
@@ -128,15 +114,12 @@ export default function OrderView() {
           {totalItems} Items
         </span>
         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
-          Total {totalPrice}
-        </span>
-        <span className="my-2 ms-5 rounded-3xl border-r border-muted bg-green-lighter px-2.5 py-1 text-xs text-green-dark first:ps-0 last:border-r-0">
-          Paid
+          Total {toCurrency(totalPrice)}
         </span>
       </div>
       <div className="items-start pt-10 @5xl:grid @5xl:grid-cols-12 @5xl:gap-7 @6xl:grid-cols-10 @7xl:gap-10">
         <div className="space-y-7 @5xl:col-span-8 @5xl:space-y-10 @6xl:col-span-7">
-          {orderNote && (
+          {/* {orderNote && (
             <div className="">
               <span className="mb-1.5 block text-sm font-medium text-gray-700">
                 Notes About Order
@@ -145,29 +128,23 @@ export default function OrderView() {
                 {orderNote}
               </div>
             </div>
-          )}
+          )} */}
 
           <div className="pb-5">
-            <OrderViewProducts />
+            <OrderViewProducts items={orderData?.items} />
             <div className="border-t border-muted pt-7 @5xl:mt-3">
               <div className="ms-auto max-w-lg space-y-6">
                 <div className="flex justify-between font-medium">
-                  Subtotal <span>{0}</span>
-                </div>
-                <div className="flex justify-between font-medium">
-                  Store Credit <span>{toCurrency(0)}</span>
-                </div>
-                <div className="flex justify-between font-medium">
-                  Subtotal <span>{toCurrency(0)}</span>
+                  Subtotal <span>{toCurrency(totalPrice)}</span>
                 </div>
                 <div className="flex justify-between border-t border-muted pt-5 text-base font-semibold">
-                  Total <span>{totalPrice}</span>
+                  Total <span>{toCurrency(totalPrice)}</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="">
+          {/* <div className="">
             <div className="mb-3.5 @5xl:mb-5">
               <Title as="h3" className="text-base font-semibold @7xl:text-lg">
                 Balance
@@ -190,7 +167,7 @@ export default function OrderView() {
                 Balance <span>$4975.00</span>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
         <div className="space-y-7 pt-8 @container @5xl:col-span-4 @5xl:space-y-10 @5xl:pt-0 @6xl:col-span-3">
           <WidgetCard
@@ -238,12 +215,11 @@ export default function OrderView() {
             childrenWrapperClass="py-5 @5xl:py-8 flex"
           >
             <div className="relative aspect-square h-16 w-16 shrink-0 @5xl:h-20 @5xl:w-20">
-              <Image
-                fill
-                alt="avatar"
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw"
-                src="https://isomorphic-furyroad.s3.amazonaws.com/public/avatar.png"
+              <Avatar
+                size="lg"
+                color="primary"
+                name={orderData?.order_info?.name}
+                // src={row.original.customer.avatar}
               />
             </div>
             <div className="ps-4 @5xl:ps-6">
@@ -251,13 +227,10 @@ export default function OrderView() {
                 as="h3"
                 className="mb-2.5 text-base font-semibold @7xl:text-lg"
               >
-                Leslie Alexander
+                {orderData?.order_info?.name}
               </Title>
               <Text as="p" className="mb-2 break-all last:mb-0">
-                nevaeh.simmons@example.com
-              </Text>
-              <Text as="p" className="mb-2 last:mb-0">
-                (316) 555-0116
+                {orderData?.order_info?.address}
               </Text>
             </div>
           </WidgetCard>
@@ -270,32 +243,12 @@ export default function OrderView() {
               as="h3"
               className="mb-2.5 text-base font-semibold @7xl:text-lg"
             >
-              {billingAddress?.customerName}
+              {orderData?.order_info?.name}
             </Title>
             <Text as="p" className="mb-2 leading-loose last:mb-0">
-              {billingAddress?.street}, {billingAddress?.city},{' '}
-              {billingAddress?.state}, {billingAddress?.zip},{' '}
-              {billingAddress?.country}
+              {orderData?.order_info?.address}
             </Text>
           </WidgetCard>
-          {!isEmpty(shippingAddress) && (
-            <WidgetCard
-              title="Billing Address"
-              childrenWrapperClass="@5xl:py-6 py-5"
-            >
-              <Title
-                as="h3"
-                className="mb-2.5 text-base font-semibold @7xl:text-lg"
-              >
-                {shippingAddress?.customerName}
-              </Title>
-              <Text as="p" className="mb-2 leading-loose last:mb-0">
-                {shippingAddress?.street}, {shippingAddress?.city},{' '}
-                {shippingAddress?.state}, {shippingAddress?.zip},{' '}
-                {shippingAddress?.country}
-              </Text>
-            </WidgetCard>
-          )}
         </div>
       </div>
     </div>

@@ -2,10 +2,11 @@
 
 import Image from 'next/image';
 import Table, { HeaderCell } from '@core/components/legacy-table';
-import { useCart } from '@/store/quick-cart/cart.context';
 import { Title, Text } from 'rizzui';
 import { toCurrency } from '@core/utils/to-currency';
 import { CartItem } from '@/types';
+import { OrderItem } from '../order-list/order-expanded-row';
+import noImage from '@public/no-image.jpg';
 
 const columns = [
   {
@@ -13,12 +14,17 @@ const columns = [
     dataIndex: 'product',
     key: 'product',
     width: 250,
-    render: (_: any, row: CartItem) => (
+    render: (_: any, row: OrderItem) => (
       <div className="flex items-center">
         <div className="relative aspect-square w-12 overflow-hidden rounded-lg">
           <Image
-            alt={row.name}
-            src={row.image}
+            alt={row.product_variant.product.name}
+            src={
+              row.product_variant.images &&
+              row.product_variant.images.length > 0
+                ? row.product_variant.images[0]
+                : noImage
+            }
             fill
             sizes="(max-width: 768px) 100vw"
             className="object-cover"
@@ -26,7 +32,7 @@ const columns = [
         </div>
         <div className="ms-4">
           <Title as="h6" className="!text-sm font-medium">
-            {row.name}
+            {row.product_variant.product.name}
           </Title>
         </div>
       </div>
@@ -64,8 +70,7 @@ const columns = [
   },
 ];
 
-export default function OrderViewProducts() {
-  const { items } = useCart();
+export default function OrderViewProducts({ items }: { items: OrderItem[] }) {
   return (
     <Table
       data={items}

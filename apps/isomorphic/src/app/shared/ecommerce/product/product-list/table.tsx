@@ -14,6 +14,7 @@ import usePaginatedProducts from '@/hooks/products/usePaginatedProducts';
 import { useDeleteProducts } from '@/hooks/products/useDeleteProducts';
 import PageLoader from '@/app/shared/page-loader';
 import { PaginationState } from '@tanstack/react-table';
+import { useGetAllCategories } from '@/hooks/categories/useGetAllCategories';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -54,6 +55,8 @@ export default function ProductsTable({
     isFetchingNextPage,
   } = usePaginatedProducts(pagination);
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
+  const { data: categoryData, isLoading: isLoadingCategory } =
+    useGetAllCategories();
 
   const pageCount =
     data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
@@ -93,12 +96,22 @@ export default function ProductsTable({
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && categoryData) {
+      const categoryMap = new Map(
+        (categoryData?.data || []).map((cat: any) => [cat.id, cat.name])
+      );
+
       const productsAPIData =
         data?.pages?.flatMap((page: any) => page?.data?.results) || [];
-      setData(productsAPIData);
+
+      const mappedProducts = productsAPIData.map((product: any) => ({
+        ...product,
+        category: categoryMap.get(product.category) || product.category,
+      }));
+
+      setData(mappedProducts);
     }
-  }, [data]);
+  }, [data, categoryData]);
 
   // Get the selected rows
   const selectedData = table
@@ -112,7 +125,7 @@ export default function ProductsTable({
     }
   }, []);
 
-  if (isLoading) return <PageLoader />;
+  if (isLoading || isLoadingCategory) return <PageLoader />;
 
   return (
     <>

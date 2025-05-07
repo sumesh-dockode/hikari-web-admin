@@ -37,7 +37,6 @@ export const routes = {
     salesHistory: '/sales-history',
     incentives: '/incentives',
     claimBalanceHistory: '/claim-balance-history',
-
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
     editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,

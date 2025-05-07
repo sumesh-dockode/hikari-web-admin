@@ -2,7 +2,7 @@
 
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
-import {  variantDataType } from '@/data/products-data';
+import { variantDataType } from '@/data/products-data';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
@@ -13,7 +13,7 @@ export function useUpdateVariant() {
     variantData: variantDataType
   ): Promise<variantDataType> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.variants}${variantData.id}`;
+    let url = `${API_ROUTES.variants}${variantData.id}/`;
     const { data } = await apiClient.patch(url, variantData);
 
     console.log('data', data);

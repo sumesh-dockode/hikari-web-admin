@@ -14,7 +14,7 @@ export function useUpdateProducts() {
     productData: productsDataType
   ): Promise<productsDataType> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.categories}${productData.id}`;
+    let url = `${API_ROUTES.products}${productData.id}/`;
     const { data } = await apiClient.patch(url, productData);
 
     console.log('data', data);

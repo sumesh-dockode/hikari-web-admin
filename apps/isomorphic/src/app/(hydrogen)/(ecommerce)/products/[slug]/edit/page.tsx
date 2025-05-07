@@ -12,11 +12,6 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-/**
- * for dynamic metadata
- * @link: https://nextjs.org/docs/app/api-reference/functions/generate-metadata#generatemetadata-function
- */
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   // read route params
   const slug = (await params).slug;
@@ -57,7 +52,7 @@ export default async function EditProductPage({ params }: any) {
         </Link>
       </PageHeader>
 
-      <CreateEditProduct slug={slug}  />
+      <CreateEditProduct slug={slug} />
     </>
   );
 }

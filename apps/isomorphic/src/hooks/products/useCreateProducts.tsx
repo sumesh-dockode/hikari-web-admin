@@ -20,7 +20,7 @@ export function useCreateProducts() {
      let url = `${API_ROUTES.products}`;
       const { data } = await apiClient.post(url, productData);
 
-    return data as Promise<productsDataType>;
+    return data?.data as Promise<productsDataType>;
   };
 
   const queryClient = useQueryClient();

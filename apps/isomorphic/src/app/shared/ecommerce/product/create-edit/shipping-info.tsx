@@ -35,12 +35,13 @@ export default function ShippingInfo({ className }: { className?: string }) {
       <Controller
         name="NextdayShipping"
         control={control}
+        defaultValue={false} // Add this line
         render={({ field: { value, onChange } }) => (
           <Switch
             label="Next Day Shipping"
             className="col-span-full"
             value={value}
-            checked={value}
+            checked={value || false} // Fallback to false if undefined
             onChange={onChange}
           />
         )}

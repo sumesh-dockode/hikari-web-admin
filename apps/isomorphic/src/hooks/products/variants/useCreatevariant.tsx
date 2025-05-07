@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from "@/app/lib/apiClient";
@@ -9,16 +9,15 @@ import { useSession } from "next-auth/react";
 export function useCreateVariants() {
   const session = useSession();
 
-
   const createVariants = async (
-    variantData: variantDataType,
+    variantData: variantDataType
   ): Promise<variantDataType> => {
-    if (!session) throw new Error("Session not found");
+    if (!session) throw new Error('Session not found');
 
-    console.log("variantData----", variantData);
-    
-     let url = `${API_ROUTES.variants}`;
-      const { data } = await apiClient.post(url, variantData);
+    console.log('variantData----', variantData);
+
+    let url = `${API_ROUTES.variants}`;
+    const { data } = await apiClient.post(url, variantData);
 
     return data as Promise<variantDataType>;
   };
@@ -27,7 +26,7 @@ export function useCreateVariants() {
   return useMutation({
     mutationFn: (data: variantDataType) => createVariants(data),
     onSuccess: (response) => {
-      queryClient.setQueryData(["variants", response.id?.toString()], response);
+      queryClient.setQueryData(['variants', response.id?.toString()], response);
     },
   });
 }

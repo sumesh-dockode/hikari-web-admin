@@ -1,85 +1,330 @@
 'use client';
 
-import { useState } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
-import { Input, Button, ActionIcon, Select } from 'rizzui';
+import { useEffect, useState } from 'react';
+import { Input, Button, Select, Modal } from 'rizzui';
 import { PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
-import TrashIcon from '@core/components/icons/trash';
-import { Modal } from '@core/modal-views/modal';
-import { useCallback } from 'react';
+import useVariants from '@/hooks/products/variants/useVariants';
+import useVariantValue from '@/hooks/products/variantValues/useVariantValue';
+import ProductMultipleMedia from './product-multiple-media';
+import { Form } from '@core/ui/form';
 import {
-  variantOption,
-  productVariants,
-} from '@/app/shared/ecommerce/product/create-edit/form-utils';
-import SelectLoader from '@core/components/loader/select-loader';
+  VariantFormInput,
+  variantSchema,
+} from '@/validators/create-variant-form-schema';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { useCreateProductVariant } from '@/hooks/products/productVariant/useCreateProductVariant';
 
-export default function ProductVariants({ className }: { className?: string }) {
+interface VariantOption {
+  value: string;
+  label: string;
+}
+
+interface VariantValueOption {
+  value: string;
+  label: string;
+  variantId: string;
+}
+
+interface CreatedVariant {
+  name: string;
+  price: number;
+  sku: string;
+  value: string;
+}
+
+export default function ProductVariants({
+  className,
+  productId,
+}: {
+  className?: string;
+  productId: string;
+}) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
+  const [valueOptions, setValueOptions] = useState<VariantValueOption[]>([]);
+  const [addedVariantAttributes, setAddedVariantAttributes] = useState([
+    { variantId: '', valueId: '' },
+  ]);
+
+  const [createdVariants, setCreatedVariants] = useState<CreatedVariant[]>([]);
+
+  const { mutate: createProductVariant, status: createStatus } =
+    useCreateProductVariant();
+
+  const { data: variantsData } = useVariants();
+  const { data: variantValuesData } = useVariantValue();
+
+  useEffect(() => {
+    if (variantsData?.pages) {
+      const options = variantsData.pages.flatMap((page) =>
+        page.data.results.map((variant: any) => ({
+          value: variant.id,
+          label: variant.name,
+        }))
+      );
+      setVariantOptions(options);
+    }
+  }, [variantsData]);
+
+  useEffect(() => {
+    if (variantValuesData?.pages) {
+      const options = variantValuesData.pages.flatMap((page) =>
+        page.data.results.map((value: any) => ({
+          value: value.attribute,
+          label: value.value,
+          variantId: value.attribute,
+        }))
+      );
+      setValueOptions(options);
+    }
+  }, [variantValuesData]);
+
+  const addNewVariantAttribute = () => {
+    setAddedVariantAttributes((prev) => [
+      ...prev,
+      { variantId: '', valueId: '' },
+    ]);
+  };
+
   const {
-    control,
     register,
-    setValue,
-    getValues,
+    control,
+    handleSubmit,
+    watch,
     formState: { errors },
-  } = useFormContext();
-const [isModalOpen, setIsModalOpen] = useState(false);
-const { fields, append, remove } = useFieldArray({
-  control,
-  name: 'productVariants',
-});
-const addVariant = useCallback(() => append([...productVariants]), [append]);
+    reset,
+  } = useForm<VariantFormInput>({
+    resolver: zodResolver(variantSchema),
+    defaultValues: {
+      variants: addedVariantAttributes,
+      price: 1,
+      sku: '',
+      stock: 1,
+    },
+  });
 
-return (
-  <>
-    <FormGroup
-      title="Variant Options"
-      description="Add your product variants here"
-      className={cn(className)}
-    >
-      {fields.map((item, index) => (
-        <div key={item.id} className="col-span-full flex gap-4 xl:gap-7">
-          <Controller
-            name={`productVariants.${index}.name`}
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Select
-                options={variantOption}
-                value={value}
-                onChange={onChange}
-                label="Variant Name"
-                className="w-full @2xl:w-auto @2xl:flex-grow"
-                getOptionValue={(option) => option.value}
-              />
-            )}
-          />
-          <Input
-            type="number"
-            label="Variant Value"
-            placeholder="150.00"
-            className="flex-grow"
-            prefix={'$'}
-            {...register(`productVariants.${index}.value`)}
-          />
-          {fields.length > 1 && (
-            <ActionIcon
-              onClick={() => remove(index)}
-              variant="flat"
-              className="mt-7 shrink-0"
-            >
-              <TrashIcon className="h-4 w-4" />
-            </ActionIcon>
-          )}
-        </div>
-      ))}
-      <Button
-        onClick={addVariant}
-        variant="outline"
-        className="col-span-full ml-auto w-auto"
+  const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
+    createProductVariant(
+      {
+        product: productId,
+        sku: formData.sku,
+        price: formData.price,
+        stock: formData.stock,
+        // variants: formData.variants.map((v) => ({
+        //   variantId: v.variantId,
+        //   valueId: v.valueId,
+        // })),
+        attributes: formData.variants.map((v) => v.valueId),
+      },
+      {
+        onSuccess: () => {
+          // Add the new variant to local table state
+          const variantName = variantOptions.find(
+            (v) => v.value === formData.variants[0].variantId
+          )?.label;
+          const valueName = valueOptions.find(
+            (v) => v.value === formData.variants[0].valueId
+          )?.label;
+
+          setCreatedVariants((prev) => [
+            ...prev,
+            {
+              name: variantName ?? 'N/A',
+              value: valueName ?? 'N/A',
+              price: formData.price,
+              sku: formData.sku,
+            },
+          ]);
+
+          // Reset modal
+          setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+          setIsModalOpen(false);
+          reset();
+        },
+      }
+    );
+  };
+
+  return (
+    <>
+      <FormGroup
+        title="Variant Options"
+        description="Add your product variants here"
+        className={cn(className)}
       >
-        <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
-      </Button>
-    </FormGroup>
-  </>
-);
+        <Button
+          onClick={() => setIsModalOpen(true)}
+          variant="outline"
+          className="col-span-full ml-auto w-auto"
+        >
+          <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
+        </Button>
+      </FormGroup>
+
+      {/* Variant Table */}
+      {createdVariants.length > 0 && (
+        <div className="mt-6">
+          <h3 className="mb-2 text-base font-semibold">Created Variants</h3>
+          <div className="overflow-x-auto rounded border">
+            <table className="min-w-full divide-y divide-gray-200 text-sm">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Variant
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Value
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Price
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    SKU
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100 bg-white">
+                {createdVariants.map((v, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-2">{v.name}</td>
+                    <td className="px-4 py-2">{v.value}</td>
+                    <td className="px-4 py-2">${v.price}</td>
+                    <td className="px-4 py-2">{v.sku}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+        <div className="space-y-5 p-4">
+          <h2 className="text-lg font-bold">Add New Variant</h2>
+
+          {addedVariantAttributes.map((_, index) => (
+            <div key={index} className="grid grid-cols-3 gap-4">
+              <Controller
+                control={control}
+                name={`variants.${index}.variantId`}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={variantOptions}
+                    label="Variant Name"
+                    className="w-full"
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      variantOptions.find((r) => r.value === selected)?.label ??
+                      ''
+                    }
+                    onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name={`variants.${index}.valueId`}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={valueOptions.filter(
+                      (opt) =>
+                        opt.variantId === watch(`variants.${index}.variantId`)
+                    )}
+                    label="Variant Value"
+                    className="w-full"
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      valueOptions.find((r) => r.value === selected)?.label ??
+                      ''
+                    }
+                    onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={addNewVariantAttribute}
+                className="mt-6 text-sm"
+              >
+                <PiPlusBold className="h-6 w-4" />
+              </Button>
+              {errors.variants?.[index] && (
+                <p className="col-span-3 text-sm text-red-500">
+                  {errors.variants[index]?.variantId?.message ||
+                    errors.variants[index]?.valueId?.message}
+                </p>
+              )}
+            </div>
+          ))}
+
+          <ProductMultipleMedia />
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Price</label>
+              <Input
+                type="number"
+                placeholder="Enter price"
+                {...register('price')}
+              />
+              {errors.price && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.price.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">SKU</label>
+              <Input type="text" placeholder="Enter SKU" {...register('sku')} />
+              {errors.sku && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.sku.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Stock</label>
+              <Input
+                type="text"
+                placeholder="Enter Stock"
+                {...register('stock')}
+              />
+              {errors.stock && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.stock.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
+              type="button"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              isLoading={createStatus === 'pending'}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleSubmit(onSubmit)();
+              }}
+            >
+              Save Variant
+            </Button>
+          </div>
+        </div>
+      </Modal>
+    </>
+  );
 }

@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { PiCheckBold } from 'react-icons/pi';
-import OrderViewProducts from '@/app/shared/ecommerce/order/order-products/order-view-products';
 import { Title, Text, Button, Avatar } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { toCurrency } from '@core/utils/to-currency';
@@ -13,6 +12,7 @@ import usePaginatedOrders from '@/hooks/orders/usePaginatedOrders';
 import { useOrderById } from '@/hooks/orders/useOrderById';
 import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
 import PageLoader from '../../page-loader';
+import OrderViewProducts from './order-products/order-view-products';
 
 const orderStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -57,7 +57,7 @@ function WidgetCard({
 
 export default function OrderView() {
   const { id } = useParams();
-  const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
+  // const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
   const {
     data: orderAPIData,
     isLoading,
@@ -73,12 +73,16 @@ export default function OrderView() {
   const ordersAPIData =
     orderAPIData?.pages?.flatMap((page: any) => page?.data?.results) || [];
 
-  const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
+  // const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
   // const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
 
   const orderData = ordersAPIData?.find((order: any) => order.id === id);
   const totalItems = orderData?.items?.length || 0;
   const totalPrice = parseFloat(orderData?.total_price || 0);
+  const currentOrderStatus =
+    orderStatusActions.find((status) => status.label === orderData?.status)
+      ?.id || 1;
+
   console.log('data', orderData);
   const handleChangeStatus = (orderId: number) => {
     const status = orderStatusActions.find(

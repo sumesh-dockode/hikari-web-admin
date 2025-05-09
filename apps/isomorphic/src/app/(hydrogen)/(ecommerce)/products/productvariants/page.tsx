@@ -24,16 +24,15 @@ import { useQueryClient } from '@tanstack/react-query';
 import TrashIcon from '@core/components/icons/trash';
 import { Tooltip } from 'rizzui/tooltip';
 import { ActionIcon } from 'rizzui/action-icon';
-import Link from 'next/link';
-import PencilIcon from '@core/components/icons/pencil';
 import DeletePopover from '@core/components/delete-popover';
 import { useUpdateVariant } from '@/hooks/products/variants/useUpdateVariant';
-import { useVariantsById } from '@/hooks/products/variants/useVariantsById';
 import useVariantValue from '@/hooks/products/variantValues/useVariantValue';
 import { useDeleteVariants } from '@/hooks/products/variants/useDeleteVariants';
 import { useCreateVariantsValues } from '@/hooks/products/variantValues/useCreateVariantValue';
 import { useDeleteVariantsValue } from '@/hooks/products/variantValues/useDeleteVariantValue';
 import { useUpdateVariantValue } from '@/hooks/products/variantValues/useUpdateVariantValue';
+import toast from 'react-hot-toast';
+import PencilIcon from '@core/components/icons/pencil';
 
 const pageHeader = {
   title: 'Product Variants',
@@ -44,54 +43,16 @@ const pageHeader = {
   ],
 };
 
-const COLORS = [
-  '#FF0000',
-  '#00AEEF',
-  '#00FF00',
-  '#FFA500',
-  '#800080',
-  '#000000',
-];
-
 export default function ProductVariantsPage() {
   const queryClient = useQueryClient();
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useVariants();
-  const {
-    data: variantValuesData,
-    isLoading: isVariantValuesLoading,
-    isError: isVariantValuesError,
-  } = useVariantValue();
-  const {
-    mutate: createVariantValue,
-    data: variantsValueData,
-    status: createsStatus,
-  } = useCreateVariantsValues();
-  const {
-    mutate: updateVariantValue,
-    data: updateValueResponseData,
-    status: updateValueStatus,
-  } = useUpdateVariantValue();
-  // const { isLoading: isFetching } = useVariantsById(variantId || '');
-  const {
-    mutate: createVariants,
-    data: variantData,
-    status: createStatus,
-  } = useCreateVariants();
-
-  const {
-    mutate: updateVariant,
-    data: updateResponseData,
-    status: updateStatus,
-  } = useUpdateVariant();
-  const { mutate: deleteVariant, status: deleteStatus } = useDeleteVariants();
+  const { data } = useVariants();
+  const { data: variantValuesData } = useVariantValue();
+  const { mutate: createVariantValue } = useCreateVariantsValues();
+  const { mutate: updateVariantValue } = useUpdateVariantValue();
+  const { mutate: createVariants } = useCreateVariants();
+  const { mutate: updateVariant } = useUpdateVariant();
+  const { mutate: deleteVariant } = useDeleteVariants();
+  const { mutate: deleteVariantValue } = useDeleteVariantsValue();
 
   const [editingVariant, setEditingVariant] = useState<any>(null);
   const [editingValue, setEditingValue] = useState<any>(null);
@@ -99,28 +60,23 @@ export default function ProductVariantsPage() {
   const [isEditMode, setIsEditMode] = useState(false);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [variantToDelete, setVariantToDelete] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isValueModalOpen, setIsValueModalOpen] = useState(false);
+  const [duplicateError, setDuplicateError] = useState<string | null>(null);
+  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedVariantType, setSelectedVariantType] =
+    useState<string>('Color');
+
   const variantsAPIData =
     data?.pages?.flatMap((page: any) => page?.data?.results) || [];
-
   const variantvalueAPIData =
     variantValuesData?.pages?.flatMap((page: any) => page?.data?.results) || [];
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isValueModalOpen, setIsValueModalOpen] = useState(false);
-  const [variantName, setVariantName] = useState('');
-  const [variants, setVariants] = useState<
-    { id: null; name: string; values: string[] }[]
-  >([]);
-  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string>('');
-  const [inputValue, setInputValue] = useState<string>('');
-  const [selectedVariantType, setSelectedVariantType] =
-    useState<string>('Color');
   const handleDeleteClick = (variantId: string) => {
     setVariantToDelete(variantId);
     setDeleteConfirmationOpen(true);
   };
-  const { mutate: deleteVariantValue } = useDeleteVariantsValue();
 
   const confirmDelete = () => {
     if (variantToDelete) {
@@ -128,6 +84,7 @@ export default function ProductVariantsPage() {
     }
     setDeleteConfirmationOpen(false);
   };
+
   const {
     register,
     handleSubmit,
@@ -136,6 +93,7 @@ export default function ProductVariantsPage() {
   } = useForm({
     resolver: zodResolver(variantSchema),
   });
+
   const {
     register: registerValueForm,
     handleSubmit: handleSubmitValueForm,
@@ -144,11 +102,12 @@ export default function ProductVariantsPage() {
 
   const openValueModal = (variantId: string) => {
     setActiveVariantId(variantId);
-    setSelectedColor('');
-    setInputValue('');
+    setSelectedColor(''); // Reset color selection
     setIsValueModalOpen(true);
+    setIsValueEditMode(false);
+    setEditingValue(null);
   };
-  // console.log('variantId', variantId);
+
   const onSubmitValue: SubmitHandler<ProductVariantValueFormInput> = (data) => {
     if (activeVariantId === null) return;
 
@@ -156,13 +115,25 @@ export default function ProductVariantsPage() {
       (variant: any) => variant.id === activeVariantId
     );
 
-    const valueToAdd =
-      currentVariant?.name[0] === 'color' ? selectedColor : data.value.trim();
+    // Check if this is a color variant (case-insensitive)
+    const isColorVariant = currentVariant?.name.toLowerCase() === 'color';
 
-    if (!valueToAdd) return;
+    // Get the value to save - use selectedColor if it's a color variant
+    const valueToAdd = isColorVariant ? selectedColor : data.value.trim();
+
+    if (!valueToAdd) {
+      toast.error('Please provide a value');
+      return;
+    }
+
     if (isValueEditMode && editingValue) {
+      // Update existing value
       updateVariantValue(
-        { id: editingValue.id, value: valueToAdd, attribute: activeVariantId },
+        {
+          id: editingValue.id,
+          value: valueToAdd,
+          attribute: activeVariantId,
+        },
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['variantValues'] });
@@ -170,20 +141,24 @@ export default function ProductVariantsPage() {
             setIsValueEditMode(false);
             setEditingValue(null);
             resetValueForm();
-            resetForm();
+            setSelectedColor('');
           },
         }
       );
     } else {
+      // Create new value
       createVariantValue(
-        { id: null, value: valueToAdd, attribute: activeVariantId },
+        {
+          id: null,
+          value: valueToAdd,
+          attribute: activeVariantId,
+        },
         {
           onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['variantValues'] });
-            setActiveVariantId(null);
-            resetValueForm();
             setIsValueModalOpen(false);
-            resetForm();
+            resetValueForm();
+            setSelectedColor('');
           },
         }
       );
@@ -201,12 +176,13 @@ export default function ProductVariantsPage() {
       variant.name === 'Seater'
     ) {
       setSelectedVariantType(variant.name);
-      setVariantName('');
+      // setVariantName('');
     } else {
       setSelectedVariantType('Custom');
-      setVariantName(variant.name);
+      // setVariantName(variant.name);
     }
   };
+
   const handleEditValue = (valueData: any) => {
     setEditingValue(valueData);
     setIsValueEditMode(true);
@@ -224,6 +200,7 @@ export default function ProductVariantsPage() {
 
     setActiveVariantId(valueData.attribute);
   };
+
   const onSubmit: SubmitHandler<ProductVariantFormInput> = (formData) => {
     const nameToSave =
       selectedVariantType === 'Custom'
@@ -232,8 +209,22 @@ export default function ProductVariantsPage() {
 
     if (!nameToSave) return;
 
+    const isDuplicate = variantsAPIData.some(
+      (variant: any) =>
+        variant.name.toLowerCase() === nameToSave.toLowerCase() &&
+        (!isEditMode || variant.id !== editingVariant?.id)
+    );
+
+    if (isDuplicate) {
+      setDuplicateError(
+        `A variant with the name "${nameToSave}" already exists.`
+      );
+      return;
+    }
+
+    setDuplicateError(null);
+
     if (isEditMode && editingVariant) {
-      // Update existing variant
       updateVariant(
         {
           id: editingVariant.id,
@@ -247,13 +238,9 @@ export default function ProductVariantsPage() {
             setEditingVariant(null);
             resetForm();
           },
-          onError: (error) => {
-            console.error('Error updating variant:', error);
-          },
         }
       );
     } else {
-      // Create new variant
       createVariants(
         {
           id: null,
@@ -265,21 +252,20 @@ export default function ProductVariantsPage() {
             setIsModalOpen(false);
             resetForm();
           },
-          onError: (error) => {
-            console.error('Error creating variant:', error);
-          },
         }
       );
     }
   };
+
   const resetForm = () => {
     reset();
     setEditingVariant(null);
     setIsEditMode(false);
-    setVariantName('');
+    // setVariantName('');
     setSelectedVariantType('Color');
     setIsModalOpen(false);
   };
+
   const getModalContent = () => {
     const currentVariant = variantsAPIData.find(
       (variant: any) => variant.id === activeVariantId
@@ -288,28 +274,42 @@ export default function ProductVariantsPage() {
 
     if (currentVariant.name.toLowerCase() === 'color') {
       return (
-        <>
-          <div className="text-sm font-medium text-gray-700">
-            Select a color
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {COLORS.map((color) => (
-              <button
-                key={color}
-                className={`h-10 w-10 rounded-full border-2 ${
-                  selectedColor === color
-                    ? 'border-gray-800'
-                    : 'border-transparent'
-                }`}
-                style={{ backgroundColor: color }}
-                onClick={() => setSelectedColor(color)}
+        <div className="space-y-4">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">
+              Select Color
+            </label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={selectedColor || '#000000'}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
               />
-            ))}
+              <Input
+                type="text"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                placeholder="Enter hex code (e.g. #FF0000)"
+                className="flex-1"
+              />
+            </div>
+            {selectedColor && (
+              <div className="mt-3 flex items-center gap-2 rounded-md bg-gray-50 p-2">
+                <div
+                  className="h-5 w-5 rounded-full border border-gray-300"
+                  style={{ backgroundColor: selectedColor }}
+                />
+                <span className="text-sm font-medium">{selectedColor}</span>
+              </div>
+            )}
           </div>
-        </>
+        </div>
       );
     }
+    return null;
   };
+
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
@@ -317,13 +317,14 @@ export default function ProductVariantsPage() {
           <Button
             onClick={() => setIsModalOpen(true)}
             variant="outline"
-            type="submit"
             className="col-span-full ml-auto w-auto"
           >
             <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
           </Button>
         </div>
       </PageHeader>
+
+      {/* Variant Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
@@ -342,9 +343,7 @@ export default function ProductVariantsPage() {
             useFormProps={{
               mode: 'onChange',
               defaultValues: isEditMode
-                ? {
-                    name: editingVariant?.name || '',
-                  }
+                ? { name: editingVariant?.name || '' }
                 : { name: '' },
               resolver: zodResolver(variantSchema),
             }}
@@ -357,7 +356,10 @@ export default function ProductVariantsPage() {
                 </label>
                 <select
                   value={selectedVariantType}
-                  onChange={(e) => setSelectedVariantType(e.target.value)}
+                  onChange={(e) => {
+                    setSelectedVariantType(e.target.value);
+                    setDuplicateError(null);
+                  }}
                   className="w-full rounded border-gray-300 px-3 py-2 text-sm"
                 >
                   <option value="Color">Color</option>
@@ -365,13 +367,16 @@ export default function ProductVariantsPage() {
                   <option value="Seater">Seater</option>
                   <option value="Custom">Custom</option>
                 </select>
+
                 {selectedVariantType === 'Custom' && (
                   <div>
                     <Input
                       type="text"
                       label="Enter custom variant name"
                       placeholder="e.g. Fabric, Height"
-                      {...register('name')}
+                      {...register('name', {
+                        onChange: () => setDuplicateError(null),
+                      })}
                     />
                     {errors.name && (
                       <p className="mt-1 text-xs text-red-500">
@@ -381,20 +386,31 @@ export default function ProductVariantsPage() {
                   </div>
                 )}
 
+                {duplicateError && (
+                  <p className="mt-1 text-xs text-red-500">{duplicateError}</p>
+                )}
+
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
                     variant="outline"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {
+                      setIsModalOpen(false);
+                      setDuplicateError(null);
+                    }}
                   >
                     Cancel
                   </Button>
-                  <Button type="submit">Save Variant</Button>
+                  <Button type="submit" disabled={!!duplicateError}>
+                    Save Variant
+                  </Button>
                 </div>
               </>
             )}
           </Form>
         </div>
       </Modal>
+
+      {/* Value Modal */}
       <Modal
         isOpen={isValueModalOpen}
         onClose={() => {
@@ -402,6 +418,7 @@ export default function ProductVariantsPage() {
           setIsValueEditMode(false);
           setEditingValue(null);
           resetValueForm();
+          setSelectedColor('');
         }}
       >
         <Form<ProductVariantValueFormInput>
@@ -450,7 +467,7 @@ export default function ProductVariantsPage() {
                   type="submit"
                   disabled={
                     variantsAPIData
-                      ?.find((variant: any) => variant.id === activeVariantId)
+                      .find((variant: any) => variant.id === activeVariantId)
                       ?.name.toLowerCase() === 'color'
                       ? !selectedColor
                       : false
@@ -464,6 +481,7 @@ export default function ProductVariantsPage() {
         </Form>
       </Modal>
 
+      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteConfirmationOpen}
         onClose={() => setDeleteConfirmationOpen(false)}
@@ -484,6 +502,8 @@ export default function ProductVariantsPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Variants List */}
       <div className="mt-8 space-y-4 px-6">
         {variantsAPIData.map((variant: any, index: number) => {
           const variantValues = variantvalueAPIData.filter(
@@ -491,7 +511,10 @@ export default function ProductVariantsPage() {
           );
 
           return (
-            <div key={index} className="space-y-2 p-4 shadow-sm">
+            <div
+              key={index}
+              className="space-y-2 rounded-lg border p-4 shadow-sm"
+            >
               <div className="flex items-center justify-between">
                 <div className="text-sm font-medium text-gray-800">
                   {variant.name}
@@ -501,9 +524,7 @@ export default function ProductVariantsPage() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      openValueModal(variant.id);
-                    }}
+                    onClick={() => openValueModal(variant.id)}
                   >
                     <PiPlusBold className="me-2 h-4 w-4" /> Add Value
                   </Button>
@@ -542,12 +563,12 @@ export default function ProductVariantsPage() {
                     {variantValues.map((valueData: any) => (
                       <div
                         key={valueData.id}
-                        className="relative flex items-center gap-1 px-3 py-1"
+                        className="relative flex items-center gap-1 rounded-full border px-3 py-1"
                       >
                         {variant.name.toLowerCase() === 'color' ? (
                           <>
                             <div
-                              className="h-4 w-4"
+                              className="h-4 w-4 rounded-full"
                               style={{ backgroundColor: valueData.value }}
                             />
                             <span className="text-xs">{valueData.value}</span>
@@ -556,7 +577,6 @@ export default function ProductVariantsPage() {
                           <span className="text-xs">{valueData.value}</span>
                         )}
 
-                        {/* Edit Icon */}
                         <Tooltip
                           size="sm"
                           content="Edit Value"
@@ -575,7 +595,6 @@ export default function ProductVariantsPage() {
                           </ActionIcon>
                         </Tooltip>
 
-                        {/* Delete Icon */}
                         <DeletePopover
                           onDelete={() => {
                             deleteVariantValue(valueData.id, {

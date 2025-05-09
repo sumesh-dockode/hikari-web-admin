@@ -27,10 +27,11 @@ import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
 import { useProductsById } from '@/hooks/products/useProductsById';
 import { productsDataType } from '@/data/products-data';
 import { Form } from '@core/ui/form';
-import ProductVariants from './product-variants';
+
 import ProductSpecification from './product-specification';
 import { log } from 'console';
 import { useRouter } from 'next/navigation';
+import ProductVariants from './product-variants';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -81,7 +82,7 @@ export default function CreateEditProduct({
     defaultValues: {
       title: '',
       sku: '',
-      price: "",
+      price: '',
       category: '',
       stock: 0,
       description: '',
@@ -208,8 +209,6 @@ export default function CreateEditProduct({
                   />
                 </Element>
               ))}
-
-           
           </div>
 
           <FormFooter

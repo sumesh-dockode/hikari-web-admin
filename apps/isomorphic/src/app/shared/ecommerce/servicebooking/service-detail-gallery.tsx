@@ -8,8 +8,14 @@ import QuillLoader from '@core/components/loader/quill-loader';
 import { Button, Input, Select, Text, Textarea, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
-import { ServiceDetailsInput, serviceValidateSchema } from '@/validators/service-validate-schema';
+import {
+  ServiceDetailsInput,
+  serviceValidateSchema,
+} from '@/validators/service-validate-schema';
 import Image from 'next/image';
+
+import { PiCheckBold } from 'react-icons/pi';
+import { useServiceStatusChange } from '@/hooks/services/useServiceStatusChange';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -17,16 +23,45 @@ const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
 });
 
 const statusOptions = [
-  { value: 'offline', label: 'Offline' },
-  { value: 'pending', label: 'Pending' },
-  { value: 'paid', label: 'Paid' },
-  { value: 'completed', label: 'Completed' },
-  { value: 'cancelled', label: 'Cancelled' },
-  { value: 'service_started', label: 'Service Started' },
-  { value: 'Booking_initiated', label: 'Booking Initiated' },
-  { value: 'confirm', label: 'Confirm' },
+  { id: 1, value: 'offline', label: 'Offline' },
+  { id: 2, value: 'pending', label: 'Pending' },
+  { id: 3, value: 'paid', label: 'Paid' },
+  { id: 4, value: 'completed', label: 'Completed' },
+  { id: 5, value: 'cancelled', label: 'Cancelled' },
+  { id: 6, value: 'service_started', label: 'Service Started' },
+  { id: 7, value: 'Booking_initiated', label: 'Booking Initiated' },
+  { id: 8, value: 'confirm', label: 'Confirm' },
 ];
-
+function WidgetCard({
+  title,
+  className,
+  children,
+  childrenWrapperClass,
+}: {
+  title?: string;
+  className?: string;
+  children: React.ReactNode;
+  childrenWrapperClass?: string;
+}) {
+  return (
+    <div className={className}>
+      <Title
+        as="h3"
+        className="mb-3.5 text-base font-semibold @5xl:mb-5 4xl:text-lg"
+      >
+        {title}
+      </Title>
+      <div
+        className={cn(
+          'rounded-lg border border-muted px-5 @sm:px-7 @5xl:rounded-xl',
+          childrenWrapperClass
+        )}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 const HorizontalFormBlockWrapper = ({
   title,
   description,
@@ -40,12 +75,7 @@ const HorizontalFormBlockWrapper = ({
   isModalView?: boolean;
 }>) => {
   return (
-    <div
-      className={cn(
-        className,
-        isModalView ? '' : ' '
-      )}
-    >
+    <div className={cn(className, isModalView ? '' : ' ')}>
       {isModalView && (
         <div className="col-span-2 mb-6 pe-4 @5xl:mb-0">
           <Title as="h6" className="font-semibold">
@@ -57,7 +87,7 @@ const HorizontalFormBlockWrapper = ({
 
       <div
         className={cn(
-          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5 mt-3',
+          'mt-3 grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
           isModalView ? 'col-span-4' : ' '
         )}
       >
@@ -80,8 +110,9 @@ export default function ServiceDetailsGallery({
   const [isLoading, setLoading] = useState(false);
   const serviceGallery = [
     'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-  ]
-  
+  ];
+  const { mutate: updateServiceStatus, status } = useServiceStatusChange();
+  const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
   const onSubmit: SubmitHandler<ServiceDetailsInput> = (data) => {
     // set timeout only required to display loading state of the create category button
     setLoading(true);
@@ -91,11 +122,31 @@ export default function ServiceDetailsGallery({
       setReset({
         productname: '',
         requestedby: '',
-        promocode:'',
-        selectedservice:'',
-        status :''
+        promocode: '',
+        selectedservice: '',
+        status: '',
       });
     }, 600);
+  };
+
+  const handleChangeStatus = (orderId: number) => {
+    const status = statusOptions.find((status) => status.id === orderId)?.label;
+
+    if (status) {
+      const payload = {
+        status: status,
+        id: id as string,
+        user_id: 1,
+      };
+
+      updateServiceStatus(payload);
+    }
+    // }
+    // setIsStatusChangeLoading(true);
+    // setTimeout(() => {
+    //   setCurrentOrderStatus(id);
+    //   setIsStatusChangeLoading(false);
+    // }, 1000);
   };
 
   return (
@@ -111,40 +162,16 @@ export default function ServiceDetailsGallery({
     >
       {({ register, control, getValues, setValue, formState: { errors } }) => (
         <>
-          <div className="flex flex-col @lg:flex-row gap-6 mb-6">
-            {/* Status Button at the top */}
-            <div className="w-full @lg:w-auto">
-              <Title as="h6" className="font-semibold mb-2">Service Status:</Title>
-              <Controller
-                name="status"
-                control={control}
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    options={statusOptions}
-                    error={errors?.status?.message}
-                    placeholder="Select Service Status"
-                    className="w-full @lg:w-[200px]"
-                    selectClassName="h-10 rounded-lg "
-                    dropdownClassName="p-2 border border-gray-200 shadow-lg rounded-lg"
-                    onChange={(selectedOption: { value: string; label: string }) => {
-                      field.onChange(selectedOption.value);
-                    }}
-                  />
-                )}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-col @lg:flex-row gap-8">
-            {/* Left side - Details */}
+          <div className="flex flex-col gap-8 @lg:flex-row">
             <div className="flex-grow">
-              <div className={cn(
-                'grid grid-cols-1',
-                isModalView
-                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
-                  : 'gap-5'
-              )}>
+              <div
+                className={cn(
+                  'grid grid-cols-1',
+                  isModalView
+                    ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
+                    : 'gap-5'
+                )}
+              >
                 <HorizontalFormBlockWrapper
                   title={'General Information:'}
                   description={'You cannot update this information'}
@@ -185,11 +212,52 @@ export default function ServiceDetailsGallery({
                 </HorizontalFormBlockWrapper>
               </div>
             </div>
+            <div className="flex flex-col gap-8 @lg:flex-row">
+              <WidgetCard
+                title="Service Status"
+                childrenWrapperClass="py-6 @5xl:py-8 flex"
+              >
+                <div className="ms-2 w-full space-y-7 border-s-2 border-gray-100">
+                  {statusOptions.map((item) => (
+                    <div
+                      key={item.id}
+                      className={cn(
+                        "relative ps-6 text-sm font-medium before:absolute before:-start-[9px] before:top-px before:h-5 before:w-5 before:-translate-x-px before:rounded-full before:bg-gray-100 before:content-[''] after:absolute after:-start-px after:top-5 after:h-10 after:w-0.5 after:content-[''] last:after:hidden",
+                        currentOrderStatus > item.id
+                          ? 'before:bg-primary after:bg-primary'
+                          : 'after:hidden',
+                        currentOrderStatus === item.id && 'before:bg-primary',
+                        currentOrderStatus + 1 < item.id && 'text-gray-300'
+                      )}
+                    >
+                      {currentOrderStatus >= item.id ? (
+                        <span className="absolute -start-1.5 top-1 text-white">
+                          <PiCheckBold className="h-auto w-3" />
+                        </span>
+                      ) : null}
+
+                      {currentOrderStatus + 1 !== item.id ? (
+                        item.label
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          isLoading={status === 'pending'}
+                          onClick={() => handleChangeStatus(item.id)}
+                        >
+                          {item.label}
+                        </Button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </WidgetCard>
+            </div>
 
             {/* Right side - Image */}
             <div className="w-full @lg:w-[40%] @xl:w-[23%]">
-              <div className="sticky top-4">
-                <div className="relative aspect-square w-full overflow-hidden rounded-lg ">
+              <div className="sticky top-8">
+                <div className="relative aspect-square w-full overflow-hidden rounded-lg">
                   <Image
                     fill
                     priority

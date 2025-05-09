@@ -73,7 +73,7 @@ export default function ProductVariants({
     if (variantValuesData?.pages) {
       const options = variantValuesData.pages.flatMap((page) =>
         page.data.results.map((value: any) => ({
-          value: value.attribute,
+          value: value.id,
           label: value.value,
           variantId: value.attribute,
         }))
@@ -139,7 +139,6 @@ export default function ProductVariants({
             },
           ]);
 
-          // Reset modal
           setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
           setIsModalOpen(false);
           reset();
@@ -163,8 +162,6 @@ export default function ProductVariants({
           <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
         </Button>
       </FormGroup>
-
-      {/* Variant Table */}
       {createdVariants.length > 0 && (
         <div className="mt-6">
           <h3 className="mb-2 text-base font-semibold">Created Variants</h3>
@@ -204,8 +201,7 @@ export default function ProductVariants({
       <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
         <div className="space-y-5 p-4">
           <h2 className="text-lg font-bold">Add New Variant</h2>
-
-          {addedVariantAttributes.map((_, index) => (
+          {addedVariantAttributes.map((field, index) => (
             <div key={index} className="grid grid-cols-3 gap-4">
               <Controller
                 control={control}
@@ -262,16 +258,14 @@ export default function ProductVariants({
               )}
             </div>
           ))}
-
           <ProductMultipleMedia />
-
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Price</label>
               <Input
                 type="number"
                 placeholder="Enter price"
-                {...register('price')}
+                {...register('price', { valueAsNumber: true })}
               />
               {errors.price && (
                 <p className="mt-1 text-sm text-red-500">
@@ -302,7 +296,6 @@ export default function ProductVariants({
               )}
             </div>
           </div>
-
           <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"

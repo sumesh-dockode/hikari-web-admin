@@ -22,6 +22,7 @@ import { useRouter } from 'next/navigation';
 import { useSalesManById } from '@/hooks/sales/salesman/useSalesManById';
 import { useCreateSalesMan } from '@/hooks/sales/salesman/useCreateSalesMan';
 import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
+import { PhoneNumber } from '@core/ui/phone-input';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -72,16 +73,18 @@ export default function CreateSalesMan({
   const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     setLoading(true);
     let payload = {
-      id: id || '',
+      id: id || null,
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       email: data.email || '',
-      role: data.role || '',
+      phone_number: data.phone_number || '',
       username: data.username || '',
       password: data.password || '',
       images: data.images?.url || undefined,
       is_active: data.is_active || false,
     };
+
+    console.log('payload', payload);
 
     if (payload.images?.includes('http')) {
       payload = omit(payload, 'images');
@@ -153,7 +156,7 @@ export default function CreateSalesMan({
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
-                  className="col-span-full"
+                  className="flex-grow"
                   prefix={
                     <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
                   }
@@ -161,6 +164,21 @@ export default function CreateSalesMan({
                   placeholder="georgia.young@example.com"
                   {...register('email')}
                   error={errors.email?.message}
+                />
+                <Controller
+                  name="phone_number"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <PhoneNumber
+                      // label="Phone Number"
+                      country="in"
+                      value={value}
+                      onChange={onChange}
+                      className="rtl:[&>.selected-flag]:right-0"
+                      inputClassName="rtl:pr-12"
+                      buttonClassName="rtl:[&>.selected-flag]:right-2 rtl:[&>.selected-flag_.arrow]:-left-6"
+                    />
+                  )}
                 />
               </FormGroup>
               <FormGroup

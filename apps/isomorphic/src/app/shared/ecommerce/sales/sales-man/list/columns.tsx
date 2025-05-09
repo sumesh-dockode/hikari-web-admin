@@ -7,14 +7,14 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
-import { SalesManDataType } from './table';
+import { SalesmanDataType } from '@/data/salesman-data';
 
 const statusColors = {
   invactive: '',
   active: 'success',
 } as { [key: string]: string };
 
-const columnHelper = createColumnHelper<SalesManDataType>();
+const columnHelper = createColumnHelper<SalesmanDataType>();
 
 export const salesManColumns = [
   columnHelper.display({
@@ -30,14 +30,14 @@ export const salesManColumns = [
     ),
   }),
   columnHelper.display({
-    id: 'image',
+    id: 'images',
     size: 100,
     header: 'Image',
     cell: ({ row }) => (
       <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
         <Image
-          alt={row.original.name}
-          src={row.original.image}
+          alt={row.original.first_name}
+          src={row.original.images || '/avatar.webp'}
           fill
           sizes="(max-width: 768px) 100vw"
           className="object-cover"
@@ -46,13 +46,13 @@ export const salesManColumns = [
     ),
   }),
 
-  columnHelper.accessor('name', {
-    id: 'name',
+  columnHelper.accessor('first_name', {
+    id: 'first_name',
     size: 200,
     header: 'Name',
-    cell: ({ getValue }) => (
+    cell: ({ row }) => (
       <Title as="h6" className="!text-sm font-medium">
-        {getValue()}
+        {row.original.first_name} {row.original?.last_name || ''}
       </Title>
     ),
   }),
@@ -61,7 +61,9 @@ export const salesManColumns = [
     size: 150,
     header: 'Email',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.email}</Text>
+      <Text className="font-medium text-gray-700">
+        {row.original.email || '-'}
+      </Text>
     ),
   }),
   columnHelper.display({
@@ -69,30 +71,29 @@ export const salesManColumns = [
     size: 150,
     header: 'Phone',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.phone}</Text>
+      <Text className="font-medium text-gray-700">
+        {row.original.phone_number || '-'}
+      </Text>
     ),
   }),
   columnHelper.display({
-    id: 'status',
+    id: 'is_active',
     size: 150,
     header: 'Status',
     cell: ({ row }) => (
       <>
-        {row.original.status === 'inactive' ? (
+        {!row.original.is_active ? (
           <div className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-100/80 px-2.5 py-1">
             <Badge renderAsDot />
             <span className="text-xs font-semibold text-gray-900">
-              {row.original.status}
+              Inactive
             </span>
           </div>
         ) : (
           <div className="inline-flex items-center justify-center gap-2 rounded-full bg-green-lighter px-2.5 py-1">
-            <Badge
-              renderAsDot
-              color={statusColors[row.original.status] as any}
-            />
+            <Badge renderAsDot color={'success'} />
             <span className="text-xs font-semibold text-green-dark">
-              {row.original.status}
+              Active
             </span>
           </div>
         )}
@@ -111,7 +112,7 @@ export const salesManColumns = [
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
         <Tooltip content={'Edit Salesman'} placement="top" color="invert">
-          <Link href={routes.eCommerce.editSalesMan(row.original.id)}>
+          <Link href={routes.eCommerce.editSalesMan(row.original.id as string)}>
             <ActionIcon size="sm" variant="outline">
               <PencilIcon className="h-4 w-4" />
             </ActionIcon>

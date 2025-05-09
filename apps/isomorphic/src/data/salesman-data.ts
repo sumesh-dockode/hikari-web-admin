@@ -3,9 +3,11 @@ export interface SalesmanDataType {
   first_name: string;
   last_name: string | null;
   email: string;
-  role: string;
+  phone_number: string;
   username: string;
   password: string;
   images: any | null;
   is_active: boolean;
+  store_manager?: any | null;
+  store?: string | null;
 }

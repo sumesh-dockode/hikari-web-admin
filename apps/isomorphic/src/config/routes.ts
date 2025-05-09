@@ -33,7 +33,7 @@ export const routes = {
     //sales section
     salesman: '/salesman',
     createSalesman: '/salesman/create',
-    editSalesMan: (id: number) => `/salesman/${id}/edit`,
+    editSalesMan: (id: string) => `/salesman/${id}/edit`,
     salesHistory: '/sales-history',
     incentives: '/incentives',
     claimBalanceHistory: '/claim-balance-history',

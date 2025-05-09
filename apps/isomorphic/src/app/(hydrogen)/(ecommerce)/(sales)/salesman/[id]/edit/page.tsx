@@ -37,6 +37,7 @@ const pageHeader = {
 const salesmanData = {
   first_name: 'Sales Man',
   email: '5Hf3H@example.com',
+  phone_number: '1234567890',
   username: 'salesman',
   password: 'passwordsss',
   images: {

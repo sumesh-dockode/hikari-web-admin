@@ -57,7 +57,7 @@ function WidgetCard({
 
 export default function OrderView() {
   const { id } = useParams();
-  // const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
+  const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
   const {
     data: orderAPIData,
     isLoading,

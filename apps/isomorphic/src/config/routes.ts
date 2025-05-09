@@ -28,7 +28,7 @@ export const routes = {
     trackingId: (id: string) => `/tracking/${id}`,
     storeManager: '/store-manager',
     createStoreManager: '/store-manager/create',
-    editStoreManager: (id: number) => `/store-manager/${id}/edit`,
+    editStoreManager: (id: string) => `/store-manager/${id}/edit`,
 
     //sales section
     salesman: '/salesman',

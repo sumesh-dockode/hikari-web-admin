@@ -11,5 +11,5 @@ export const API_ROUTES = {
   singleOrder: '/ecom/orders/',
   orderStatusChange: '/ecom/orders/{id}/status/',
   salesman: '/mingler/admin/users/salesman/',
-  storeManager: '/ecom/admin/store-manager/',
+  storeManager: '/mingler/admin/users/store-manager/',
 };

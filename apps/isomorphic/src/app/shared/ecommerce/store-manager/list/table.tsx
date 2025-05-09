@@ -13,33 +13,7 @@ import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreMana
 import { useDeleteStoreManager } from '@/hooks/storeManager/useDeleteStoreManager';
 import PageLoader from '@/app/shared/page-loader';
 import toast from 'react-hot-toast';
-
-const storeManagerList = [
-  {
-    id: 1,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Store Manager',
-    store_name: 'Furyroad',
-    email: '1kTt2@example.com',
-    phone: '(123) 456-7890',
-    address: '123 Main St, Anytown, USA',
-    status: 'active',
-  },
-  {
-    id: 2,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Jane Smith',
-    store_name: 'JamesVillage',
-    email: '5M0x3@example.com',
-    phone: '(987) 654-3210',
-    address: '456 Elm St, Anytown, USA',
-    status: 'inactive',
-  },
-];
-
-export type StoreManagerDataType = (typeof storeManagerList)[number];
+import { StoreManagerTableDataType } from '@/data/store-manager-data';
 
 export default function StoreManagerTable() {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -62,7 +36,7 @@ export default function StoreManagerTable() {
   const pageCount =
     data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
-  const { table, setData } = useTanStackTable<StoreManagerDataType>({
+  const { table, setData } = useTanStackTable<StoreManagerTableDataType>({
     tableData: [],
     columnConfig: storeManagerColumns,
     options: {

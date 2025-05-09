@@ -6,7 +6,6 @@ export interface SalesmanDataType {
   phone_number: string;
   username: string;
   password: string;
-  images: any | null;
   is_active: boolean;
   store_manager?: any | null;
   store?: string | null;

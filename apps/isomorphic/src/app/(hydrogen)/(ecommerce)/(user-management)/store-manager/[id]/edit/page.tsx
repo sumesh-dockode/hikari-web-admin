@@ -34,15 +34,6 @@ const pageHeader = {
   ],
 };
 
-const storeManagerData = {
-  first_name: 'Store Manager',
-  email: '5Hf3H@example.com',
-  username: 'store_manager',
-  password: 'password',
-  store_name: 'New Store',
-  store_address: 'New Address',
-};
-
 export default async function EditStoreManagerPage({ params }: any) {
   const id = (await params).id;
 
@@ -59,7 +50,7 @@ export default async function EditStoreManagerPage({ params }: any) {
         </Link>
       </PageHeader>
 
-      <CreateStoreManager id={id} initialValue={storeManagerData} />
+      <CreateStoreManager id={id} />
     </>
   );
 }

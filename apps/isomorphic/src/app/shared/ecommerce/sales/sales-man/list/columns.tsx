@@ -9,11 +9,6 @@ import Link from 'next/link';
 import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
 import { SalesmanDataType } from '@/data/salesman-data';
 
-const statusColors = {
-  invactive: '',
-  active: 'success',
-} as { [key: string]: string };
-
 const columnHelper = createColumnHelper<SalesmanDataType>();
 
 export const salesManColumns = [
@@ -27,22 +22,6 @@ export const salesManColumns = [
         checked={row.getIsSelected()}
         onChange={row.getToggleSelectedHandler()}
       />
-    ),
-  }),
-  columnHelper.display({
-    id: 'images',
-    size: 100,
-    header: 'Image',
-    cell: ({ row }) => (
-      <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
-        <Image
-          alt={row.original.first_name}
-          src={row.original.images || '/avatar.webp'}
-          fill
-          sizes="(max-width: 768px) 100vw"
-          className="object-cover"
-        />
-      </figure>
     ),
   }),
 

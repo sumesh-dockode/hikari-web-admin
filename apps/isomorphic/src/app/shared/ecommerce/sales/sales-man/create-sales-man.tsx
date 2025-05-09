@@ -33,10 +33,9 @@ export const salesmanDefaultValues = {
   first_name: '',
   last_name: '',
   email: '',
-  role: '',
+  phone_number: '',
   username: '',
   password: '',
-  images: undefined,
   is_active: true,
 };
 
@@ -80,15 +79,10 @@ export default function CreateSalesMan({
       phone_number: data.phone_number || '',
       username: data.username || '',
       password: data.password || '',
-      images: data.images?.url || undefined,
       is_active: data.is_active || false,
     };
 
     console.log('payload', payload);
-
-    if (payload.images?.includes('http')) {
-      payload = omit(payload, 'images');
-    }
 
     id ? updateSalesMan(payload) : createSalesMan(payload);
   };
@@ -126,7 +120,7 @@ export default function CreateSalesMan({
       onSubmit={onSubmit}
       useFormProps={{
         mode: 'onChange',
-        defaultValues: initialValue,
+        defaultValues: salesmanDefaultValues,
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
@@ -152,7 +146,7 @@ export default function CreateSalesMan({
                 />
               </FormGroup>
               <FormGroup
-                title="Email Address"
+                title="Email & Phone Number"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
@@ -180,20 +174,6 @@ export default function CreateSalesMan({
                     />
                   )}
                 />
-              </FormGroup>
-              <FormGroup
-                title={'Profile Picture'}
-                description={'This will be displayed on profile.'}
-                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
-              >
-                <div className="flex flex-col gap-6 @container @3xl:col-span-2">
-                  <AvatarUploadNew
-                    name="images"
-                    setValue={setValue}
-                    getValues={getValues}
-                    error={errors?.images?.message as string}
-                  />
-                </div>
               </FormGroup>
               <FormGroup
                 title={'Username & Password'}

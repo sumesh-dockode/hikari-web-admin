@@ -11,8 +11,7 @@ import { useEffect, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
 import usePaginatedServices from '@/hooks/services/usePaginatedServices';
 import PageLoader from '@/app/shared/page-loader';
-
-export type ServiceBookingDataType = (typeof ServiceData)[number];
+import { serviceDataType, serviceStatusChangeDataType } from '@/data/service-data';
 
 export default function ServiceBookingTable() {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -24,9 +23,9 @@ export default function ServiceBookingTable() {
     usePaginatedServices(pagination);
   const pageCount =
     data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  console.log('data............', data);
 
-  const { table, setData } = useTanStackTable<ServiceBookingDataType>({
-    // tableData: ServiceData,
+  const { table, setData } = useTanStackTable<serviceDataType | any>({
     tableData: [],
     columnConfig: servicebookingColumn,
     options: {
@@ -53,8 +52,9 @@ export default function ServiceBookingTable() {
 
   useEffect(() => {
     if (data) {
+      console.log('data??????????????', data);
       const serviceBookingAPIData =
-        data.pages.flatMap((page: any) => page?.results) || [];
+        data?.pages.flatMap((page: any) => page?.data?.results) || [];
       setData(serviceBookingAPIData);
     }
   }, [data]);

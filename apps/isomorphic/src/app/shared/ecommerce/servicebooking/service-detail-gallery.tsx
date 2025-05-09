@@ -136,6 +136,7 @@ export default function ServiceDetailsGallery({
       const payload = {
         status: status,
         id: id as string,
+        user_id: 1,
       };
 
       updateServiceStatus(payload);

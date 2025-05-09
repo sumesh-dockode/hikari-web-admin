@@ -71,9 +71,10 @@ export function useTanStackTable<T extends Record<string, any>>({
     columns.map((c) => c.id!)
   );
   const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map(({ id }) => id),
+    () => data?.map((item) => item?.id).filter(Boolean),
     [data]
   );
+  
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   );
@@ -81,9 +82,6 @@ export function useTanStackTable<T extends Record<string, any>>({
     top: [],
     bottom: [],
   });
-
-  // ===================================================================================================
-  // these are custom functions dependent on dnd kit and react-table to handle Drag and Drop events
   const handleDragEndColumn = React.useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
@@ -111,8 +109,6 @@ export function useTanStackTable<T extends Record<string, any>>({
     useSensor(TouchSensor, {}),
     useSensor(KeyboardSensor, {})
   );
-  // these are custom functions dependent on dnd kit and react-table to handle Drag and Drop events
-  // =================================================================================================
 
   const table = useReactTable({
     data,

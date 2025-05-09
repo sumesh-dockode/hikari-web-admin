@@ -6,6 +6,7 @@ import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 import TableAvatar from '@core/ui/avatar-card';
 import DateCell from '@core/ui/date-cell';
+import { toCurrency } from '@core/utils/to-currency';
 import { createColumnHelper } from '@tanstack/react-table';
 import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
 import { ActionIcon, Box, Text } from 'rizzui';
@@ -55,7 +56,7 @@ export const ordersColumns = (expanded: boolean = true) => {
       header: 'Price',
       cell: ({ row }) => (
         <Text className="font-medium text-gray-700">
-          {row.original.total_price}
+          {toCurrency(row.original.total_price || 0)}
         </Text>
       ),
     }),

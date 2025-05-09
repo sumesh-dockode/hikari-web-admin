@@ -4,59 +4,37 @@ import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
 import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
-import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
-import { StoreManagerDataType } from './table';
+import { StoreManagerTableDataType } from '@/data/store-manager-data';
 
-const statusColors = {
-  invactive: '',
-  active: 'success',
-} as { [key: string]: string };
-
-const columnHelper = createColumnHelper<StoreManagerDataType>();
+const columnHelper = createColumnHelper<StoreManagerTableDataType>();
 
 export const storeManagerColumns = [
-  columnHelper.display({
-    id: 'checked',
-    size: 50,
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="ps-3.5"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
-  columnHelper.display({
-    id: 'image',
-    size: 100,
-    header: 'Image',
-    cell: ({ row }) => (
-      <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
-        <Image
-          alt={row.original.name}
-          src={row.original.image}
-          fill
-          sizes="(max-width: 768px) 100vw"
-          className="object-cover"
-        />
-      </figure>
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'checked',
+  //   size: 50,
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       aria-label="Select row"
+  //       className="ps-3.5"
+  //       checked={row.getIsSelected()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
 
-  columnHelper.accessor('name', {
-    id: 'name',
+  columnHelper.accessor('first_name', {
+    id: 'first_name',
     size: 200,
     header: 'Name',
-    cell: ({ getValue }) => (
+    cell: ({ row }) => (
       <Title as="h6" className="!text-sm font-medium">
-        {getValue()}
+        {row.original.first_name} {row.original?.last_name || ''}
       </Title>
     ),
   }),
-  columnHelper.accessor('store_name', {
+  columnHelper.accessor('store_info.store_name', {
     id: 'store_name',
     size: 200,
     header: 'Store Name',
@@ -71,38 +49,37 @@ export const storeManagerColumns = [
     size: 150,
     header: 'Email',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.email}</Text>
+      <Text className="font-medium text-gray-700">{row.original.email}</Text>
     ),
   }),
   columnHelper.display({
-    id: 'phone',
+    id: 'phone_number',
     size: 150,
     header: 'Phone',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.phone}</Text>
+      <Text className="font-medium text-gray-700">
+        {row.original.phone_number}
+      </Text>
     ),
   }),
   columnHelper.display({
-    id: 'status',
+    id: 'is_active',
     size: 150,
     header: 'Status',
     cell: ({ row }) => (
       <>
-        {row.original.status === 'inactive' ? (
+        {!row.original.is_active ? (
           <div className="inline-flex items-center justify-center gap-2 rounded-full bg-gray-100/80 px-2.5 py-1">
             <Badge renderAsDot />
             <span className="text-xs font-semibold text-gray-900">
-              {row.original.status}
+              Inactive
             </span>
           </div>
         ) : (
           <div className="inline-flex items-center justify-center gap-2 rounded-full bg-green-lighter px-2.5 py-1">
-            <Badge
-              renderAsDot
-              color={statusColors[row.original.status] as any}
-            />
+            <Badge renderAsDot color={'success'} />
             <span className="text-xs font-semibold text-green-dark">
-              {row.original.status}
+              Active
             </span>
           </div>
         )}
@@ -121,7 +98,9 @@ export const storeManagerColumns = [
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
         <Tooltip content={'Edit Store Manager'} placement="top" color="invert">
-          <Link href={routes.eCommerce.editStoreManager(row.original.id)}>
+          <Link
+            href={routes.eCommerce.editStoreManager(row.original.id as string)}
+          >
             <ActionIcon size="sm" variant="outline">
               <PencilIcon className="h-4 w-4" />
             </ActionIcon>

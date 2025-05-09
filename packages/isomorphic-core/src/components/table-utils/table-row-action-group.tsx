@@ -14,6 +14,7 @@ export default function TableRowActionGroup({
   deletePopoverTitle = "Delete the appointment",
   deletePopoverDescription = "Are you sure you want to delete this item?",
   className,
+  children,
 }: {
   onDelete?: () => void;
   editUrl?: string;
@@ -21,8 +22,8 @@ export default function TableRowActionGroup({
   deletePopoverTitle?: string;
   deletePopoverDescription?: string;
   className?: string;
+  children?: React.ReactNode;
 }) {
-
   const isViewUrlAvailable = viewUrl && viewUrl !== "#";
   const isEditUrlAvailable = editUrl && editUrl !== "#";
 
@@ -33,6 +34,7 @@ export default function TableRowActionGroup({
       gap="3"
       className={cn("pe-3", className)}
     >
+      {children}
       {isEditUrlAvailable && (
         <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
           <Link href={editUrl}>

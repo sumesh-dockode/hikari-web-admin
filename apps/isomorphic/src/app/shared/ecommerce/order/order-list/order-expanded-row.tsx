@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { PiXBold } from 'react-icons/pi';
 import { Flex, Text, Title } from 'rizzui';
 import noImage from '@public/no-image.jpg';
+import { toCurrency } from '@core/utils/to-currency';
 
 export interface OrderItem {
   id: string;
@@ -66,7 +67,7 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
                 Sku: {product.product_variant.sku}
               </Text>
               <Text className="text-xs text-gray-500">
-                Unit Price: {product.price}
+                Unit Price: {toCurrency(product.price || 0)}
               </Text>
             </header>
           </div>
@@ -81,7 +82,7 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
               </Text>
             </div>
             <Text className="font-medium text-gray-900 dark:text-gray-700">
-              {Number(product.quantity) * Number(product.price)}
+              {toCurrency(Number(product.quantity) * Number(product.price))}
             </Text>
           </div>
         </article>

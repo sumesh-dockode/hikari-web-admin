@@ -17,7 +17,6 @@ import CustomerInfo from '@/app/shared/ecommerce/order/order-form/customer-info'
 import AddressInfo from '@/app/shared/ecommerce/order/order-form/address-info';
 import { Button, Text } from 'rizzui';
 import cn from '@core/utils/class-names';
-import OrderSummery from '@/app/shared/ecommerce/checkout/order-summery';
 import { useRouter } from 'next/navigation';
 import { routes } from '@/config/routes';
 import { DUMMY_ID } from '@/config/constants';

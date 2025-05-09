@@ -12,31 +12,7 @@ import usePaginatedSalesMan from '@/hooks/sales/salesman/usePaginatedSalesMan';
 import { useDeleteSalesMan } from '@/hooks/sales/salesman/useDeleteSalesMan';
 import toast from 'react-hot-toast';
 import PageLoader from '@/app/shared/page-loader';
-
-const storeManagerList = [
-  {
-    id: 1,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Sales Man',
-    email: '1kTt2@example.com',
-    phone: '(123) 456-7890',
-    address: '123 Main St, Anytown, USA',
-    status: 'active',
-  },
-  {
-    id: 2,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Jane Smith',
-    email: '5M0x3@example.com',
-    phone: '(987) 654-3210',
-    address: '456 Elm St, Anytown, USA',
-    status: 'inactive',
-  },
-];
-
-export type SalesManDataType = (typeof storeManagerList)[number];
+import { SalesmanDataType } from '@/data/salesman-data';
 
 export default function SalesManTable() {
   const [pagination, setPagination] = useState<PaginationState>({
@@ -57,7 +33,7 @@ export default function SalesManTable() {
   const pageCount =
     data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
 
-  const { table, setData } = useTanStackTable<SalesManDataType>({
+  const { table, setData } = useTanStackTable<SalesmanDataType>({
     tableData: [],
     columnConfig: salesManColumns,
     options: {

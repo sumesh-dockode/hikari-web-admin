@@ -1,9 +1,6 @@
 'use client';
 
 import DeletePopover from '@core/components/delete-popover';
-import { getRatings } from '@core/components/table-utils/get-ratings';
-import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
-import { getStockStatus } from '@core/components/table-utils/get-stock-status';
 import { routes } from '@/config/routes';
 import { productsData, productsDataType } from '@/data/products-data';
 import PencilIcon from '@core/components/icons/pencil';
@@ -12,7 +9,9 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import AvatarCard from '@core/ui/avatar-card';
-import fallback from "../../../../../../public/fallback.png"
+import { BiDownload } from 'react-icons/bi';
+import { downloadQRCode } from '@/app/lib/downloadQrCode';
+import { toCurrency } from '@core/utils/to-currency';
 const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
@@ -46,6 +45,7 @@ export const productsListColumns = [
         src={row.original.images}
         name={row.original.name}
         description={row.original.description}
+        descriptionClassName="line-clamp-2"
         avatarProps={{
           name: row.original.name,
           size: 'lg',
@@ -71,7 +71,9 @@ export const productsListColumns = [
     size: 150,
     header: 'Price',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">{row.original.price}</Text>
+      <Text className="font-medium text-gray-700">
+        {toCurrency(row.original.price || 0)}
+      </Text>
     ),
   }),
   // columnHelper.display({

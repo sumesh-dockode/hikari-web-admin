@@ -13,10 +13,9 @@ export const salesmanFormSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().optional(),
   email: validateEmail,
-  role: z.string().optional(),
+  phone_number: z.string().min(1, { message: messages.phoneNumberIsRequired }),
   username: validateUserName,
   password: validateNewPassword,
-  images: fileSchema.optional(),
   is_active: z.boolean().optional(),
 });
 

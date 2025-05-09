@@ -13,11 +13,11 @@ export const storeManagerFormSchema = z.object({
   first_name: z.string().min(1, { message: messages.firstNameRequired }),
   last_name: z.string().optional(),
   email: validateEmail,
+  phone_number: z.string().min(1, { message: messages.phoneNumberIsRequired }),
   store_name: z.string().min(1, { message: messages.storeNameRequired }),
   store_address: z.string().min(1, { message: messages.storeAddressRequired }),
   username: validateUserName,
   password: validateNewPassword,
-  images: fileSchema.optional(),
   is_active: z.boolean().optional(),
 });
 

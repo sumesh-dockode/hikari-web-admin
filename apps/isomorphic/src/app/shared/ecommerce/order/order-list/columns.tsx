@@ -1,14 +1,17 @@
 'use client';
 
+import { downloadQRCode } from '@/app/lib/downloadQrCode';
 import { routes } from '@/config/routes';
 import { OrdersDataType } from '@/data/orders';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 import TableAvatar from '@core/ui/avatar-card';
 import DateCell from '@core/ui/date-cell';
+import { toCurrency } from '@core/utils/to-currency';
 import { createColumnHelper } from '@tanstack/react-table';
+import { BiDownload } from 'react-icons/bi';
 import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
-import { ActionIcon, Box, Text } from 'rizzui';
+import { ActionIcon, Box, Text, Tooltip } from 'rizzui';
 
 const columnHelper = createColumnHelper<OrdersDataType>();
 
@@ -55,7 +58,7 @@ export const ordersColumns = (expanded: boolean = true) => {
       header: 'Price',
       cell: ({ row }) => (
         <Text className="font-medium text-gray-700">
-          {row.original.total_price}
+          {toCurrency(row.original.total_price || 0)}
         </Text>
       ),
     }),
@@ -82,12 +85,31 @@ export const ordersColumns = (expanded: boolean = true) => {
         },
       }) => (
         <TableRowActionGroup
-          editUrl={routes.eCommerce.editOrder(row.original.id)}
+          // editUrl={routes.eCommerce.editOrder(row.original.id)}
           viewUrl={routes.eCommerce.orderDetails(row.original.id)}
           deletePopoverTitle={`Delete the order`}
           deletePopoverDescription={`Are you sure you want to delete this #${row.original.id} order?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
-        />
+        >
+          {row.original.status === 'Confirmed' && (
+            <Tooltip
+              size="sm"
+              content={'Download QR Code'}
+              placement="top"
+              color="invert"
+            >
+              <ActionIcon
+                as="span"
+                size="sm"
+                variant="outline"
+                aria-label={'Download QR Code'}
+                onClick={async () => await downloadQRCode(row.original.id)}
+              >
+                <BiDownload className="size-4" />
+              </ActionIcon>
+            </Tooltip>
+          )}
+        </TableRowActionGroup>
       ),
     }),
   ];

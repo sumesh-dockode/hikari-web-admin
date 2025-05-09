@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
 import { metaObject } from '@/config/site.config';
@@ -64,7 +64,7 @@ export default function ProductVariantsPage() {
   const [isValueModalOpen, setIsValueModalOpen] = useState(false);
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
-  const [selectedColor, setSelectedColor] = useState<string>('');
+  const [selectedColor, setSelectedColor] = useState<string>('#000000');
   const [selectedVariantType, setSelectedVariantType] =
     useState<string>('Color');
 
@@ -72,6 +72,30 @@ export default function ProductVariantsPage() {
     data?.pages?.flatMap((page: any) => page?.data?.results) || [];
   const variantvalueAPIData =
     variantValuesData?.pages?.flatMap((page: any) => page?.data?.results) || [];
+
+  // Reset form when editingVariant changes
+  useEffect(() => {
+    if (isEditMode && editingVariant) {
+      reset({
+        name: editingVariant.name || '',
+      });
+    }
+  }, [editingVariant, isEditMode]);
+
+  // Reset value form when editingValue changes
+  useEffect(() => {
+    if (isValueEditMode && editingValue) {
+      const currentVariant = variantsAPIData.find(
+        (variant: any) => variant.id === editingValue.attribute
+      );
+
+      if (currentVariant?.name.toLowerCase() === 'color') {
+        setSelectedColor(editingValue.value || '#000000');
+      } else {
+        resetValueForm({ value: editingValue.value || '' });
+      }
+    }
+  }, [editingValue]);
 
   const handleDeleteClick = (variantId: string) => {
     setVariantToDelete(variantId);
@@ -90,7 +114,7 @@ export default function ProductVariantsPage() {
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<ProductVariantFormInput>({
     resolver: zodResolver(variantSchema),
   });
 
@@ -98,11 +122,14 @@ export default function ProductVariantsPage() {
     register: registerValueForm,
     handleSubmit: handleSubmitValueForm,
     reset: resetValueForm,
-  } = useForm<ProductVariantValueFormInput>();
+    formState: { errors: valueErrors },
+  } = useForm<ProductVariantValueFormInput>({
+    resolver: zodResolver(variantValueSchema),
+  });
 
   const openValueModal = (variantId: string) => {
     setActiveVariantId(variantId);
-    setSelectedColor(''); // Reset color selection
+    setSelectedColor('#000000');
     setIsValueModalOpen(true);
     setIsValueEditMode(false);
     setEditingValue(null);
@@ -115,10 +142,7 @@ export default function ProductVariantsPage() {
       (variant: any) => variant.id === activeVariantId
     );
 
-    // Check if this is a color variant (case-insensitive)
     const isColorVariant = currentVariant?.name.toLowerCase() === 'color';
-
-    // Get the value to save - use selectedColor if it's a color variant
     const valueToAdd = isColorVariant ? selectedColor : data.value.trim();
 
     if (!valueToAdd) {
@@ -127,7 +151,6 @@ export default function ProductVariantsPage() {
     }
 
     if (isValueEditMode && editingValue) {
-      // Update existing value
       updateVariantValue(
         {
           id: editingValue.id,
@@ -141,12 +164,11 @@ export default function ProductVariantsPage() {
             setIsValueEditMode(false);
             setEditingValue(null);
             resetValueForm();
-            setSelectedColor('');
+            setSelectedColor('#000000');
           },
         }
       );
     } else {
-      // Create new value
       createVariantValue(
         {
           id: null,
@@ -158,7 +180,7 @@ export default function ProductVariantsPage() {
             queryClient.invalidateQueries({ queryKey: ['variantValues'] });
             setIsValueModalOpen(false);
             resetValueForm();
-            setSelectedColor('');
+            setSelectedColor('#000000');
           },
         }
       );
@@ -176,10 +198,8 @@ export default function ProductVariantsPage() {
       variant.name === 'Seater'
     ) {
       setSelectedVariantType(variant.name);
-      // setVariantName('');
     } else {
       setSelectedVariantType('Custom');
-      // setVariantName(variant.name);
     }
   };
 
@@ -187,17 +207,6 @@ export default function ProductVariantsPage() {
     setEditingValue(valueData);
     setIsValueEditMode(true);
     setIsValueModalOpen(true);
-
-    const currentVariant = variantsAPIData.find(
-      (variant: any) => variant.id === valueData.attribute
-    );
-
-    if (currentVariant?.name.toLowerCase() === 'color') {
-      setSelectedColor(valueData.value);
-    } else {
-      resetValueForm({ value: valueData.value });
-    }
-
     setActiveVariantId(valueData.attribute);
   };
 
@@ -261,7 +270,6 @@ export default function ProductVariantsPage() {
     reset();
     setEditingVariant(null);
     setIsEditMode(false);
-    // setVariantName('');
     setSelectedVariantType('Color');
     setIsModalOpen(false);
   };
@@ -282,14 +290,14 @@ export default function ProductVariantsPage() {
             <div className="flex items-center gap-3">
               <input
                 type="color"
-                value={selectedColor || '#000000'}
-                onChange={(e) => setSelectedColor(e.target.value)}
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value || '#000000')}
                 className="h-10 w-10 cursor-pointer rounded border border-gray-300"
               />
               <Input
                 type="text"
                 value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value)}
+                onChange={(e) => setSelectedColor(e.target.value || '#000000')}
                 placeholder="Enter hex code (e.g. #FF0000)"
                 className="flex-1"
               />
@@ -329,84 +337,78 @@ export default function ProductVariantsPage() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          resetForm();
+          setDuplicateError(null);
+          setEditingVariant(null);
+          setIsEditMode(false);
+          setSelectedVariantType('Color');
+          reset();
         }}
       >
         <div className="p-6">
           <h2 className="mb-4 text-lg font-semibold">
             {isEditMode ? 'Edit Variant' : 'Add New Variant'}
           </h2>
-          <Form<ProductVariantFormInput>
-            validationSchema={variantSchema}
-            resetValues={reset}
-            onSubmit={onSubmit}
-            useFormProps={{
-              mode: 'onChange',
-              defaultValues: isEditMode
-                ? { name: editingVariant?.name || '' }
-                : { name: '' },
-              resolver: zodResolver(variantSchema),
-            }}
-            className="space-y-4 p-6"
-          >
-            {({ register, formState: { errors } }) => (
-              <>
-                <label className="text-sm font-medium text-gray-700">
-                  Choose a variant type
-                </label>
-                <select
-                  value={selectedVariantType}
-                  onChange={(e) => {
-                    setSelectedVariantType(e.target.value);
-                    setDuplicateError(null);
-                  }}
-                  className="w-full rounded border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="Color">Color</option>
-                  <option value="Material">Material</option>
-                  <option value="Seater">Seater</option>
-                  <option value="Custom">Custom</option>
-                </select>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Choose a variant type
+              </label>
+              <select
+                value={selectedVariantType}
+                onChange={(e) => {
+                  setSelectedVariantType(e.target.value);
+                  setDuplicateError(null);
+                }}
+                className="w-full rounded border-gray-300 px-3 py-2 text-sm"
+              >
+                <option value="Color">Color</option>
+                <option value="Material">Material</option>
+                <option value="Seater">Seater</option>
+                <option value="Custom">Custom</option>
+              </select>
+            </div>
 
-                {selectedVariantType === 'Custom' && (
-                  <div>
-                    <Input
-                      type="text"
-                      label="Enter custom variant name"
-                      placeholder="e.g. Fabric, Height"
-                      {...register('name', {
-                        onChange: () => setDuplicateError(null),
-                      })}
-                    />
-                    {errors.name && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.name?.message}
-                      </p>
-                    )}
-                  </div>
+            {selectedVariantType === 'Custom' && (
+              <div>
+                <Input
+                  type="text"
+                  label="Enter custom variant name"
+                  placeholder="e.g. Fabric, Height"
+                  {...register('name', {
+                    onChange: () => setDuplicateError(null),
+                  })}
+                />
+                {errors.name && (
+                  <p className="mt-1 text-xs text-red-500">
+                    {errors.name?.message}
+                  </p>
                 )}
-
-                {duplicateError && (
-                  <p className="mt-1 text-xs text-red-500">{duplicateError}</p>
-                )}
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setIsModalOpen(false);
-                      setDuplicateError(null);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit" disabled={!!duplicateError}>
-                    Save Variant
-                  </Button>
-                </div>
-              </>
+              </div>
             )}
-          </Form>
+
+            {duplicateError && (
+              <p className="text-sm text-red-500">{duplicateError}</p>
+            )}
+
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setIsModalOpen(false);
+                  setDuplicateError(null);
+                  setEditingVariant(null);
+                  setIsEditMode(false);
+                  setSelectedVariantType('Color');
+                  reset();
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" variant="solid">
+                {isEditMode ? 'Update' : 'Create'}
+              </Button>
+            </div>
+          </form>
         </div>
       </Modal>
 
@@ -418,67 +420,50 @@ export default function ProductVariantsPage() {
           setIsValueEditMode(false);
           setEditingValue(null);
           resetValueForm();
-          setSelectedColor('');
+          setSelectedColor('#000000');
         }}
       >
-        <Form<ProductVariantValueFormInput>
-          validationSchema={variantValueSchema}
-          resetValues={reset}
-          onSubmit={onSubmitValue}
-          useFormProps={{
-            mode: 'onChange',
-            defaultValues:
-              isValueEditMode && editingValue
-                ? { value: editingValue.value }
-                : { value: '' },
-            resolver: zodResolver(variantValueSchema),
-          }}
+        <form
+          onSubmit={handleSubmitValueForm(onSubmitValue)}
           className="space-y-4 p-6"
         >
-          {({ register, formState: { errors } }) => (
-            <>
-              {getModalContent()}
-              {variantsAPIData
-                ?.find((variant: any) => variant.id === activeVariantId)
-                ?.name.toLowerCase() !== 'color' && (
-                <div>
-                  <Input
-                    type="text"
-                    label="Enter value"
-                    placeholder="e.g. Blue, Leather, 3-seater"
-                    {...register('value')}
-                  />
-                  {errors.value && (
-                    <p className="mt-1 text-xs text-red-500">
-                      {errors.value.message}
-                    </p>
-                  )}
-                </div>
+          {getModalContent()}
+          {variantsAPIData
+            ?.find((variant: any) => variant.id === activeVariantId)
+            ?.name.toLowerCase() !== 'color' && (
+            <div>
+              <Input
+                type="text"
+                label="Enter value"
+                placeholder="e.g. Blue, Leather, 3-seater"
+                {...registerValueForm('value')}
+              />
+              {valueErrors.value && (
+                <p className="mt-1 text-xs text-red-500">
+                  {valueErrors.value.message}
+                </p>
               )}
-              <div className="flex justify-end gap-3 pt-4">
-                <Button
-                  variant="outline"
-                  type="button"
-                  onClick={() => setIsValueModalOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    variantsAPIData
-                      .find((variant: any) => variant.id === activeVariantId)
-                      ?.name.toLowerCase() === 'color'
-                      ? !selectedColor
-                      : false
-                  }
-                >
-                  {isValueEditMode ? 'Update Value' : 'Save Value'}
-                </Button>
-              </div>
-            </>
+            </div>
           )}
-        </Form>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsValueModalOpen(false);
+                setIsValueEditMode(false);
+                setEditingValue(null);
+                resetValueForm();
+                setSelectedColor('#000000');
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="solid">
+              {isValueEditMode ? 'Update' : 'Create'}
+            </Button>
+          </div>
+        </form>
       </Modal>
 
       {/* Delete Confirmation Modal */}
@@ -509,7 +494,6 @@ export default function ProductVariantsPage() {
           const variantValues = variantvalueAPIData.filter(
             (value: any) => value.attribute === variant.id
           );
-
           return (
             <div
               key={index}

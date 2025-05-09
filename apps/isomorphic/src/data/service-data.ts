@@ -12,5 +12,5 @@ export interface serviceDataType {
 export interface serviceStatusChangeDataType {
   id: string;
   status: string;
-  user_id: number;
+  // user_id: number;
 }

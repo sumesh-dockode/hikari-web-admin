@@ -16,21 +16,19 @@ import Image from 'next/image';
 
 import { PiCheckBold } from 'react-icons/pi';
 import { useServiceStatusChange } from '@/hooks/services/useServiceStatusChange';
+import { useParams } from 'next/navigation';
+import usePaginatedServices from '@/hooks/services/usePaginatedServices';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
   loading: () => <QuillLoader className="col-span-full h-[168px]" />,
 });
 
-const statusOptions = [
-  { id: 1, value: 'offline', label: 'Offline' },
-  { id: 2, value: 'pending', label: 'Pending' },
-  { id: 3, value: 'paid', label: 'Paid' },
-  { id: 4, value: 'completed', label: 'Completed' },
-  { id: 5, value: 'cancelled', label: 'Cancelled' },
-  { id: 6, value: 'service_started', label: 'Service Started' },
-  { id: 7, value: 'Booking_initiated', label: 'Booking Initiated' },
-  { id: 8, value: 'confirm', label: 'Confirm' },
+const serviceStatusActions = [
+  { id: 1, label: 'NEW', actionLabel: 'Mark as New' },
+  { id: 2, label: 'ASSIGNED', actionLabel: 'Mark as Assigned' },
+  { id: 3, label: 'CONFIRMED', actionLabel: 'Mark as Confirmed' },
+  { id: 4, label: 'COMPLETED', actionLabel: 'Mark as Completed' }, // No further action
 ];
 function WidgetCard({
   title,
@@ -98,21 +96,32 @@ const HorizontalFormBlockWrapper = ({
 };
 
 export default function ServiceDetailsGallery({
-  id,
+  // id,
   service,
   isModalView = true,
 }: {
-  id?: string;
+  // id?: string;
   isModalView?: boolean;
   service?: ServiceDetailsInput;
 }) {
+  const { id } = useParams();
   const [reset, setReset] = useState({});
+  const { data, error, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    usePaginatedServices({ pageIndex: 0, pageSize: 10 });
   const [isLoading, setLoading] = useState(false);
+  const serviceBookingAPIData =
+    data?.pages.flatMap((page: any) => page?.data?.results) || [];
+
+  const serviceData = serviceBookingAPIData?.find(
+    (service: any) => service.id === id
+  );
   const serviceGallery = [
     'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
   ];
   const { mutate: updateServiceStatus, status } = useServiceStatusChange();
-  const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
+  const currentServiceStatus =
+    serviceStatusActions.find((status) => status.label === serviceData?.status)
+      ?.id || 1;
   const onSubmit: SubmitHandler<ServiceDetailsInput> = (data) => {
     // set timeout only required to display loading state of the create category button
     setLoading(true);
@@ -129,14 +138,16 @@ export default function ServiceDetailsGallery({
     }, 600);
   };
 
-  const handleChangeStatus = (orderId: number) => {
-    const status = statusOptions.find((status) => status.id === orderId)?.label;
+  const handleChangeStatus = (serviceId: number) => {
+    const status = serviceStatusActions.find(
+      (status) => status.id === serviceId
+    )?.label;
 
     if (status) {
       const payload = {
         status: status,
         id: id as string,
-        user_id: 1,
+        // user_id: 1,
       };
 
       updateServiceStatus(payload);
@@ -218,25 +229,25 @@ export default function ServiceDetailsGallery({
                 childrenWrapperClass="py-6 @5xl:py-8 flex"
               >
                 <div className="ms-2 w-full space-y-7 border-s-2 border-gray-100">
-                  {statusOptions.map((item) => (
+                  {serviceStatusActions.map((item) => (
                     <div
                       key={item.id}
                       className={cn(
                         "relative ps-6 text-sm font-medium before:absolute before:-start-[9px] before:top-px before:h-5 before:w-5 before:-translate-x-px before:rounded-full before:bg-gray-100 before:content-[''] after:absolute after:-start-px after:top-5 after:h-10 after:w-0.5 after:content-[''] last:after:hidden",
-                        currentOrderStatus > item.id
+                        currentServiceStatus > item.id
                           ? 'before:bg-primary after:bg-primary'
                           : 'after:hidden',
-                        currentOrderStatus === item.id && 'before:bg-primary',
-                        currentOrderStatus + 1 < item.id && 'text-gray-300'
+                        currentServiceStatus === item.id && 'before:bg-primary',
+                        currentServiceStatus + 1 < item.id && 'text-gray-300'
                       )}
                     >
-                      {currentOrderStatus >= item.id ? (
+                      {currentServiceStatus >= item.id ? (
                         <span className="absolute -start-1.5 top-1 text-white">
                           <PiCheckBold className="h-auto w-3" />
                         </span>
                       ) : null}
 
-                      {currentOrderStatus + 1 !== item.id ? (
+                      {currentServiceStatus + 1 !== item.id ? (
                         item.label
                       ) : (
                         <Button

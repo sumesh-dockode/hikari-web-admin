@@ -15,7 +15,7 @@ export default function useVariantValue() {
     return data;
   };
   return useInfiniteQuery({
-    queryKey: [''],
+    queryKey: ['variantValues'],
     queryFn: ({ pageParam = 1 }) => fetchVariantValue(pageParam),
     initialPageParam: 1,
     getNextPageParam: (lastPage, pages, lastPageParam) => {

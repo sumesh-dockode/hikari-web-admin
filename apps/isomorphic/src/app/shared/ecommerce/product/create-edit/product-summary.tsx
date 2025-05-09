@@ -12,6 +12,7 @@ import {
 import dynamic from 'next/dynamic';
 import SelectLoader from '@core/components/loader/select-loader';
 import QuillLoader from '@core/components/loader/quill-loader';
+import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
 // const Select = dynamic(() => import('rizzui').then((mod) => mod.Select), {
 //   ssr: false,
 //   loading: () => <SelectLoader />,
@@ -28,9 +29,22 @@ export default function ProductSummary({ className }: { className?: string }) {
     formState: { errors },
   } = useFormContext();
 
+  const { data, isLoading } = usePaginatedCategories({
+    pageIndex: 0,
+    pageSize: 100,
+  });
+
+  const categoryOptions =
+    data?.pages
+      ?.flatMap((page: any) => page?.data?.results)
+      ?.map((category: any) => ({
+        label: category.name,
+        value: category.id,
+      })) || [];
+
   return (
     <FormGroup
-      title="Summary"
+      title="summary"
       description="Edit your product description and necessary information from here"
       className={cn(className)}
     >
@@ -46,22 +60,35 @@ export default function ProductSummary({ className }: { className?: string }) {
         {...register('sku')}
         error={errors.sku?.message as string}
       />
+      <Input
+        label="Stock"
+        placeholder="10"
+        {...register('stock')}
+        error={errors.stock?.message as string}
+      />
 
-    
       <Controller
-        name="categories"
         control={control}
-        render={({ field: { onChange, value } }) => (
-          <Select
-            options={categoryOption}
-            value={value}
-            onChange={onChange}
-            label="Categories"
-            error={errors?.categories?.message as string}
-            getOptionValue={(option) => option.value}
-            dropdownClassName="h-auto"
-          />
-        )}
+        name="category"
+        render={({ field }) => {
+          const selectedOption = categoryOptions.find(
+            (opt) => opt.value === field.value
+          );
+
+          return (
+            <Select
+              label="Categories"
+              placeholder="Select a category"
+              options={categoryOptions}
+              value={selectedOption ?? null}
+              onChange={(option: { label: string; value: number }) =>
+                field.onChange(option?.value)
+              }
+              // isLoading={isLoading}
+              error={errors.category?.message as string}
+            />
+          );
+        }}
       />
 
       <Controller
@@ -74,35 +101,9 @@ export default function ProductSummary({ className }: { className?: string }) {
             label="Product Details"
             className="col-span-full [&_.ql-editor]:min-h-[100px]"
             labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
+            error={errors?.description?.message as string}
           />
         )}
-      />
-      <Controller
-        name="Material"
-        control={control}
-        render={({ field: { onChange, value } }) => (
-          <MultiSelect
-            value={value}
-            clearable={true}
-            searchable={true}
-            options={materialOptions}
-            onChange={onChange}
-            onClear={() => {}}
-            label="Select Material"
-          />
-        )}
-      />
-      <Input
-        label="Dimentions"
-        placeholder="Dimentions"
-        {...register('dimensions')}
-        error={errors.title?.message as string}
-      />
-      <Textarea
-        label="Care Instructions"
-        placeholder="Enter your instructions"
-        className="col-span-full"
-        {...register('careInstructions')}
       />
     </FormGroup>
   );

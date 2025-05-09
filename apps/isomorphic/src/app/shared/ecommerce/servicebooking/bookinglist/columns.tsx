@@ -7,25 +7,26 @@ import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ActionIcon, Badge, Checkbox, Text, Title, Tooltip } from 'rizzui';
-import { ServiceBookingDataType } from './table';
+import noImage from '@public/no-image.jpg';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
 import EyeIcon from '@core/components/icons/eye';
+import { serviceDataType } from '@/data/service-data';
 
-const columnHelper = createColumnHelper<ServiceBookingDataType>();
+const columnHelper = createColumnHelper<serviceDataType>();
 
 export const servicebookingColumn = [
-  columnHelper.display({
-    id: 'checked',
-    size: 50,
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="ps-3.5"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'checked',
+  //   size: 50,
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       aria-label="Select row"
+  //       className="ps-3.5"
+  //       checked={row.getIsSelected()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
   columnHelper.display({
     id: 'image',
     size: 100,
@@ -33,8 +34,8 @@ export const servicebookingColumn = [
     cell: ({ row }) => (
       <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
         <Image
-          alt={row.original.name}
-          src={row.original.image}
+          alt={row.original.service_type}
+          src={row.original.image || noImage}
           fill
           sizes="(max-width: 768px) 100vw"
           className="object-cover"
@@ -43,46 +44,40 @@ export const servicebookingColumn = [
     ),
   }),
 
-  columnHelper.accessor('name', {
-    id: 'name',
-    size: 200,
-    header: 'Product Name',
-    cell: ({ getValue }) => (
-      <Title as="h6" className="!text-sm font-medium">
-        {getValue()}
-      </Title>
-    ),
-  }),
   columnHelper.display({
-    id: 'Requested User',
+    id: 'user_id',
     size: 120,
-    header: 'Requested By',
-    cell: ({ row }) => <div className="ps-6">{row.original.requesteduser}</div>,
+    header: 'Service to',
+    cell: ({ row }) => <div className="ps-6">{row.original.user_id}</div>,
   }),
   columnHelper.display({
-    id: 'promocode',
+    id: 'service_to',
+    size: 120,
+    header: 'Service to',
+    cell: ({ row }) => <div className="ps-6">{row.original.service_to}</div>,
+  }),
+  columnHelper.display({
+    id: 'service_type',
     size: 250,
-    header: 'Promo code',
+    header: 'Service Type',
     cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.promocode}</Text>
+      <Text className="truncate !text-sm">{row.original.service_type}</Text>
     ),
   }),
   columnHelper.display({
-    id: 'selectedservices',
-    size: 250,
-    header: 'Selected service',
+    id: 'description',
+    size: 300,
+    header: 'Description',
     cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.selectedservices}</Text>
+      <Text className="truncate !text-sm">{row.original.description}</Text>
     ),
   }),
-  // columnHelper.display({
-  //   id: 'additionalservicerequest',
-  //   size: 120,
-  //   header: 'Additonal Service Requests',
-  //   cell: ({ row }) => (
-  //     <div className="ps-6">{row.original.additionalservicerequest}</div>
-  //   ),
-  // }),
+  columnHelper.display({
+    id: 'price',
+    size: 120,
+    header: 'Price',
+    cell: ({ row }) => <div className="ps-6">{row.original.price}</div>,
+  }),
   columnHelper.accessor('status', {
     id: 'status',
     size: 140,
@@ -106,7 +101,7 @@ export const servicebookingColumn = [
             as="span"
             size="sm"
             variant="outline"
-            aria-label={'View Product'}
+            aria-label={'View Service'}
           >
             <EyeIcon className="h-4 w-4" />
           </ActionIcon>
@@ -114,7 +109,7 @@ export const servicebookingColumn = [
 
         <DeletePopover
           title={`Delete the category`}
-          description={`Are you sure you want to delete this #${row.original.id} category?`}
+          description={`Are you sure you want to delete this #${row.original.id} service?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
         />
       </div>

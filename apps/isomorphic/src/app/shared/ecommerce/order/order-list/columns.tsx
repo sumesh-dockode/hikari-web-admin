@@ -8,7 +8,7 @@ import TableAvatar from '@core/ui/avatar-card';
 import DateCell from '@core/ui/date-cell';
 import { createColumnHelper } from '@tanstack/react-table';
 import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
-import { ActionIcon, Text } from 'rizzui';
+import { ActionIcon, Box, Text } from 'rizzui';
 
 const columnHelper = createColumnHelper<OrdersDataType>();
 
@@ -20,13 +20,18 @@ export const ordersColumns = (expanded: boolean = true) => {
       header: 'Order Id',
       cell: ({ row }) => <>#{row.original.id}</>,
     }),
-    columnHelper.accessor('user', {
-      id: 'user',
+    columnHelper.accessor('order_info', {
+      id: 'order-info',
       size: 300,
       header: 'Customer',
       enableSorting: false,
       cell: ({ row }) => (
-        <Text>{row.original.user}</Text>
+        <Box>
+          <Text>{row.original.order_info?.name}</Text>
+          <Text className="text-xs text-gray-400">
+            {row.original.order_info?.address}
+          </Text>
+        </Box>
         // <TableAvatar
         //   src={row.original.avatar}
         //   name={row.original.name}

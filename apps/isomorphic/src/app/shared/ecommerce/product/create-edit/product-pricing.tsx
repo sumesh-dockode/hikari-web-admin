@@ -8,6 +8,7 @@ export default function ProductPricing() {
     register,
     formState: { errors },
   } = useFormContext();
+  console.log('priceerror', errors);
 
   return (
     <>
@@ -17,7 +18,7 @@ export default function ProductPricing() {
         {...register('price')}
         error={errors.price?.message as string}
         prefix={'$'}
-        type="number"
+        // type="number"
       />
     </>
   );

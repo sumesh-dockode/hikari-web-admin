@@ -1,9 +1,9 @@
-import ServiceDetailGallery from "@/app/shared/ecommerce/servicebooking/service-detail-gallery";
-import PageHeader from "@/app/shared/page-header";
-import { routes } from "@/config/routes";
+import ServiceDetailGallery from '@/app/shared/ecommerce/servicebooking/service-detail-gallery';
+import PageHeader from '@/app/shared/page-header';
+import { routes } from '@/config/routes';
 
 export default function ServiceDetailPage({ params }: any) {
-  const id = (params).id;
+  const id = params.id;
 
   const pageHeader = {
     title: 'Service Booking',
@@ -40,7 +40,7 @@ export default function ServiceDetailPage({ params }: any) {
       {/* Container */}
       <div className="@container">
         {/* Status Dropdown at the Top */}
-        <div className="flex justify-end mb-4">
+        <div className="mb-4 flex justify-end">
           <ServiceDetailGallery service={ServiceData} />
         </div>
       </div>

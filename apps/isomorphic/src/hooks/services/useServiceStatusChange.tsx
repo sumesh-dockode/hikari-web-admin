@@ -27,7 +27,7 @@ export function useServiceStatusChange() {
   return useMutation({
     mutationFn: (data: serviceStatusChangeDataType) => serviceStatusChange(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['orders', response?.id] });
+      queryClient.invalidateQueries({ queryKey: ['services', response?.id] });
       toast.success('Status changed successfully');
     },
   });

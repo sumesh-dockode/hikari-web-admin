@@ -12,6 +12,8 @@ export const API_ROUTES = {
   orderStatusChange: '/ecom/orders/{id}/status/',
   salesman: '/mingler/admin/users/salesman/',
   storeManager: '/mingler/admin/users/store-manager/',
-  serviceStatusChange: '/ecom/service-booking/{id}/service-status/',
+  serviceStatusChange: '/service/admin/services/{service_id}/',
   services: '/service/admin/services/',
+  singleService: 'service/admin/services/{service_id}/',
+  serviceStatus :`/service/service-statuses/`
 };

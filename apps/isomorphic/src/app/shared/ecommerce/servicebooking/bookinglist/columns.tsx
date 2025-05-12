@@ -15,6 +15,12 @@ import { serviceDataType } from '@/data/service-data';
 const columnHelper = createColumnHelper<serviceDataType>();
 
 export const servicebookingColumn = [
+  columnHelper.display({
+    id: 'id',
+    size: 120,
+    header: 'Id',
+    cell: ({ row }) => <>#{row.original.id}</>,
+  }),
   // columnHelper.display({
   //   id: 'checked',
   //   size: 50,
@@ -47,7 +53,7 @@ export const servicebookingColumn = [
   columnHelper.display({
     id: 'user_id',
     size: 120,
-    header: 'Service to',
+    header: 'User Id',
     cell: ({ row }) => <div className="ps-6">{row.original.user_id}</div>,
   }),
   columnHelper.display({
@@ -64,14 +70,14 @@ export const servicebookingColumn = [
       <Text className="truncate !text-sm">{row.original.service_type}</Text>
     ),
   }),
-  columnHelper.display({
-    id: 'description',
-    size: 300,
-    header: 'Description',
-    cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.description}</Text>
-    ),
-  }),
+  // columnHelper.display({
+  //   id: 'description',
+  //   size: 300,
+  //   header: 'Description',
+  //   cell: ({ row }) => (
+  //     <Text className="truncate !text-sm">{row.original.description}</Text>
+  //   ),
+  // }),
   columnHelper.display({
     id: 'price',
     size: 120,

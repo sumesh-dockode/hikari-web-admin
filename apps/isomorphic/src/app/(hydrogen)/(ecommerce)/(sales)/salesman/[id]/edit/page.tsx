@@ -64,7 +64,7 @@ export default async function EditSalesmanPage({ params }: any) {
         </Link>
       </PageHeader>
 
-      <CreateSalesMan id={id} initialValue={salesmanData} />
+      <CreateSalesMan id={id} />
     </>
   );
 }

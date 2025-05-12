@@ -5,8 +5,9 @@ export interface SalesmanDataType {
   email: string;
   phone_number: string;
   username: string;
-  password: string;
+  password?: string;
   is_active: boolean;
   store_manager?: any | null;
   store?: string | null;
+  store_manager_id?: number | null;
 }

@@ -10,8 +10,8 @@ import { Form } from '@core/ui/form';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
+  getSalesmanFormSchema,
   SalesmanFormInput,
-  salesmanFormSchema,
 } from '@/validators/create-salesman.schema';
 import FormGroup from '@/app/shared/form-group';
 import { omit } from '@/utils/utils';
@@ -23,6 +23,8 @@ import { useSalesManById } from '@/hooks/sales/salesman/useSalesManById';
 import { useCreateSalesMan } from '@/hooks/sales/salesman/useCreateSalesMan';
 import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
 import { PhoneNumber } from '@core/ui/phone-input';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
+import { debounce } from 'lodash';
 
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -37,21 +39,25 @@ export const salesmanDefaultValues = {
   username: '',
   password: '',
   is_active: true,
+  store_manager_id: undefined,
 };
 
 // main category form component for create and update category
 export default function CreateSalesMan({
   id,
-  initialValue,
   isModalView = true,
 }: {
   id?: string;
   isModalView?: boolean;
-  initialValue?: SalesmanFormInput;
 }) {
   const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const { data: storeManagerData, isLoading: isFetchingStoreManager } =
+    usePaginatedStoreManager({
+      search: searchText,
+    });
   const {
     data,
     isLoading: isFetching,
@@ -69,6 +75,34 @@ export default function CreateSalesMan({
     status: updateStatus,
   } = useUpdateSalesMan();
 
+  const storeManagerList =
+    storeManagerData?.pages?.flatMap((page: any) => page?.data?.results) || [];
+  const storeManagerOptions = storeManagerList.map((item) => ({
+    label: `${item.first_name || ''} ${item.last_name || ''}`,
+    value: item.id,
+  }));
+
+  useEffect(() => {
+    if (data) {
+      console.log('data', data);
+      const detailData = data?.data;
+      const resetData = {
+        id: detailData?.id || null,
+        first_name: detailData?.first_name || '',
+        last_name: detailData?.last_name || '',
+        email: detailData?.email || '',
+        phone_number: detailData?.phone_number || '',
+        username: detailData?.username || '',
+        password: detailData?.password || '',
+        is_active: detailData?.is_active || false,
+        store_manager_id: detailData?.store_manager?.id,
+      };
+      setReset(resetData);
+
+      // setReset(data);
+    }
+  }, [data]);
+
   const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     setLoading(true);
     let payload = {
@@ -78,11 +112,10 @@ export default function CreateSalesMan({
       email: data.email || '',
       phone_number: data.phone_number || '',
       username: data.username || '',
-      password: data.password || '',
+      password: data.password || undefined,
       is_active: data.is_active || false,
+      store_manager_id: data.store_manager_id || null,
     };
-
-    console.log('payload', payload);
 
     id ? updateSalesMan(payload) : createSalesMan(payload);
   };
@@ -100,7 +133,7 @@ export default function CreateSalesMan({
 
       setReset(salesmanDefaultValues);
 
-      push(routes.eCommerce.categories);
+      push(routes.eCommerce.salesman);
 
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
@@ -109,13 +142,17 @@ export default function CreateSalesMan({
     }
   }, [createStatus, updateStatus]);
 
+  const handleStoreManagerSearch = debounce((value: string) => {
+    setSearchText(value);
+  }, 500);
+
   if (isFetching) return <PageLoader />;
 
   if (fetchError) throw fetchError;
 
   return (
     <Form<SalesmanFormInput>
-      validationSchema={salesmanFormSchema}
+      validationSchema={getSalesmanFormSchema(!!id)}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
@@ -171,6 +208,7 @@ export default function CreateSalesMan({
                       className="rtl:[&>.selected-flag]:right-0"
                       inputClassName="rtl:pr-12"
                       buttonClassName="rtl:[&>.selected-flag]:right-2 rtl:[&>.selected-flag_.arrow]:-left-6"
+                      error={errors.phone_number?.message}
                     />
                   )}
                 />
@@ -186,19 +224,48 @@ export default function CreateSalesMan({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
+                {!id && (
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <Password
+                        placeholder="Enter your password"
+                        helperText={
+                          value &&
+                          value?.length < 8 &&
+                          'Your current password must be more than 8 characters'
+                        }
+                        value={value}
+                        onChange={onChange}
+                        error={errors.password?.message}
+                      />
+                    )}
+                  />
+                )}
+              </FormGroup>
+              <FormGroup
+                title="Store Manager"
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
                 <Controller
                   control={control}
-                  name="password"
-                  render={({ field: { onChange, value } }) => (
-                    <Password
-                      placeholder="Enter your password"
-                      helperText={
-                        getValues().password?.length < 8 &&
-                        'Your current password must be more than 8 characters'
-                      }
+                  name="store_manager_id"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      placeholder="Select Store Manager"
                       value={value}
                       onChange={onChange}
-                      error={errors.password?.message}
+                      options={storeManagerOptions}
+                      searchable={true}
+                      stickySearch={true}
+                      getOptionValue={(option) => option.value}
+                      displayValue={(selected) =>
+                        storeManagerOptions.find((o) => o.value === selected)
+                          ?.label || ''
+                      }
+                      onSearchChange={handleStoreManagerSearch}
+                      error={errors.store_manager_id?.message}
                     />
                   )}
                 />

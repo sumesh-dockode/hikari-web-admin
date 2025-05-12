@@ -9,7 +9,7 @@ export function useDeleteSalesMan() {
 
   const deleteSalesMan = async (salesManId: any): Promise<void> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.categories}${salesManId}`;
+    let url = `${API_ROUTES.salesman}${salesManId}/`;
     const { data } = await apiClient.delete(url);
     return data;
   };

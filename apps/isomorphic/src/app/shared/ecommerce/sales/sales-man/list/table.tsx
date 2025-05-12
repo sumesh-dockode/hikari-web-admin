@@ -6,32 +6,29 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { salesManColumns } from './columns';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
 import usePaginatedSalesMan from '@/hooks/sales/salesman/usePaginatedSalesMan';
 import { useDeleteSalesMan } from '@/hooks/sales/salesman/useDeleteSalesMan';
 import toast from 'react-hot-toast';
 import PageLoader from '@/app/shared/page-loader';
 import { SalesmanDataType } from '@/data/salesman-data';
+import { debounce } from 'lodash';
+
+interface FiltersProps {
+  search?: string;
+}
 
 export default function SalesManTable() {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedSalesMan(pagination);
+  const { data, isLoading } = usePaginatedSalesMan(pagination);
   const { mutate: deleteSalesman, status: deleteStatus } = useDeleteSalesMan();
-
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<SalesmanDataType>({
     tableData: [],
@@ -39,15 +36,15 @@ export default function SalesManTable() {
     options: {
       meta: {
         handleDeleteRow: (row) => {
+          setDeleteItemId(row.id);
           deleteSalesman(row.id, {
             onSuccess: () => {
               toast.success('Salesman deleted successfully');
             },
           });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -64,17 +61,28 @@ export default function SalesManTable() {
 
   useEffect(() => {
     if (data) {
-      const salesManAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const salesManAPIData = data?.data?.results || [];
       setData(salesManAPIData);
     }
   }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
 
   if (isLoading) return <PageLoader />;
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

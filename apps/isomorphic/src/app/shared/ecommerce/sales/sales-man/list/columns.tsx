@@ -12,19 +12,18 @@ import { SalesmanDataType } from '@/data/salesman-data';
 const columnHelper = createColumnHelper<SalesmanDataType>();
 
 export const salesManColumns = [
-  columnHelper.display({
-    id: 'checked',
-    size: 50,
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="ps-3.5"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
-
+  // columnHelper.display({
+  //   id: 'checked',
+  //   size: 50,
+  //   cell: ({ row }) => (
+  //     <Checkbox
+  //       aria-label="Select row"
+  //       className="ps-3.5"
+  //       checked={row.getIsSelected()}
+  //       onChange={row.getToggleSelectedHandler()}
+  //     />
+  //   ),
+  // }),
   columnHelper.accessor('first_name', {
     id: 'first_name',
     size: 200,
@@ -32,6 +31,16 @@ export const salesManColumns = [
     cell: ({ row }) => (
       <Title as="h6" className="!text-sm font-medium">
         {row.original.first_name} {row.original?.last_name || ''}
+      </Title>
+    ),
+  }),
+  columnHelper.accessor('username', {
+    id: 'username',
+    size: 200,
+    header: 'Username',
+    cell: ({ row }) => (
+      <Title as="h6" className="!text-sm font-medium">
+        {row.original.username}
       </Title>
     ),
   }),
@@ -99,8 +108,11 @@ export const salesManColumns = [
         </Tooltip>
         <DeletePopover
           title={`Delete the Sales man`}
-          description={`Are you sure you want to delete this #${row.original.id} salesman?`}
-          onDelete={() => meta?.handleDeleteRow?.(row.original)}
+          description={`Are you sure you want to delete this #${row.original.username} salesman?`}
+          onDelete={() => {
+            meta?.handleDeleteRow?.(row.original);
+          }}
+          isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />
       </div>
     ),

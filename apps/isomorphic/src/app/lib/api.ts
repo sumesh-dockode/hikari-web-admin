@@ -14,4 +14,5 @@ export const API_ROUTES = {
   storeManager: '/mingler/admin/users/store-manager/',
   serviceStatusChange: '/ecom/service-booking/{id}/service-status/',
   services: '/service/admin/services/',
+  deliveryManager: '/authentication/admin/users/',
 };

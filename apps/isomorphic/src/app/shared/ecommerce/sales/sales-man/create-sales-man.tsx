@@ -140,7 +140,6 @@ export default function CreateSalesMan({
 
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
-      toast.error('Something went wrong');
       setLoading(false);
     }
   }, [createStatus, updateStatus]);

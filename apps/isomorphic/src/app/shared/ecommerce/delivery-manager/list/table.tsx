@@ -6,53 +6,46 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { DeliveryManagerColumns } from './columns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
+import { DeliveryManagerDataType } from '@/data/delivery-manager-data';
+import usePaginatedDeliveryManager from '@/hooks/DeliveryManager/usePaginatedDeliveryManager';
+import { useDeleteDeliveryManager } from '@/hooks/DeliveryManager/useDeleteDeliveryManager';
+import toast from 'react-hot-toast';
+import PageLoader from '@/app/shared/page-loader';
+import { debounce } from 'lodash';
 
-const storeManagerList = [
-  {
-    id: 1,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Delivery Agent',
-    email: '1kTt2@example.com',
-    phone: '(123) 456-7890',
-    address: '123 Main St, Anytown, USA',
-    status: 'active',
-  },
-  {
-    id: 2,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Jane Smith',
-    email: '5M0x3@example.com',
-    phone: '(987) 654-3210',
-    address: '456 Elm St, Anytown, USA',
-    status: 'inactive',
-  },
-];
-
-export type DeliveryManagerDataType = (typeof storeManagerList)[number];
+interface FiltersProps {
+  search?: string;
+}
 
 export default function DeliveryManagerTable() {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
-
-  const pageCount = 1;
+  const { data, isLoading } = usePaginatedDeliveryManager(pagination);
+  const { mutate: deleteDeliveryManager, status: deleteStatus } =
+    useDeleteDeliveryManager();
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<DeliveryManagerDataType>({
-    tableData: storeManagerList,
+    tableData: [],
     columnConfig: DeliveryManagerColumns,
     options: {
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          setDeleteItemId(row.id);
+          deleteDeliveryManager(row.id, {
+            onSuccess: () => {
+              toast.success('Delivery Manager deleted successfully');
+            },
+          });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -67,9 +60,30 @@ export default function DeliveryManagerTable() {
     pagination,
   });
 
+  useEffect(() => {
+    if (data) {
+      const deliveryManagerAPIData = data?.data?.results || [];
+      setData(deliveryManagerAPIData);
+    }
+  }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
+
+  if (isLoading) return <PageLoader />;
+
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

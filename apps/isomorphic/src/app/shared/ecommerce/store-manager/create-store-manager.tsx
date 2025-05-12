@@ -18,8 +18,8 @@ import {
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import {
+  getStoreManagerFormSchema,
   StoreManagerFormInput,
-  storeManagerFormSchema,
 } from '@/validators/create-store-manager.schema';
 import FormGroup from '../../form-group';
 import { PiEnvelopeSimple } from 'react-icons/pi';
@@ -31,11 +31,6 @@ import { routes } from '@/config/routes';
 import toast from 'react-hot-toast';
 import PageLoader from '../../page-loader';
 import { PhoneNumber } from '@core/ui/phone-input';
-
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
-});
 
 const DefaultValues = {
   first_name: '',
@@ -77,6 +72,25 @@ export default function CreateStoreManager({
     status: updateStatus,
   } = useUpdateStoreManager();
 
+  useEffect(() => {
+    if (data) {
+      const detailData = data?.data;
+      const resetData = {
+        id: detailData?.id || null,
+        first_name: detailData?.first_name || '',
+        last_name: detailData?.last_name || '',
+        email: detailData?.email || '',
+        phone_number: detailData?.phone_number || '',
+        username: detailData?.username || '',
+        password: detailData?.password || '',
+        is_active: detailData?.is_active || false,
+        store_name: detailData?.store_info?.name || '',
+        store_address: detailData?.store_info?.address || '',
+      };
+      setReset(resetData);
+    }
+  }, [data]);
+
   const onSubmit: SubmitHandler<StoreManagerFormInput> = (data) => {
     setLoading(true);
     let payload = {
@@ -86,12 +100,10 @@ export default function CreateStoreManager({
       email: data.email || '',
       phone_number: data.phone_number || '',
       username: data.username || '',
-      password: data.password || '',
+      password: data.password || undefined,
       is_active: data.is_active || false,
-      // store_info: {
       store_name: data.store_name || '',
       store_address: data.store_address || '',
-      // },
     };
 
     id ? updateStoreManager(payload) : createStoreManager(payload);
@@ -110,7 +122,7 @@ export default function CreateStoreManager({
 
       setReset(DefaultValues);
 
-      push(routes.eCommerce.categories);
+      push(routes.eCommerce.storeManager);
 
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
@@ -125,7 +137,7 @@ export default function CreateStoreManager({
 
   return (
     <Form<StoreManagerFormInput>
-      validationSchema={storeManagerFormSchema}
+      validationSchema={getStoreManagerFormSchema(!!id)}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
@@ -174,13 +186,13 @@ export default function CreateStoreManager({
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <PhoneNumber
-                      // label="Phone Number"
                       country="in"
                       value={value}
                       onChange={onChange}
                       className="rtl:[&>.selected-flag]:right-0"
                       inputClassName="rtl:pr-12"
                       buttonClassName="rtl:[&>.selected-flag]:right-2 rtl:[&>.selected-flag_.arrow]:-left-6"
+                      error={errors.phone_number?.message}
                     />
                   )}
                 />
@@ -213,21 +225,24 @@ export default function CreateStoreManager({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field: { onChange, value } }) => (
-                    <Password
-                      placeholder="Enter your password"
-                      helperText={
-                        getValues().password?.length < 8 &&
-                        'Your current password must be more than 8 characters'
-                      }
-                      onChange={onChange}
-                      error={errors.password?.message}
-                    />
-                  )}
-                />
+                {!id && (
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <Password
+                        placeholder="Enter your password"
+                        helperText={
+                          value &&
+                          value?.length < 8 &&
+                          'Your current password must be more than 8 characters'
+                        }
+                        onChange={onChange}
+                        error={errors.password?.message}
+                      />
+                    )}
+                  />
+                )}
               </FormGroup>
               <FormGroup
                 title={'Status'}

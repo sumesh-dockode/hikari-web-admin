@@ -17,9 +17,7 @@ export const getSalesmanFormSchema = (isEditMode: boolean) =>
       .string()
       .min(1, { message: messages.phoneNumberIsRequired }),
     username: validateUserName,
-    password: isEditMode
-      ? z.string().optional() // ✅ Optional in edit mode
-      : validateNewPassword, // ✅ Required in create mode
+    password: isEditMode ? z.string().optional() : validateNewPassword,
     is_active: z.boolean().optional(),
     store_manager_id: z
       .number({

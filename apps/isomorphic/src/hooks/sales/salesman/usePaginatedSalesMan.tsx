@@ -16,7 +16,7 @@ export default function usePaginatedSalesMan(options: {
     let url = API_ROUTES.salesman;
     let params = [];
 
-    if (options?.pageIndex) {
+    if (options?.pageIndex || options?.pageIndex === 0) {
       params.push(`page=${options.pageIndex + 1}`);
     }
     if (options?.pageSize) {
@@ -34,25 +34,11 @@ export default function usePaginatedSalesMan(options: {
   };
 
   return useQuery({
-    queryKey: ['salesManTable', options], // Query key
-    queryFn: () => fetchSalesMan(), // Query function
-
-    enabled: status === 'authenticated', // Only fetch when authenticated
+    queryKey: ['salesManTable', options],
+    queryFn: () => fetchSalesMan(),
+    enabled: status === 'authenticated',
     throwOnError(error, query) {
       throw error;
     },
   });
-  // return useInfiniteQuery({
-  //   queryKey: ['salesManTable', options],
-  //   queryFn: fetchSalesMan,
-  //   initialPageParam: 1,
-  //   getNextPageParam: (lastPage, allPages) => {
-  //     if (!lastPage?.data?.next) return undefined;
-  //     return allPages.length + 1;
-  //   },
-  //   enabled: status === 'authenticated',
-  //   throwOnError(error, query) {
-  //     throw error;
-  //   },
-  // });
 }

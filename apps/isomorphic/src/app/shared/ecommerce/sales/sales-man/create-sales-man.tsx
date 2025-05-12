@@ -4,7 +4,16 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import QuillLoader from '@core/components/loader/quill-loader';
-import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
+import {
+  Button,
+  Input,
+  Password,
+  Select,
+  SelectOption,
+  Switch,
+  Text,
+  Title,
+} from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
@@ -25,11 +34,7 @@ import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
 import { PhoneNumber } from '@core/ui/phone-input';
 import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
 import { debounce } from 'lodash';
-
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
-});
+import { StoreManagerTableDataType } from '@/data/store-manager-data';
 
 export const salesmanDefaultValues = {
   first_name: '',
@@ -75,16 +80,16 @@ export default function CreateSalesMan({
     status: updateStatus,
   } = useUpdateSalesMan();
 
-  const storeManagerList =
-    storeManagerData?.pages?.flatMap((page: any) => page?.data?.results) || [];
-  const storeManagerOptions = storeManagerList.map((item) => ({
-    label: `${item.first_name || ''} ${item.last_name || ''}`,
-    value: item.id,
-  }));
+  const storeManagerList = storeManagerData?.data?.results || [];
+  const storeManagerOptions = storeManagerList.map(
+    (item: StoreManagerTableDataType) => ({
+      label: `${item.first_name || ''} ${item.last_name || ''}`,
+      value: item.id,
+    })
+  );
 
   useEffect(() => {
     if (data) {
-      console.log('data', data);
       const detailData = data?.data;
       const resetData = {
         id: detailData?.id || null,
@@ -98,8 +103,6 @@ export default function CreateSalesMan({
         store_manager_id: detailData?.store_manager?.id,
       };
       setReset(resetData);
-
-      // setReset(data);
     }
   }, [data]);
 
@@ -146,7 +149,7 @@ export default function CreateSalesMan({
     setSearchText(value);
   }, 500);
 
-  if (isFetching) return <PageLoader />;
+  if (isFetching || isFetchingStoreManager) return <PageLoader />;
 
   if (fetchError) throw fetchError;
 
@@ -201,7 +204,6 @@ export default function CreateSalesMan({
                   control={control}
                   render={({ field: { value, onChange } }) => (
                     <PhoneNumber
-                      // label="Phone Number"
                       country="in"
                       value={value}
                       onChange={onChange}
@@ -261,8 +263,9 @@ export default function CreateSalesMan({
                       stickySearch={true}
                       getOptionValue={(option) => option.value}
                       displayValue={(selected) =>
-                        storeManagerOptions.find((o) => o.value === selected)
-                          ?.label || ''
+                        storeManagerOptions.find(
+                          (o: SelectOption) => o.value === selected
+                        )?.label || ''
                       }
                       onSearchChange={handleStoreManagerSearch}
                       error={errors.store_manager_id?.message}

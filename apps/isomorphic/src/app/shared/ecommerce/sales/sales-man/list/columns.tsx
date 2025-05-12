@@ -107,11 +107,9 @@ export const salesManColumns = [
           </Link>
         </Tooltip>
         <DeletePopover
-          title={`Delete the Sales man`}
+          title={`Delete the Salesman`}
           description={`Are you sure you want to delete this #${row.original.username} salesman?`}
-          onDelete={() => {
-            meta?.handleDeleteRow?.(row.original);
-          }}
+          onDelete={() => meta?.handleDeleteRow?.(row.original)}
           isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />
       </div>

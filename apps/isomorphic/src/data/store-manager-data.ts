@@ -5,7 +5,7 @@ export interface StoreManagerDataType {
   email: string;
   phone_number: string;
   username: string;
-  password: string;
+  password?: string;
   is_active: boolean;
   store_name: string;
   store_address: string;
@@ -20,5 +20,5 @@ export interface StoreManagerTableDataType {
   username: string;
   password: string;
   is_active: boolean;
-  store_info: { store_name: string; store_address: string } | null;
+  store_info: { name: string; address: string } | null;
 }

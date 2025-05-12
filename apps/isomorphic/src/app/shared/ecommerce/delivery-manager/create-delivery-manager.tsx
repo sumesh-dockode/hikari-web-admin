@@ -9,10 +9,6 @@ import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import UploadZone from '@core/ui/file-upload/upload-zone';
-import {
-  StoreManagerFormInput,
-  storeManagerFormSchema,
-} from '@/validators/create-store-manager.schema';
 import FormGroup from '../../form-group';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';

@@ -2,8 +2,12 @@ import ServiceDetailGallery from '@/app/shared/ecommerce/servicebooking/service-
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 
-export default function ServiceDetailPage({ params }: any) {
-  const id = params.id;
+interface PageProps {
+  params: { id: string };
+}
+
+export default async function ServiceDetailPage({ params }: PageProps) {
+  const id = (await params).id;
 
   const pageHeader = {
     title: 'Service Booking',

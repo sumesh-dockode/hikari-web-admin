@@ -15,7 +15,7 @@ export function useServiceStatusChange() {
     ...statusData
   }: serviceStatusChangeDataType): Promise<serviceStatusChangeDataType> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.serviceStatusChange}`.replace('{id}', id);
+    let url = `${API_ROUTES.serviceStatusChange}`.replace('{service_id}', id);
     const { data } = await apiClient.patch(url, statusData);
 
     console.log('data', data);
@@ -25,9 +25,10 @@ export function useServiceStatusChange() {
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: serviceStatusChangeDataType) => serviceStatusChange(data),
+    mutationFn: (data: serviceStatusChangeDataType) =>
+      serviceStatusChange(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['services', response?.id] });
+      queryClient.invalidateQueries({ queryKey: ['service', response?.id] });
       toast.success('Status changed successfully');
     },
   });

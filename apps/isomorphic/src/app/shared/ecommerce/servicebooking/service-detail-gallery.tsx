@@ -68,7 +68,7 @@ const HorizontalFormBlockWrapper = ({
 
       <div
         className={cn(
-          'mt-3 grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
+          'mt-3 gap-3 @lg:gap-4 @2xl:gap-5',
           isModalView ? 'col-span-4' : ' '
         )}
       >
@@ -100,23 +100,23 @@ export default function ServiceDetailsGallery({
     serviceStatusActions?.pages.flatMap((page: any) => page?.data?.results) ||
     [];
 
-  const currentService =
-    serviceBookingsAPIData?.find((service: any) => service.id === id) ||
-    serviceData;
+  const currentService = serviceData?.data;
 
   const { mutate: updateServiceStatus, status } = useServiceStatusChange();
-  const currentStatusOrder =
-    statusActions.find((action) => action.name === currentService?.status)
-      ?.id || 0;
+  const currentStatusOrder = statusActions.find(
+    (action) => action.name === currentService?.status
+  );
+  console.log('currentStatusOrder', currentStatusOrder);
   // const {data,}
   const handleChangeStatus = (statusId: string) => {
     const status = statusActions.find((s) => s.id === statusId)?.name;
 
     if (status && id) {
       const payload = {
+        id: id,
         new_status: statusId,
         new_price: currentService.price?.toString() || '0',
-        service_type_id: currentService.service_type_id || '', 
+        // service_type_id: currentService.service_type_id || '',
         image: currentService.image || '',
       };
       updateServiceStatus(payload);
@@ -131,9 +131,8 @@ export default function ServiceDetailsGallery({
         <div className="flex-grow">
           <div
             className={cn(
-              'grid grid-cols-1',
               isModalView
-                ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
+                ? 'gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
                 : 'gap-5'
             )}
           >
@@ -142,41 +141,69 @@ export default function ServiceDetailsGallery({
               // description={'You cannot update this information'}
               isModalView={isModalView}
             >
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="serviceTo"
+                  >
                     Service To
                   </label>
-                  <div className="mt-1 text-sm text-gray-900">
-                    {currentService?.service_to || 'N/A'}
-                  </div>
+                  <input
+                    type="text"
+                    id="serviceTo"
+                    name="serviceTo"
+                    value={currentService?.service_to || 'N/A'}
+                    readOnly
+                    className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                  />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    className="block text-sm font-medium text-gray-700"
+                    htmlFor="serviceType"
+                  >
                     Service Type
                   </label>
-                  <div className="mt-1 text-sm text-gray-900">
-                    {currentService?.service_type || 'N/A'}
-                  </div>
+                  <input
+                    type="text"
+                    id="serviceType"
+                    name="serviceType"
+                    value={currentService?.service_type || 'N/A'}
+                    readOnly
+                    className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                  />
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Description
-                  </label>
-                  <div className="mt-1 text-sm text-gray-900">
-                    {currentService?.description || 'N/A'}
-                  </div>
+              <div className="mt-4">
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="description"
+                >
+                  Description
+                </label>
+                <div className="mt-1 rounded-md border border-gray-300 p-2 text-sm text-gray-900">
+                  {currentService?.description || 'N/A'}
                 </div>
+              </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">
-                    Price
-                  </label>
-                  <div className="mt-1 text-sm text-gray-900">
-                    {currentService?.price || 'N/A'}
-                  </div>
-                </div>
+              <div className="mt-4">
+                <label
+                  className="block text-sm font-medium text-gray-700"
+                  htmlFor="price"
+                >
+                  Price
+                </label>
+                <input
+                  type="text"
+                  id="price"
+                  name="price"
+                  value={currentService?.price || 'N/A'}
+                  readOnly
+                  className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                />
               </div>
             </HorizontalFormBlockWrapper>
           </div>
@@ -189,27 +216,28 @@ export default function ServiceDetailsGallery({
           >
             <div className="ms-2 w-full space-y-7 border-s-2 border-gray-100">
               {statusActions
-                .sort((a, b) => a.id - b.id) 
+                .sort((a, b) => a.order - b.order)
                 .map((item) => (
                   <div
                     key={item.id}
                     className={cn(
                       "relative ps-6 text-sm font-medium before:absolute before:-start-[9px] before:top-px before:h-5 before:w-5 before:-translate-x-px before:rounded-full before:bg-gray-100 before:content-[''] after:absolute after:-start-px after:top-5 after:h-10 after:w-0.5 after:content-[''] last:after:hidden",
-                      currentStatusOrder > item.id
+                      currentStatusOrder.order > item.order
                         ? 'before:bg-primary after:bg-primary'
                         : 'after:hidden',
-                      currentStatusOrder === item.id && 'before:bg-primary',
-                      currentStatusOrder + 1 < item.id && 'text-gray-300'
+                      currentStatusOrder.id === item.id && 'before:bg-primary',
+                      currentStatusOrder.order + 1 < item.order &&
+                        'text-gray-300'
                     )}
                   >
-                    {currentStatusOrder >= item.id ? (
+                    {currentStatusOrder.order >= item.order ? (
                       <span className="absolute -start-1.5 top-1 text-white">
                         <PiCheckBold className="h-auto w-3" />
                       </span>
                     ) : null}
 
-                    {currentStatusOrder + 1 !== item.id ? (
-                      item.name 
+                    {currentStatusOrder.order + 1 !== item.order ? (
+                      item.name
                     ) : (
                       <Button
                         size="sm"
@@ -225,9 +253,9 @@ export default function ServiceDetailsGallery({
             </div>
           </WidgetCard>
         </div>
-        <div className="w-full @lg:w-[40%] @xl:w-[23%]">
+        <div className="w-full @lg:w-[45%] @xl:w-[35%]">
           <div className="sticky top-8">
-            <div className="relative aspect-square w-full overflow-hidden rounded-lg">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
               <Image
                 fill
                 priority

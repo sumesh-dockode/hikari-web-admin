@@ -14,6 +14,6 @@ export interface serviceStatusChangeDataType {
   status?: string;
     new_status: string;
     new_price: string;
-    service_type_id: string;
+    // service_type_id: string;
     image: any
   };

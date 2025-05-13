@@ -64,18 +64,26 @@ export default function ProductVariants({
     }
   });
   useEffect(() => {
-    if (variantValuesData?.pages) {
-      const options = variantValuesData.pages.flatMap(
-        (page) =>
-          page?.data?.results?.map((value: any) => ({
-            value: value.id,
-            label: value.value,
-            variantId: value.attribute,
-          })) ?? [] // fallback to empty array if results is undefined
-      );
-      setValueOptions(options);
-    }
+    if (!variantValuesData?.data) return;
+
+    const options = variantValuesData.data.map((value: any) => ({
+      value: value.id,
+      label: value.value,
+      variantId: value.attribute,
+    }));
+
+    setValueOptions(options);
   }, [variantValuesData]);
+
+  useEffect(() => {
+    if (variantsData?.data) {
+      const options = variantsData.data.map((variant: any) => ({
+        value: variant.id,
+        label: variant.name,
+      }));
+      setVariantOptions(options);
+    }
+  }, [variantsData]);
 
   // useEffect(() => {
   //   if (variantValuesData?.pages) {

@@ -1,26 +1,21 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
 export default function useSpecificationValue() {
   const { status } = useSession();
 
-  const fetchSpecificationsValue = async (pageParam: number = 1) => {
-    let url = `${API_ROUTES.specificationValues}?page=1&page_size=10`;
-    const { data } = await apiClient.get(url);
-
+  const fetchSpecificationValues = async () => {
+    const { data } = await apiClient.get(API_ROUTES.specificationValues);
     return data;
   };
-  return useInfiniteQuery({
+
+  return useQuery({
     queryKey: ['specificationValue'],
-    queryFn: ({ pageParam = 1 }) => fetchSpecificationsValue(pageParam),
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, pages, lastPageParam) => {
-      return lastPage ? lastPageParam + 1 : null;
-    },
+    queryFn: fetchSpecificationValues,
     enabled: status === 'authenticated',
   });
 }

@@ -68,10 +68,8 @@ export default function ProductVariantsPage() {
   const [selectedVariantType, setSelectedVariantType] =
     useState<string>('Color');
 
-  const variantsAPIData =
-    data?.pages?.flatMap((page: any) => page?.data?.results) || [];
-  const variantvalueAPIData =
-    variantValuesData?.pages?.flatMap((page: any) => page?.data?.results) || [];
+  const variantsAPIData = data?.data || [];
+  const variantvalueAPIData = variantValuesData?.data || [];
 
   // Reset form when editingVariant changes
   useEffect(() => {

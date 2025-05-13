@@ -62,18 +62,16 @@ export default function ProductSpecifications({
     }
   }, [productSpecification]);
   useEffect(() => {
-    if (!specificationsData?.pages) return;
-
-    const options = specificationsData.pages.flatMap(
-      (page) =>
-        page?.data?.results?.map((spec: Specification) => ({
-          value: spec.id,
-          label: spec.name,
-        })) ?? []
-    );
-
+    if (!specificationsData?.data) return;
+  
+    const options = specificationsData.data.map((spec: Specification) => ({
+      value: spec.id,
+      label: spec.name,
+    }));
+  
     setSpecificationOptions(options);
   }, [specificationsData]);
+  
 
   const {
     register,

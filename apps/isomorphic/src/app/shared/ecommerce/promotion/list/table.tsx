@@ -5,7 +5,6 @@ import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
-import Filters from '../../review/filters';
 import { PromotionColumn } from './columns';
 import PromotionModal from '../../product/create-edit/promotion-modal';
 import { PaginationState } from '@tanstack/react-table';
@@ -15,6 +14,7 @@ import { useDeletePromotion } from '@/hooks/promotions/useDeletePromotion';
 import toast from 'react-hot-toast';
 import { debounce } from 'lodash';
 import PageLoader from '../../../page-loader';
+import Filters from './filters';
 
 interface FiltersProps {
   search?: string;
@@ -67,6 +67,7 @@ export default function PromotionsTable() {
       setData(promotionAPIData);
     }
   }, [data]);
+
   const handleSearchChange = debounce((value: string) => {
     setPagination((prev) => ({
       ...prev,
@@ -79,7 +80,11 @@ export default function PromotionsTable() {
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

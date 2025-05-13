@@ -40,15 +40,13 @@ export const PromotionColumn = [
     id: 'promotion_medium',
     size: 120,
     header: 'Promotion Medium',
-    cell: ({ row }) => (
-      <div className="ps-6">{row.original.promotion_medium}</div>
-    ),
+    cell: ({ row }) => <div className="">{row.original.promotion_medium}</div>,
   }),
   columnHelper.display({
     id: 'comments',
     size: 120,
     header: 'Comments',
-    cell: ({ row }) => <div className="ps-6">{row.original.comments}</div>,
+    cell: ({ row }) => <div className="">{row.original.comments}</div>,
   }),
   columnHelper.display({
     id: 'action',

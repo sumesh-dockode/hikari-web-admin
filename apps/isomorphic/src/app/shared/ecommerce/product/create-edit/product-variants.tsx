@@ -64,31 +64,31 @@ export default function ProductVariants({
     }
   });
   useEffect(() => {
-    if (variantsData?.pages) {
-      console.log('variantsData000000000', variantsData);
-
-      const options = variantsData.pages.flatMap((page) =>
-        page.data.results.map((variant: any) => ({
-          value: variant.id,
-          label: variant.name,
-        }))
-      );
-      setVariantOptions(options);
-    }
-  }, [variantsData]);
-
-  useEffect(() => {
     if (variantValuesData?.pages) {
-      const options = variantValuesData.pages.flatMap((page) =>
-        page.data.results.map((value: any) => ({
-          value: value.id,
-          label: value.value,
-          variantId: value.attribute,
-        }))
+      const options = variantValuesData.pages.flatMap(
+        (page) =>
+          page?.data?.results?.map((value: any) => ({
+            value: value.id,
+            label: value.value,
+            variantId: value.attribute,
+          })) ?? [] // fallback to empty array if results is undefined
       );
       setValueOptions(options);
     }
   }, [variantValuesData]);
+
+  // useEffect(() => {
+  //   if (variantValuesData?.pages) {
+  //     const options = variantValuesData.pages.flatMap((page) =>
+  //       page.data.results.map((value: any) => ({
+  //         value: value.id,
+  //         label: value.value,
+  //         variantId: value.attribute,
+  //       }))
+  //     );
+  //     setValueOptions(options);
+  //   }
+  // }, [variantValuesData]);
 
   const addNewVariantAttribute = () => {
     const currentVariants = getValues('variants');

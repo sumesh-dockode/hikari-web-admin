@@ -62,16 +62,17 @@ export default function ProductSpecifications({
     }
   }, [productSpecification]);
   useEffect(() => {
-    // Set specification options for dropdown
-    if (specificationsData?.pages) {
-      const options = specificationsData.pages.flatMap((page) =>
-        page.data.results.map((spec: Specification) => ({
+    if (!specificationsData?.pages) return;
+
+    const options = specificationsData.pages.flatMap(
+      (page) =>
+        page?.data?.results?.map((spec: Specification) => ({
           value: spec.id,
           label: spec.name,
-        }))
-      );
-      setSpecificationOptions(options);
-    }
+        })) ?? []
+    );
+
+    setSpecificationOptions(options);
   }, [specificationsData]);
 
   const {

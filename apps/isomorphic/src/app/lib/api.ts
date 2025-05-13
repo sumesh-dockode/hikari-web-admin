@@ -17,4 +17,5 @@ export const API_ROUTES = {
   singleService: 'service/admin/services/{service_id}/',
   serviceStatus :`/service/service-statuses/`,
   deliveryManager: '/authentication/admin/users/',
+  
 };

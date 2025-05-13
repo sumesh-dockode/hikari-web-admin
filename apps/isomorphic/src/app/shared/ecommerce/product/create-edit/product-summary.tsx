@@ -61,9 +61,10 @@ export default function ProductSummary({ className }: { className?: string }) {
         error={errors.sku?.message as string}
       />
       <Input
+        type="number"
         label="Stock"
         placeholder="10"
-        {...register('stock')}
+        {...register('stock', { valueAsNumber: true })}
         error={errors.stock?.message as string}
       />
 

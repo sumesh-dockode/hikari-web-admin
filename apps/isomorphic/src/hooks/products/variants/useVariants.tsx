@@ -9,7 +9,7 @@ export default function useVariants() {
   const { status } = useSession();
 
   const fetchVariants = async (pageParam: number = 1) => {
-    let url = `${API_ROUTES.variants}`;
+    let url = `${API_ROUTES.variants}?page=1&page_size=10`;
     const { data } = await apiClient.get(url);
 
     return data;

@@ -9,7 +9,7 @@ export default function useVariantValue() {
   const { status } = useSession();
 
   const fetchVariantValue = async (pageParam: number = 1) => {
-    let url = `${API_ROUTES.variantValues}`;
+    let url = `${API_ROUTES.variantValues}?page=1&page_size=10`;
     const { data } = await apiClient.get(url);
 
     return data;

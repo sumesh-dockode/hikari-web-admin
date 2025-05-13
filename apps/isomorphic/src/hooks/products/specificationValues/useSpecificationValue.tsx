@@ -9,7 +9,7 @@ export default function useSpecificationValue() {
   const { status } = useSession();
 
   const fetchSpecificationsValue = async (pageParam: number = 1) => {
-    let url = `${API_ROUTES.specificationValues}`;
+    let url = `${API_ROUTES.specificationValues}?page=1&page_size=10`;
     const { data } = await apiClient.get(url);
 
     return data;

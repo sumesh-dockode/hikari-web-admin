@@ -275,9 +275,12 @@ export default function ProductVariantsPage() {
   };
 
   const getModalContent = () => {
+    if (!activeVariantId) return null;
     const currentVariant = variantsAPIData.find(
       (variant: any) => variant.id === activeVariantId
     );
+    console.log('variantsAPIData888888', variantsAPIData);
+
     if (!currentVariant) return null;
 
     if (currentVariant.name.toLowerCase() === 'color') {

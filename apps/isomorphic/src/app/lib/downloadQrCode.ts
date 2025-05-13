@@ -14,7 +14,7 @@ export async function downloadQRCode(productId: string): Promise<void> {
 
     const link = document.createElement('a');
     link.href = dataUrl;
-    link.download = `product-${productId}-qr.png`;
+    link.download = `${productId}-qr.png`;
     link.click();
   } catch (error) {
     console.error('QR code generation failed:', error);

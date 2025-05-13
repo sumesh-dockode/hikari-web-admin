@@ -36,6 +36,8 @@ apiClient.interceptors.response.use(
       await signOut(); // Logout user if token is invalid
     } else if (error.response?.status === 404) {
       toast.error('Page Not Found');
+    } else if (error.response?.status === 400){
+      toast.error(error.response.data?.message || 'Bad Request');
     }
     return Promise.reject(error);
   }

@@ -101,22 +101,6 @@ export const productsListColumns = [
       <Flex align="center" justify="end" gap="3" className="pe-4">
         <Tooltip
           size="sm"
-          content={'Download QR Code'}
-          placement="top"
-          color="invert"
-        >
-          <ActionIcon
-            as="span"
-            size="sm"
-            variant="outline"
-            aria-label={'Download QR Code'}
-            onClick={async () => await downloadQRCode(row.original.id)}
-          >
-            <BiDownload className="h-4 w-4" />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip
-          size="sm"
           content={'Edit Product'}
           placement="top"
           color="invert"

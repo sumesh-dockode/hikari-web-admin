@@ -1,34 +1,28 @@
 'use client';
 
-import Image from 'next/image';
 import { PiCheckBold } from 'react-icons/pi';
 import { Title, Text, Button, Avatar } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { toCurrency } from '@core/utils/to-currency';
 import { formatDate } from '@core/utils/format-date';
-import { useState } from 'react';
 import { useParams } from 'next/navigation';
-import usePaginatedOrders from '@/hooks/orders/usePaginatedOrders';
 import { useOrderById } from '@/hooks/orders/useOrderById';
 import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
 import PageLoader from '../../page-loader';
 import OrderViewProducts from './order-products/order-view-products';
 
-const orderStatusActions = [
+const baseStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
   { id: 2, label: 'Confirmed', actionLabel: 'Mark as Confirmed' },
-  // { id: 3, label: 'Packed', actionLabel: 'Mark as Packed' },
   { id: 3, label: 'Shipped', actionLabel: 'Mark as Shipped' },
-  { id: 4, label: 'Delivered', actionLabel: 'Mark as Delivered' }, // No further action
+  { id: 4, label: 'Delivered', actionLabel: 'Mark as Delivered' },
 ];
-
-// const currentOrderStatus = 1;
 
 function WidgetCard({
   title,
-  className,
+  className = '',
   children,
-  childrenWrapperClass,
+  childrenWrapperClass = '',
 }: {
   title?: string;
   className?: string;
@@ -57,33 +51,25 @@ function WidgetCard({
 
 export default function OrderView() {
   const { id } = useParams();
-  // const { data, isLoading: isLoadingOrder } = useOrderById(id as string);
-  const {
-    data: orderAPIData,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedOrders({
-    pageIndex: 0,
-    pageSize: 10,
-  });
+  const { data, isLoading: isLoading } = useOrderById(id as string);
   const { mutate: updateOrderStatus, status } = useOrderStatusChange();
 
-  const ordersAPIData =
-    orderAPIData?.pages?.flatMap((page: any) => page?.data?.results) || [];
-
-  // const [currentOrderStatus, setCurrentOrderStatus] = useState(1);
-  // const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
-
-  const orderData = ordersAPIData?.find((order: any) => order.id === id);
+  const orderData = data?.data;
   const totalItems = orderData?.items?.length || 0;
   const totalPrice = parseFloat(orderData?.total_price || 0);
+  const isCancelled = orderData?.status === 'Cancelled';
+
+  const orderStatusActions = !isCancelled
+    ? baseStatusActions
+    : [
+        { id: 1, label: 'Ordered', actionLabel: '' },
+        { id: 5, label: 'Cancelled', actionLabel: '' },
+      ];
+
   const currentOrderStatus =
     orderStatusActions.find((status) => status.label === orderData?.status)
       ?.id || 1;
 
-  console.log('data', orderData);
   const handleChangeStatus = (orderId: number) => {
     const status = orderStatusActions.find(
       (status) => status.id === orderId
@@ -97,13 +83,17 @@ export default function OrderView() {
 
       updateOrderStatus(payload);
     }
-    // }
-    // setIsStatusChangeLoading(true);
-    // setTimeout(() => {
-    //   setCurrentOrderStatus(id);
-    //   setIsStatusChangeLoading(false);
-    // }, 1000);
   };
+
+  const handleCancelOrder = () => {
+    const payload = {
+      status: 'Cancelled',
+      id: id as string,
+    };
+
+    updateOrderStatus(payload);
+  };
+
   if (isLoading) return <PageLoader />;
 
   return (
@@ -188,7 +178,8 @@ export default function OrderView() {
                       ? 'before:bg-primary after:bg-primary'
                       : 'after:hidden',
                     currentOrderStatus === item.id && 'before:bg-primary',
-                    currentOrderStatus + 1 < item.id && 'text-gray-300'
+                    currentOrderStatus + 1 < item.id && 'text-gray-300',
+                    isCancelled && 'before:bg-red-500 after:bg-red-500'
                   )}
                 >
                   {currentOrderStatus >= item.id ? (
@@ -209,6 +200,18 @@ export default function OrderView() {
                       {item.actionLabel}
                     </Button>
                   )}
+                  {item.id === 2 && currentOrderStatus === 1 && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      color="danger"
+                      isLoading={status === 'pending'}
+                      className="ms-2"
+                      onClick={handleCancelOrder}
+                    >
+                      Cancel
+                    </Button>
+                  )}
                 </div>
               ))}
             </div>
@@ -222,7 +225,7 @@ export default function OrderView() {
               <Avatar
                 size="lg"
                 color="primary"
-                name={orderData?.order_info?.name}
+                name={orderData?.order_info?.name || ''}
                 // src={row.original.customer.avatar}
               />
             </div>
@@ -231,10 +234,10 @@ export default function OrderView() {
                 as="h3"
                 className="mb-2.5 text-base font-semibold @7xl:text-lg"
               >
-                {orderData?.order_info?.name}
+                {orderData?.order_info?.name || ''}
               </Title>
               <Text as="p" className="mb-2 break-all last:mb-0">
-                {orderData?.order_info?.address}
+                {orderData?.order_info?.address || ''}
               </Text>
             </div>
           </WidgetCard>

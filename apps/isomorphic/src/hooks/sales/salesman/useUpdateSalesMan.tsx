@@ -13,7 +13,7 @@ export function useUpdateSalesMan() {
     salesManData: SalesmanDataType
   ): Promise<SalesmanDataType> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.salesman}${salesManData.id}`;
+    let url = `${API_ROUTES.salesman}${salesManData.id}/`;
     const { data } = await apiClient.patch(url, salesManData);
 
     return data.data as Promise<SalesmanDataType>;

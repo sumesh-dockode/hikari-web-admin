@@ -14,6 +14,8 @@ export default function TableRowActionGroup({
   deletePopoverTitle = "Delete the appointment",
   deletePopoverDescription = "Are you sure you want to delete this item?",
   className,
+  children,
+  isLoading,
 }: {
   onDelete?: () => void;
   editUrl?: string;
@@ -21,8 +23,9 @@ export default function TableRowActionGroup({
   deletePopoverTitle?: string;
   deletePopoverDescription?: string;
   className?: string;
+  children?: React.ReactNode;
+  isLoading?: boolean;
 }) {
-
   const isViewUrlAvailable = viewUrl && viewUrl !== "#";
   const isEditUrlAvailable = editUrl && editUrl !== "#";
 
@@ -33,6 +36,7 @@ export default function TableRowActionGroup({
       gap="3"
       className={cn("pe-3", className)}
     >
+      {children}
       {isEditUrlAvailable && (
         <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
           <Link href={editUrl}>
@@ -65,6 +69,7 @@ export default function TableRowActionGroup({
         title={deletePopoverTitle}
         description={deletePopoverDescription}
         onDelete={onDelete}
+        isLoading={isLoading}
       />
     </Flex>
   );

@@ -13,26 +13,24 @@ import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
 import PageLoader from '@/app/shared/page-loader';
 import toast from 'react-hot-toast';
 import { PaginationState } from '@tanstack/react-table';
+import { debounce } from 'lodash';
+
+interface FiltersProps {
+  search?: string;
+}
 
 export default function CategoryTable() {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedCategories(pagination);
+  const { data, isLoading } = usePaginatedCategories(pagination);
   const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
 
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<CategoryDataType | any>({
     tableData: [],
@@ -40,15 +38,15 @@ export default function CategoryTable() {
     options: {
       meta: {
         handleDeleteRow: (row) => {
+          setDeleteItemId(row.id);
           deleteCategory(row.id, {
             onSuccess: () => {
               toast.success('Category deleted successfully');
             },
           });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -65,17 +63,28 @@ export default function CategoryTable() {
 
   useEffect(() => {
     if (data) {
-      const categoriesAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const categoriesAPIData = data?.data?.results || [];
       setData(categoriesAPIData);
     }
   }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
 
   if (isLoading) return <PageLoader />;
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

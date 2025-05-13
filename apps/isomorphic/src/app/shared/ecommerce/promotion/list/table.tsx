@@ -1,48 +1,47 @@
 'use client';
 
-
+import { useEffect, useState } from 'react';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
-import Filters from './filters';
-import { storeManagerColumns } from './columns';
-import { useEffect, useState } from 'react';
+import { PromotionColumn } from './columns';
+import PromotionModal from '../../product/create-edit/promotion-modal';
 import { PaginationState } from '@tanstack/react-table';
-import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
-import { useDeleteStoreManager } from '@/hooks/storeManager/useDeleteStoreManager';
-import PageLoader from '@/app/shared/page-loader';
+import { PromotionDataType } from '@/data/promotion-data';
+import usePaginatedPromotions from '@/hooks/promotions/usePaginatedPromotion';
+import { useDeletePromotion } from '@/hooks/promotions/useDeletePromotion';
 import toast from 'react-hot-toast';
-import { StoreManagerTableDataType } from '@/data/store-manager-data';
 import { debounce } from 'lodash';
+import PageLoader from '../../../page-loader';
+import Filters from './filters';
 
 interface FiltersProps {
   search?: string;
 }
 
-export default function StoreManagerTable() {
+export default function PromotionsTable() {
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
     search: '',
   });
-
-  const { data, isLoading } = usePaginatedStoreManager(pagination);
-  const { mutate: deleteStoreManager, status: deleteStatus } =
-    useDeleteStoreManager();
+  const { data, isLoading } = usePaginatedPromotions(pagination);
+  const { mutate: deletePromotion, status: deleteStatus } =
+    useDeletePromotion();
   const pageCount = data?.data?.total_pages || 1;
 
-  const { table, setData } = useTanStackTable<StoreManagerTableDataType>({
+  const { table, setData } = useTanStackTable<PromotionDataType>({
     tableData: [],
-    columnConfig: storeManagerColumns,
+    columnConfig: PromotionColumn,
     options: {
       meta: {
         handleDeleteRow: (row) => {
           setDeleteItemId(row.id);
-          deleteStoreManager(row.id, {
+          deletePromotion(row.id, {
             onSuccess: () => {
-              toast.success('Store Manager deleted successfully');
+              toast.success('Promotion deleted successfully');
             },
           });
         },
@@ -64,8 +63,8 @@ export default function StoreManagerTable() {
 
   useEffect(() => {
     if (data) {
-      const APIData = data?.data?.results || [];
-      setData(APIData);
+      const promotionAPIData = data?.data?.results || [];
+      setData(promotionAPIData);
     }
   }, [data]);
 
@@ -91,9 +90,10 @@ export default function StoreManagerTable() {
         variant="modern"
         classNames={{
           container: 'border border-muted rounded-md',
-          rowClassName: 'last:border-0',
+          rowClassName: 'last:border-0 cursor-pointer',
         }}
       />
+
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />
     </>

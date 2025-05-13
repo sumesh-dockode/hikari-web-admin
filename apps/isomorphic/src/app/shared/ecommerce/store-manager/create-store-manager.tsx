@@ -17,35 +17,28 @@ import {
 } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
-import UploadZone from '@core/ui/file-upload/upload-zone';
 import {
+  getStoreManagerFormSchema,
   StoreManagerFormInput,
-  storeManagerFormSchema,
 } from '@/validators/create-store-manager.schema';
 import FormGroup from '../../form-group';
-import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import { useRouter } from 'next/navigation';
 import { useStoreManagerById } from '@/hooks/storeManager/useStoreManagerById';
 import { useCreateStoreManager } from '@/hooks/storeManager/useCreateStoreManager';
 import { useUpdateStoreManager } from '@/hooks/storeManager/useUpdateStoreManager';
-import { omit } from '@/utils/utils';
 import { routes } from '@/config/routes';
 import toast from 'react-hot-toast';
 import PageLoader from '../../page-loader';
-
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
-});
+import { PhoneNumber } from '@core/ui/phone-input';
 
 const DefaultValues = {
   first_name: '',
   last_name: '',
   email: '',
+  phone_number: '',
   username: '',
   password: '',
-  images: '',
   is_active: false,
   store_name: '',
   store_address: '',
@@ -54,12 +47,10 @@ const DefaultValues = {
 // main category form component for create and update category
 export default function CreateStoreManager({
   id,
-  initialValue,
   isModalView = true,
 }: {
   id?: string;
   isModalView?: boolean;
-  initialValue?: StoreManagerFormInput;
 }) {
   const { push } = useRouter();
   const [reset, setReset] = useState({});
@@ -81,6 +72,25 @@ export default function CreateStoreManager({
     status: updateStatus,
   } = useUpdateStoreManager();
 
+  useEffect(() => {
+    if (data) {
+      const detailData = data?.data;
+      const resetData = {
+        id: detailData?.id || null,
+        first_name: detailData?.first_name || '',
+        last_name: detailData?.last_name || '',
+        email: detailData?.email || '',
+        phone_number: detailData?.phone_number || '',
+        username: detailData?.username || '',
+        password: detailData?.password || '',
+        is_active: detailData?.is_active || false,
+        store_name: detailData?.store_info?.name || '',
+        store_address: detailData?.store_info?.address || '',
+      };
+      setReset(resetData);
+    }
+  }, [data]);
+
   const onSubmit: SubmitHandler<StoreManagerFormInput> = (data) => {
     setLoading(true);
     let payload = {
@@ -88,17 +98,13 @@ export default function CreateStoreManager({
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       email: data.email || '',
+      phone_number: data.phone_number || '',
       username: data.username || '',
-      password: data.password || '',
-      images: data.images?.url || undefined,
+      password: data.password || undefined,
       is_active: data.is_active || false,
       store_name: data.store_name || '',
       store_address: data.store_address || '',
     };
-
-    if (payload.images?.includes('http')) {
-      payload = omit(payload, 'images');
-    }
 
     id ? updateStoreManager(payload) : createStoreManager(payload);
   };
@@ -116,11 +122,10 @@ export default function CreateStoreManager({
 
       setReset(DefaultValues);
 
-      push(routes.eCommerce.categories);
+      push(routes.eCommerce.storeManager);
 
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
-      toast.error('Something went wrong');
       setLoading(false);
     }
   }, [createStatus, updateStatus]);
@@ -131,12 +136,12 @@ export default function CreateStoreManager({
 
   return (
     <Form<StoreManagerFormInput>
-      validationSchema={storeManagerFormSchema}
+      validationSchema={getStoreManagerFormSchema(!!id)}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
         mode: 'onChange',
-        defaultValues: initialValue,
+        defaultValues: DefaultValues,
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
@@ -162,11 +167,11 @@ export default function CreateStoreManager({
                 />
               </FormGroup>
               <FormGroup
-                title="Email Address"
+                title="Email & Phone Number"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
-                  className="col-span-full"
+                  className="flex-grow"
                   prefix={
                     <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
                   }
@@ -175,20 +180,21 @@ export default function CreateStoreManager({
                   {...register('email')}
                   error={errors.email?.message}
                 />
-              </FormGroup>
-              <FormGroup
-                title={'Profile Picture'}
-                description={'This will be displayed on profile.'}
-                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
-              >
-                <div className="flex flex-col gap-6 @container @3xl:col-span-2">
-                  <AvatarUploadNew
-                    name="images"
-                    setValue={setValue}
-                    getValues={getValues}
-                    error={errors?.images?.message as string}
-                  />
-                </div>
+                <Controller
+                  name="phone_number"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <PhoneNumber
+                      country="in"
+                      value={value}
+                      onChange={onChange}
+                      className="rtl:[&>.selected-flag]:right-0"
+                      inputClassName="rtl:pr-12"
+                      buttonClassName="rtl:[&>.selected-flag]:right-2 rtl:[&>.selected-flag_.arrow]:-left-6"
+                      error={errors.phone_number?.message}
+                    />
+                  )}
+                />
               </FormGroup>
               <FormGroup
                 title={'Store Details'}
@@ -218,21 +224,24 @@ export default function CreateStoreManager({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
-                <Controller
-                  control={control}
-                  name="password"
-                  render={({ field: { onChange, value } }) => (
-                    <Password
-                      placeholder="Enter your password"
-                      helperText={
-                        getValues().password?.length < 8 &&
-                        'Your current password must be more than 8 characters'
-                      }
-                      onChange={onChange}
-                      error={errors.password?.message}
-                    />
-                  )}
-                />
+                {!id && (
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <Password
+                        placeholder="Enter your password"
+                        helperText={
+                          value &&
+                          value?.length < 8 &&
+                          'Your current password must be more than 8 characters'
+                        }
+                        onChange={onChange}
+                        error={errors.password?.message}
+                      />
+                    )}
+                  />
+                )}
               </FormGroup>
               <FormGroup
                 title={'Status'}

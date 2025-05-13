@@ -6,7 +6,7 @@ import promotion from '@public/promotion.png';
 import { Button } from 'rizzui/button';
 import { metaObject } from '@/config/site.config';
 import Link from 'next/link';
-import PromotionsTable from '@/app/shared/ecommerce/promotion/table';
+import PromotionsTable from '@/app/shared/ecommerce/promotion/list/table';
 export const metadata = {
   ...metaObject('Promotions'),
 };

@@ -77,6 +77,7 @@ export const categoriesColumns = [
           title={`Delete the category`}
           description={`Are you sure you want to delete this #${row.original.id} category?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
+          isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />
       </div>
     ),

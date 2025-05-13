@@ -6,72 +6,45 @@ import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
 import Filters from './filters';
 import { salesManColumns } from './columns';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
 import usePaginatedSalesMan from '@/hooks/sales/salesman/usePaginatedSalesMan';
 import { useDeleteSalesMan } from '@/hooks/sales/salesman/useDeleteSalesMan';
 import toast from 'react-hot-toast';
 import PageLoader from '@/app/shared/page-loader';
+import { SalesmanDataType } from '@/data/salesman-data';
+import { debounce } from 'lodash';
 
-const storeManagerList = [
-  {
-    id: 1,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Sales Man',
-    email: '1kTt2@example.com',
-    phone: '(123) 456-7890',
-    address: '123 Main St, Anytown, USA',
-    status: 'active',
-  },
-  {
-    id: 2,
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Jane Smith',
-    email: '5M0x3@example.com',
-    phone: '(987) 654-3210',
-    address: '456 Elm St, Anytown, USA',
-    status: 'inactive',
-  },
-];
-
-export type SalesManDataType = (typeof storeManagerList)[number];
+interface FiltersProps {
+  search?: string;
+}
 
 export default function SalesManTable() {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedSalesMan(pagination);
+  const { data, isLoading } = usePaginatedSalesMan(pagination);
   const { mutate: deleteSalesman, status: deleteStatus } = useDeleteSalesMan();
+  const pageCount = data?.data?.total_pages || 1;
 
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
-
-  const { table, setData } = useTanStackTable<SalesManDataType>({
+  const { table, setData } = useTanStackTable<SalesmanDataType>({
     tableData: [],
     columnConfig: salesManColumns,
     options: {
       meta: {
         handleDeleteRow: (row) => {
+          setDeleteItemId(row.id);
           deleteSalesman(row.id, {
             onSuccess: () => {
               toast.success('Salesman deleted successfully');
             },
           });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -88,17 +61,28 @@ export default function SalesManTable() {
 
   useEffect(() => {
     if (data) {
-      const salesManAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const salesManAPIData = data?.data?.results || [];
       setData(salesManAPIData);
     }
   }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
 
   if (isLoading) return <PageLoader />;
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

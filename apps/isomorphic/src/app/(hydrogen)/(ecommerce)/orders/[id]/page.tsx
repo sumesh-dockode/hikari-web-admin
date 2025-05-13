@@ -26,11 +26,11 @@ export default async function OrderDetailsPage({ params }: any) {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <Link
-          href={routes.eCommerce.editOrder(id)}
+          href={routes.eCommerce.orders}
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         >
-          <Button as="span" className="w-full @lg:w-auto">
-            Edit Order
+          <Button as="span" className="w-full @lg:w-auto" variant="outline">
+            Cancel
           </Button>
         </Link>
       </PageHeader>

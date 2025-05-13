@@ -5,15 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
-export default function usePaginatedOrders(options: {
-  pageIndex: number;
-  pageSize: number;
+export default function usePaginatedDeliveryManager(options: {
+  pageIndex?: number;
+  pageSize?: number;
   search?: string;
 }) {
   const { status } = useSession();
 
-  const fetchOrders = async () => {
-    let url = `${API_ROUTES.orders}`;
+  const fetchDeliveryManager = async () => {
+    let url = `${API_ROUTES.deliveryManager}?user_role=DELIVERYMANAGER`;
     let params = [];
 
     if (options?.pageIndex || options?.pageIndex === 0) {
@@ -26,16 +26,16 @@ export default function usePaginatedOrders(options: {
       params.push(`search=${options.search}`);
     }
     if (params.length > 0) {
-      url += `?${params.join('&')}`;
+      url += `&${params.join('&')}`;
     }
-
     const { data } = await apiClient.get(url);
 
     return data;
   };
+
   return useQuery({
-    queryKey: ['ordersTable', options],
-    queryFn: fetchOrders,
+    queryKey: ['deliveryManagerTable', options],
+    queryFn: () => fetchDeliveryManager(),
     enabled: status === 'authenticated',
     throwOnError(error, query) {
       throw error;

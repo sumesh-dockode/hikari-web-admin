@@ -18,8 +18,6 @@ export function useOrderStatusChange() {
     let url = `${API_ROUTES.orderStatusChange}`.replace('{id}', id);
     const { data } = await apiClient.patch(url, statusData);
 
-    console.log('data', data);
-
     return data.data as Promise<OrderStatusChangeDataType>;
   };
 
@@ -27,7 +25,7 @@ export function useOrderStatusChange() {
   return useMutation({
     mutationFn: (data: OrderStatusChangeDataType) => orderStatusChange(data),
     onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: ['orders', response?.id] });
+      queryClient.invalidateQueries({ queryKey: ['order', response?.id] });
       toast.success('Status changed successfully');
     },
   });

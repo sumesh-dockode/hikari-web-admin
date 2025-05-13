@@ -4,14 +4,23 @@ import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
 import QuillLoader from '@core/components/loader/quill-loader';
-import { Button, Input, Password, Select, Switch, Text, Title } from 'rizzui';
+import {
+  Button,
+  Input,
+  Password,
+  Select,
+  SelectOption,
+  Switch,
+  Text,
+  Title,
+} from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
 import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
+  getSalesmanFormSchema,
   SalesmanFormInput,
-  salesmanFormSchema,
 } from '@/validators/create-salesman.schema';
 import FormGroup from '@/app/shared/form-group';
 import { omit } from '@/utils/utils';
@@ -22,36 +31,38 @@ import { useRouter } from 'next/navigation';
 import { useSalesManById } from '@/hooks/sales/salesman/useSalesManById';
 import { useCreateSalesMan } from '@/hooks/sales/salesman/useCreateSalesMan';
 import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
-
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
-});
+import { PhoneNumber } from '@core/ui/phone-input';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
+import { debounce } from 'lodash';
+import { StoreManagerTableDataType } from '@/data/store-manager-data';
 
 export const salesmanDefaultValues = {
   first_name: '',
   last_name: '',
   email: '',
-  role: '',
+  phone_number: '',
   username: '',
   password: '',
-  images: undefined,
   is_active: true,
+  store_manager_id: undefined,
 };
 
 // main category form component for create and update category
 export default function CreateSalesMan({
   id,
-  initialValue,
   isModalView = true,
 }: {
   id?: string;
   isModalView?: boolean;
-  initialValue?: SalesmanFormInput;
 }) {
   const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const { data: storeManagerData, isLoading: isFetchingStoreManager } =
+    usePaginatedStoreManager({
+      search: searchText,
+    });
   const {
     data,
     isLoading: isFetching,
@@ -69,23 +80,45 @@ export default function CreateSalesMan({
     status: updateStatus,
   } = useUpdateSalesMan();
 
+  const storeManagerList = storeManagerData?.data || [];
+  const storeManagerOptions = storeManagerList.map(
+    (item: StoreManagerTableDataType) => ({
+      label: `${item.first_name || ''} ${item.last_name || ''}`,
+      value: item.id,
+    })
+  );
+
+  useEffect(() => {
+    if (data) {
+      const detailData = data?.data;
+      const resetData = {
+        id: detailData?.id || null,
+        first_name: detailData?.first_name || '',
+        last_name: detailData?.last_name || '',
+        email: detailData?.email || '',
+        phone_number: detailData?.phone_number || '',
+        username: detailData?.username || '',
+        password: detailData?.password || '',
+        is_active: detailData?.is_active || false,
+        store_manager_id: detailData?.store_manager?.id,
+      };
+      setReset(resetData);
+    }
+  }, [data]);
+
   const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     setLoading(true);
     let payload = {
-      id: id || '',
+      id: id || null,
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       email: data.email || '',
-      role: data.role || '',
+      phone_number: data.phone_number || '',
       username: data.username || '',
-      password: data.password || '',
-      images: data.images?.url || undefined,
+      password: data.password || undefined,
       is_active: data.is_active || false,
+      store_manager_id: data.store_manager_id || null,
     };
-
-    if (payload.images?.includes('http')) {
-      payload = omit(payload, 'images');
-    }
 
     id ? updateSalesMan(payload) : createSalesMan(payload);
   };
@@ -103,27 +136,30 @@ export default function CreateSalesMan({
 
       setReset(salesmanDefaultValues);
 
-      push(routes.eCommerce.categories);
+      push(routes.eCommerce.salesman);
 
       setLoading(false);
     } else if (createStatus === 'error' || updateStatus === 'error') {
-      toast.error('Something went wrong');
       setLoading(false);
     }
   }, [createStatus, updateStatus]);
 
-  if (isFetching) return <PageLoader />;
+  const handleStoreManagerSearch = debounce((value: string) => {
+    setSearchText(value);
+  }, 500);
+
+  if (isFetching || isFetchingStoreManager) return <PageLoader />;
 
   if (fetchError) throw fetchError;
 
   return (
     <Form<SalesmanFormInput>
-      validationSchema={salesmanFormSchema}
+      validationSchema={getSalesmanFormSchema(!!id)}
       resetValues={reset}
       onSubmit={onSubmit}
       useFormProps={{
         mode: 'onChange',
-        defaultValues: initialValue,
+        defaultValues: salesmanDefaultValues,
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
@@ -149,11 +185,11 @@ export default function CreateSalesMan({
                 />
               </FormGroup>
               <FormGroup
-                title="Email Address"
+                title="Email & Phone Number"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
-                  className="col-span-full"
+                  className="flex-grow"
                   prefix={
                     <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
                   }
@@ -162,20 +198,21 @@ export default function CreateSalesMan({
                   {...register('email')}
                   error={errors.email?.message}
                 />
-              </FormGroup>
-              <FormGroup
-                title={'Profile Picture'}
-                description={'This will be displayed on profile.'}
-                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
-              >
-                <div className="flex flex-col gap-6 @container @3xl:col-span-2">
-                  <AvatarUploadNew
-                    name="images"
-                    setValue={setValue}
-                    getValues={getValues}
-                    error={errors?.images?.message as string}
-                  />
-                </div>
+                <Controller
+                  name="phone_number"
+                  control={control}
+                  render={({ field: { value, onChange } }) => (
+                    <PhoneNumber
+                      country="in"
+                      value={value}
+                      onChange={onChange}
+                      className="rtl:[&>.selected-flag]:right-0"
+                      inputClassName="rtl:pr-12"
+                      buttonClassName="rtl:[&>.selected-flag]:right-2 rtl:[&>.selected-flag_.arrow]:-left-6"
+                      error={errors.phone_number?.message}
+                    />
+                  )}
+                />
               </FormGroup>
               <FormGroup
                 title={'Username & Password'}
@@ -188,19 +225,49 @@ export default function CreateSalesMan({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
+                {!id && (
+                  <Controller
+                    control={control}
+                    name="password"
+                    render={({ field: { onChange, value } }) => (
+                      <Password
+                        placeholder="Enter your password"
+                        helperText={
+                          value &&
+                          value?.length < 8 &&
+                          'Your current password must be more than 8 characters'
+                        }
+                        value={value}
+                        onChange={onChange}
+                        error={errors.password?.message}
+                      />
+                    )}
+                  />
+                )}
+              </FormGroup>
+              <FormGroup
+                title="Store Manager"
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
+              >
                 <Controller
                   control={control}
-                  name="password"
-                  render={({ field: { onChange, value } }) => (
-                    <Password
-                      placeholder="Enter your password"
-                      helperText={
-                        getValues().password?.length < 8 &&
-                        'Your current password must be more than 8 characters'
-                      }
+                  name="store_manager_id"
+                  render={({ field: { value, onChange } }) => (
+                    <Select
+                      placeholder="Select Store Manager"
                       value={value}
                       onChange={onChange}
-                      error={errors.password?.message}
+                      options={storeManagerOptions}
+                      searchable={true}
+                      stickySearch={true}
+                      getOptionValue={(option) => option.value}
+                      displayValue={(selected) =>
+                        storeManagerOptions.find(
+                          (o: SelectOption) => o.value === selected
+                        )?.label || ''
+                      }
+                      onSearchChange={handleStoreManagerSearch}
+                      error={errors.store_manager_id?.message}
                     />
                   )}
                 />

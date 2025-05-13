@@ -4,24 +4,29 @@ import apiClient from '@/app/lib/apiClient';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
-export function useDeleteSalesMan() {
+export function useDeleteDeliveryManager() {
   const { data: session } = useSession();
 
-  const deleteSalesMan = async (salesManId: any): Promise<void> => {
+  const deleteDeliveryManager = async (
+    deliveryManagerId: any
+  ): Promise<void> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.salesman}${salesManId}/`;
+    let url = `${API_ROUTES.deliveryManager}${deliveryManagerId}/`;
     const { data } = await apiClient.delete(url);
     return data;
   };
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (salesManId: number) => deleteSalesMan(salesManId),
-    onSuccess: (_, salesManId) => {
+    mutationFn: (deliveryManagerId: number) =>
+      deleteDeliveryManager(deliveryManagerId),
+    onSuccess: (_, deliveryManagerId) => {
       queryClient.invalidateQueries({
-        queryKey: ['salesManTable'],
+        queryKey: ['deliveryManagerTable'],
       });
-      queryClient.removeQueries({ queryKey: ['salesman', salesManId] });
+      queryClient.removeQueries({
+        queryKey: ['deliveryManager', deliveryManagerId],
+      });
     },
   });
 }

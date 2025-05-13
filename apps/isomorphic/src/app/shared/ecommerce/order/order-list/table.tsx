@@ -24,16 +24,15 @@ export default function OrderTable({
   hidePagination?: boolean;
   variant?: TableVariantProps;
 }) {
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   });
 
-  const { data, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    usePaginatedOrders(pagination);
+  const { data, isLoading } = usePaginatedOrders(pagination);
 
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<OrdersDataType>({
     tableData: [],
@@ -59,8 +58,7 @@ export default function OrderTable({
 
   useEffect(() => {
     if (data) {
-      const ordersAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const ordersAPIData = data?.data?.results || [];
       setData(ordersAPIData);
     }
   }, [data]);

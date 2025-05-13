@@ -1,10 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import { SubmitHandler, Controller } from 'react-hook-form';
-import SelectLoader from '@core/components/loader/select-loader';
-import QuillLoader from '@core/components/loader/quill-loader';
 import { Button, Input, Select, Text, Textarea, Title } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
@@ -13,65 +10,44 @@ import {
   PromotionFormInput,
   promotionFormSchema,
 } from '@/validators/create-promotion.schema';
+import FormGroup from '../../form-group';
+import { useRouter } from 'next/navigation';
+import { usePromotionById } from '@/hooks/promotions/usePromotionById';
 
-const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
-  ssr: false,
-  loading: () => <QuillLoader className="col-span-full h-[168px]" />,
-});
-
-// a reusable form wrapper component
-function HorizontalFormBlockWrapper({
-  title,
-  description,
-  children,
-  className,
-  isModalView = true,
-}: React.PropsWithChildren<{
-  title: string;
-  description?: string;
-  className?: string;
-  isModalView?: boolean;
-}>) {
-  return (
-    <div
-      className={cn(
-        className,
-        isModalView ? '@5xl:grid @5xl:grid-cols-6' : ' '
-      )}
-    >
-      {isModalView && (
-        <div className="col-span-2 mb-6 pe-4 @5xl:mb-0">
-          <Title as="h6" className="font-semibold">
-            {title}
-          </Title>
-          <Text className="mt-1 text-sm text-gray-500">{description}</Text>
-        </div>
-      )}
-
-      <div
-        className={cn(
-          'grid grid-cols-2 gap-3 @lg:gap-4 @2xl:gap-5',
-          isModalView ? 'col-span-4' : ' '
-        )}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// main category form component for create and update category
 export default function CreatePromotion({
   id,
-  promotion,
   isModalView = true,
 }: {
   id?: string;
   isModalView?: boolean;
-  promotion?: PromotionFormInput;
 }) {
+  const { push } = useRouter();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
+  const {
+    data,
+    isLoading: isFetching,
+    error: fetchError,
+  } = usePromotionById(id || '');
+
+  useEffect(() => {
+    if (data) {
+      const detailData = data?.data;
+      const resetData = {
+        id: detailData?.id || null,
+        store_manager: detailData?.store_manager || null,
+        product: detailData?.product || null,
+        promotion_medium: detailData?.promotion_medium || null,
+        aspect_ratio: detailData?.aspect_ratio || null,
+        area_latitude: detailData?.area_latitude || null,
+        area_longitude: detailData?.area_longitude || null,
+        comments: detailData?.comments || null,
+        promotion_image: detailData?.promotion_image || null,
+        promotion_document: detailData?.promotion_document || null,
+      };
+      setReset(resetData);
+    }
+  }, [data]);
 
   const onSubmit: SubmitHandler<PromotionFormInput> = (data) => {
     // set timeout ony required to display loading state of the create category button
@@ -80,14 +56,15 @@ export default function CreatePromotion({
       setLoading(false);
       console.log('createCategory data ->', data);
       setReset({
-        productname: '',
-        requestedby: '',
+        store_manager: '',
+        promotion_medium: '',
+        product: '',
         comments: '',
-        aspectratio: '',
-        area: '',
-        promotionmedium: '',
-        document: [],
-        images: [],
+        aspect_ratio: '',
+        area_latitude: '',
+        area_longitude: '',
+        promotion_document: [],
+        promotion_image: [],
       });
     }, 600);
   };
@@ -99,60 +76,60 @@ export default function CreatePromotion({
       onSubmit={onSubmit}
       useFormProps={{
         mode: 'onChange',
-        defaultValues: promotion,
+        defaultValues: {},
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
       {({ register, control, getValues, setValue, formState: { errors } }) => (
         <>
           <div className="flex-grow pb-10">
-            <div
-              className={cn(
-                'grid grid-cols-1',
-                isModalView
-                  ? 'grid grid-cols-1 gap-8 divide-y divide-dashed divide-gray-200 @2xl:gap-10 @3xl:gap-12 [&>div]:pt-7 first:[&>div]:pt-0 @2xl:[&>div]:pt-9 @3xl:[&>div]:pt-11'
-                  : 'gap-5'
-              )}
-            >
-              <HorizontalFormBlockWrapper
-                title={'General Information:'}
+            <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
+              <FormGroup
+                title={'General Information'}
                 description={'You cannot update this information'}
-                isModalView={isModalView}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <Input
                   label="Product Name"
                   placeholder="product name"
-                  {...register('productname')}
+                  {...register('product')}
                   readOnly
-                  error={errors?.productname?.message}
+                  error={errors?.product?.message}
                 />
                 <Input
                   label="Requested By"
                   placeholder="requested by"
-                  {...register('requestedby')}
+                  {...register('store_manager')}
                   readOnly
-                  error={errors.requestedby?.message}
+                  error={errors.store_manager?.message}
                 />
                 <Input
                   label="Aspect Ratio"
                   placeholder="aspect ratio"
-                  {...register('aspectratio')}
+                  {...register('aspect_ratio')}
                   readOnly
-                  error={errors.aspectratio?.message}
-                />
-                <Input
-                  label="Area"
-                  placeholder="area"
-                  {...register('area')}
-                  readOnly
-                  error={errors.area?.message}
+                  error={errors.aspect_ratio?.message}
                 />
                 <Input
                   label="Promotion Medium"
                   placeholder="promotion medium"
-                  {...register('promotionmedium')}
+                  {...register('promotion_medium')}
                   readOnly
-                  error={errors.promotionmedium?.message}
+                  error={errors.promotion_medium?.message}
+                />
+                <Input
+                  label="Area Longitude"
+                  placeholder="area longitude"
+                  {...register('area_longitude')}
+                  readOnly
+                  error={errors.area_longitude?.message}
+                />
+                <Input
+                  label="Area Latitude"
+                  placeholder="area latitude"
+                  {...register('area_latitude')}
+                  readOnly
+                  error={errors.area_latitude?.message}
                 />
                 <Textarea
                   label="Comments"
@@ -162,11 +139,11 @@ export default function CreatePromotion({
                   readOnly
                   error={errors.comments?.message}
                 />
-              </HorizontalFormBlockWrapper>
-              <HorizontalFormBlockWrapper
-                title="Upload promotion image"
-                description="Upload your product image gallery here"
-                isModalView={isModalView}
+              </FormGroup>
+              <FormGroup
+                title={'Upload promotion image'}
+                description={'Upload your product image gallery here'}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <UploadZone
                   name="images"
@@ -174,11 +151,11 @@ export default function CreatePromotion({
                   setValue={setValue}
                   className="col-span-full"
                 />
-              </HorizontalFormBlockWrapper>
-              <HorizontalFormBlockWrapper
+              </FormGroup>
+              <FormGroup
                 title="Upload promotion document"
                 description="Upload your promotion document here"
-                isModalView={isModalView}
+                className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <UploadZone
                   name="document"
@@ -186,7 +163,7 @@ export default function CreatePromotion({
                   setValue={setValue}
                   className="col-span-full"
                 />
-              </HorizontalFormBlockWrapper>
+              </FormGroup>
             </div>
           </div>
 
@@ -196,9 +173,6 @@ export default function CreatePromotion({
               isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
             )}
           >
-            {/* <Button variant="outline" className="w-full @xl:w-auto">
-              Save as Draft
-            </Button> */}
             <Button
               type="submit"
               isLoading={isLoading}

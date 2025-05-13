@@ -15,4 +15,6 @@ export const API_ROUTES = {
   serviceStatusChange: '/ecom/service-booking/{id}/service-status/',
   services: '/service/admin/services/',
   deliveryManager: '/authentication/admin/users/',
+  promotionList: '/mingler/promotions/',
+  promotion: '/mingler/admin/promotions/',
 };

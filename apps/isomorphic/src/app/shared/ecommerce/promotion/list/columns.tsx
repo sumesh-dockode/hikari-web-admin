@@ -1,23 +1,22 @@
 'use client';
 
-import DeletePopover from '@core/components/delete-popover';
 import { createColumnHelper } from '@tanstack/react-table';
 import { Title } from 'rizzui';
-import { PromotionDataType } from './table';
 import TableRowActionGroup from '@core/components/table-utils/table-row-action-group';
 import { routes } from '@/config/routes';
+import { PromotionDataType } from '@/data/promotion-data';
 
 const columnHelper = createColumnHelper<PromotionDataType>();
 
 export const PromotionColumn = [
-  columnHelper.display({
-    id: 'id',
-    size: 120,
-    header: 'Id',
-    cell: ({ row }) => <>#{row.original.id}</>,
-  }),
-  columnHelper.accessor('requestedby', {
-    id: 'requestedby',
+  // columnHelper.display({
+  //   id: 'id',
+  //   size: 120,
+  //   header: 'Id',
+  //   cell: ({ row }) => <>#{row.original.id}</>,
+  // }),
+  columnHelper.accessor('store_manager', {
+    id: 'store_manager',
     size: 200,
     header: 'Requested By',
     cell: ({ getValue }) => (
@@ -26,8 +25,8 @@ export const PromotionColumn = [
       </Title>
     ),
   }),
-  columnHelper.accessor('productname', {
-    id: 'productname',
+  columnHelper.accessor('product', {
+    id: 'product',
     size: 200,
     header: 'Product Name',
     cell: ({ getValue }) => (
@@ -38,11 +37,11 @@ export const PromotionColumn = [
   }),
 
   columnHelper.display({
-    id: 'promotionmedium',
+    id: 'promotion_medium',
     size: 120,
     header: 'Promotion Medium',
     cell: ({ row }) => (
-      <div className="ps-6">{row.original.promotionmedium}</div>
+      <div className="ps-6">{row.original.promotion_medium}</div>
     ),
   }),
   columnHelper.display({
@@ -63,9 +62,10 @@ export const PromotionColumn = [
       <TableRowActionGroup
         editUrl={routes.eCommerce.editPromotion(row.original.id)}
         // viewUrl={routes.eCommerce.promotionDetails(row.original.id)}
-        deletePopoverTitle={`Delete the order`}
-        deletePopoverDescription={`Are you sure you want to delete this #${row.original.id} order?`}
+        deletePopoverTitle={`Delete the Promotion`}
+        deletePopoverDescription={`Are you sure you want to delete this #${row.original.id} promotion?`}
         onDelete={() => meta?.handleDeleteRow?.(row.original)}
+        isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
       />
     ),
   }),

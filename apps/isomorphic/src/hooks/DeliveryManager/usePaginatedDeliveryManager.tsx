@@ -5,15 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
-export default function usePaginatedSalesMan(options: {
+export default function usePaginatedDeliveryManager(options: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
 }) {
   const { status } = useSession();
 
-  const fetchSalesMan = async () => {
-    let url = API_ROUTES.salesman;
+  const fetchDeliveryManager = async () => {
+    let url = `${API_ROUTES.deliveryManager}?user_role=DELIVERYMANAGER`;
     let params = [];
 
     if (options?.pageIndex || options?.pageIndex === 0) {
@@ -26,7 +26,7 @@ export default function usePaginatedSalesMan(options: {
       params.push(`search=${options.search}`);
     }
     if (params.length > 0) {
-      url += `?${params.join('&')}`;
+      url += `&${params.join('&')}`;
     }
     const { data } = await apiClient.get(url);
 
@@ -34,8 +34,8 @@ export default function usePaginatedSalesMan(options: {
   };
 
   return useQuery({
-    queryKey: ['salesManTable', options],
-    queryFn: () => fetchSalesMan(),
+    queryKey: ['deliveryManagerTable', options],
+    queryFn: () => fetchDeliveryManager(),
     enabled: status === 'authenticated',
     throwOnError(error, query) {
       throw error;

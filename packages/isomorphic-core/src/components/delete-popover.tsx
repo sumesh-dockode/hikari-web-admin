@@ -8,12 +8,14 @@ type DeletePopoverProps = {
   title: string;
   description: string;
   onDelete?: () => void;
+  isLoading?: boolean;
 };
 
 export default function DeletePopover({
   title,
   description,
   onDelete,
+  isLoading,
 }: DeletePopoverProps) {
   return (
     <Popover placement="left">
@@ -23,6 +25,7 @@ export default function DeletePopover({
           variant="outline"
           aria-label={"Delete Item"}
           className="cursor-pointer"
+          isLoading={isLoading}
         >
           <TrashIcon className="size-4" />
         </ActionIcon>
@@ -43,6 +46,7 @@ export default function DeletePopover({
               <Button
                 size="sm"
                 className="me-1.5 h-7"
+                isLoading={isLoading}
                 onClick={() => {
                   onDelete && onDelete();
                   setOpen(false);

@@ -14,27 +14,24 @@ import { useDeleteStoreManager } from '@/hooks/storeManager/useDeleteStoreManage
 import PageLoader from '@/app/shared/page-loader';
 import toast from 'react-hot-toast';
 import { StoreManagerTableDataType } from '@/data/store-manager-data';
+import { debounce } from 'lodash';
+
+interface FiltersProps {
+  search?: string;
+}
 
 export default function StoreManagerTable() {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedStoreManager(pagination);
+  const { data, isLoading } = usePaginatedStoreManager(pagination);
   const { mutate: deleteStoreManager, status: deleteStatus } =
     useDeleteStoreManager();
-
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<StoreManagerTableDataType>({
     tableData: [],
@@ -42,15 +39,15 @@ export default function StoreManagerTable() {
     options: {
       meta: {
         handleDeleteRow: (row) => {
+          setDeleteItemId(row.id);
           deleteStoreManager(row.id, {
             onSuccess: () => {
               toast.success('Store Manager deleted successfully');
             },
           });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -67,17 +64,28 @@ export default function StoreManagerTable() {
 
   useEffect(() => {
     if (data) {
-      const APIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const APIData = data?.data?.results || [];
       setData(APIData);
     }
   }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
 
   if (isLoading) return <PageLoader />;
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
       <Table
         table={table}
         variant="modern"

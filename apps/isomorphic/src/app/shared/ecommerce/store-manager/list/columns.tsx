@@ -34,14 +34,19 @@ export const storeManagerColumns = [
       </Title>
     ),
   }),
-  columnHelper.accessor('store_info.store_name', {
+  columnHelper.accessor('store_info.name', {
     id: 'store_name',
     size: 200,
     header: 'Store Name',
-    cell: ({ getValue }) => (
-      <Title as="h6" className="!text-sm font-medium">
-        {getValue()}
-      </Title>
+    cell: ({ row, getValue }) => (
+      <>
+        <Title as="h6" className="!text-sm font-medium">
+          {getValue()}
+        </Title>
+        <Text className="line-clamp-2 text-[13px] text-gray-500">
+          {row.original.store_info?.address}
+        </Text>
+      </>
     ),
   }),
   columnHelper.accessor('email', {
@@ -107,9 +112,10 @@ export const storeManagerColumns = [
           </Link>
         </Tooltip>
         <DeletePopover
-          title={`Delete the store manager`}
-          description={`Are you sure you want to delete this #${row.original.id} store manager?`}
+          title={`Delete the Store Manager`}
+          description={`Are you sure you want to delete this #${row.original.username} store manager?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
+          isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />
       </div>
     ),

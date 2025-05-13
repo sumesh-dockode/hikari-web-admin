@@ -114,8 +114,10 @@ export default function ServiceDetailsGallery({
 
     if (status && id) {
       const payload = {
-        status: status,
-        id: id as string,
+        new_status: statusId,
+        new_price: currentService.price?.toString() || '0',
+        service_type_id: currentService.service_type_id || '', 
+        image: currentService.image || '',
       };
       updateServiceStatus(payload);
     }

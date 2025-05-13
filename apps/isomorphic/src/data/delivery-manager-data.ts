@@ -1,4 +1,4 @@
-export interface SalesmanDataType {
+export interface DeliveryManagerDataType {
   id: string | null;
   first_name: string;
   last_name: string | null;
@@ -7,7 +7,5 @@ export interface SalesmanDataType {
   username: string;
   password?: string;
   is_active: boolean;
-  store_manager?: any | null;
-  store?: string | null;
-  store_manager_id?: number | null;
+  user_role: string;
 }

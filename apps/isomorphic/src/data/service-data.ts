@@ -10,7 +10,10 @@ export interface serviceDataType {
 }
 
 export interface serviceStatusChangeDataType {
-  id: string;
-  status: string;
-  // user_id: number;
-}
+  id?: any;
+  status?: string;
+    new_status: string;
+    new_price: string;
+    service_type_id: string;
+    image: any
+  };

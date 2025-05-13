@@ -16,6 +16,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useCreateProductVariant } from '@/hooks/products/productVariant/useCreateProductVariant';
+import { useProductsById } from '@/hooks/products/useProductsById';
 
 interface VariantOption {
   value: string;
@@ -56,33 +57,54 @@ export default function ProductVariants({
 
   const { data: variantsData } = useVariants();
   const { data: variantValuesData } = useVariantValue();
+  const { data: productVariant, isFetching } = useProductsById(productId);
+  useEffect(() => {
+    if (productVariant?.data?.variants) {
+      setCreatedVariants(productVariant.data.variants);
+    }
+  });
+  useEffect(() => {
+    if (!variantValuesData?.data) return;
+
+    const options = variantValuesData.data.map((value: any) => ({
+      value: value.id,
+      label: value.value,
+      variantId: value.attribute,
+    }));
+
+    setValueOptions(options);
+  }, [variantValuesData]);
 
   useEffect(() => {
-    if (variantsData?.pages) {
-      const options = variantsData.pages.flatMap((page) =>
-        page.data.results.map((variant: any) => ({
-          value: variant.id,
-          label: variant.name,
-        }))
-      );
+    if (variantsData?.data) {
+      const options = variantsData.data.map((variant: any) => ({
+        value: variant.id,
+        label: variant.name,
+      }));
       setVariantOptions(options);
     }
   }, [variantsData]);
 
-  useEffect(() => {
-    if (variantValuesData?.pages) {
-      const options = variantValuesData.pages.flatMap((page) =>
-        page.data.results.map((value: any) => ({
-          value: value.id,
-          label: value.value,
-          variantId: value.attribute,
-        }))
-      );
-      setValueOptions(options);
-    }
-  }, [variantValuesData]);
+  // useEffect(() => {
+  //   if (variantValuesData?.pages) {
+  //     const options = variantValuesData.pages.flatMap((page) =>
+  //       page.data.results.map((value: any) => ({
+  //         value: value.id,
+  //         label: value.value,
+  //         variantId: value.attribute,
+  //       }))
+  //     );
+  //     setValueOptions(options);
+  //   }
+  // }, [variantValuesData]);
 
   const addNewVariantAttribute = () => {
+    const currentVariants = getValues('variants');
+    const newIndex = currentVariants.length;
+
+    setValue(`variants.${newIndex}.variantId`, '');
+    setValue(`variants.${newIndex}.valueId`, '');
+
     setAddedVariantAttributes((prev) => [
       ...prev,
       { variantId: '', valueId: '' },
@@ -90,16 +112,18 @@ export default function ProductVariants({
   };
 
   const {
-    register,
     control,
+    register,
+    setValue,
+    getValues,
+    reset,
     handleSubmit,
     watch,
     formState: { errors },
-    reset,
   } = useForm<VariantFormInput>({
     resolver: zodResolver(variantSchema),
     defaultValues: {
-      variants: addedVariantAttributes,
+      variants: [{ variantId: '', valueId: '' }],
       price: 1,
       sku: '',
       stock: 1,
@@ -121,24 +145,28 @@ export default function ProductVariants({
       },
       {
         onSuccess: () => {
-          // Add the new variant to local table state
-          const variantName = variantOptions.find(
-            (v) => v.value === formData.variants[0].variantId
-          )?.label;
-          const valueName = valueOptions.find(
-            (v) => v.value === formData.variants[0].valueId
-          )?.label;
+          // Collect all variant + value labels
+          const variantPairs = formData.variants.map((v) => {
+            const variantName =
+              variantOptions.find((opt) => opt.value === v.variantId)?.label ??
+              'Unknown';
+            const valueName =
+              valueOptions.find((opt) => opt.value === v.valueId)?.label ??
+              'Unknown';
+            return `${variantName}: ${valueName}`;
+          });
+
+          const combinedName = variantPairs.join(' / ');
 
           setCreatedVariants((prev) => [
             ...prev,
             {
-              name: variantName ?? 'N/A',
-              value: valueName ?? 'N/A',
+              name: combinedName,
+              value: '', // Not used anymore as name includes all
               price: formData.price,
               sku: formData.sku,
             },
           ]);
-
           setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
           setIsModalOpen(false);
           reset();
@@ -170,10 +198,7 @@ export default function ProductVariants({
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-4 py-2 text-left font-medium text-gray-600">
-                    Variant
-                  </th>
-                  <th className="px-4 py-2 text-left font-medium text-gray-600">
-                    Value
+                    Attributes
                   </th>
                   <th className="px-4 py-2 text-left font-medium text-gray-600">
                     Price
@@ -183,11 +208,10 @@ export default function ProductVariants({
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 bg-white">
+              <tbody>
                 {createdVariants.map((v, index) => (
                   <tr key={index}>
                     <td className="px-4 py-2">{v.name}</td>
-                    <td className="px-4 py-2">{v.value}</td>
                     <td className="px-4 py-2">${v.price}</td>
                     <td className="px-4 py-2">{v.sku}</td>
                   </tr>

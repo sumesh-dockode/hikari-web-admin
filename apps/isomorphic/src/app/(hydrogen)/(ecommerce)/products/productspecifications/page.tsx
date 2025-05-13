@@ -75,12 +75,8 @@ export default function ProductSpecificationPage() {
     useState<string>('Color');
   const [specificationName, setSpecificationName] = useState('');
   const [selectedColor, setSelectedColor] = useState('');
-  const specificationAPIData =
-    data?.pages?.flatMap((page: any) => page?.data?.results) || [];
-  const specificationValueAPIData =
-    specificationValuesData?.pages?.flatMap(
-      (page: any) => page?.data?.results
-    ) || [];
+  const specificationAPIData = data?.data || [];
+  const specificationValueAPIData = specificationValuesData?.data || [];
 
   const openValueModal = (specificationId: string) => {
     setActiveSpecificationId(specificationId);
@@ -191,7 +187,6 @@ export default function ProductSpecificationPage() {
       );
     }
   };
-
 
   const getModalContent = () => {
     if (!activeSpecificationId) return null;
@@ -320,9 +315,7 @@ export default function ProductSpecificationPage() {
           resetValueForm();
           setSelectedColor('');
         }}
-      >
-       
-      </Modal>
+      ></Modal>
       <Modal
         isOpen={deleteConfirmationOpen}
         onClose={() => setDeleteConfirmationOpen(false)}

@@ -2,8 +2,8 @@ import ServiceDetailGallery from '@/app/shared/ecommerce/servicebooking/service-
 import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 
-export default function ServiceDetailPage({ params }: any) {
-  const id = params.id;
+export default async function ServiceDetailPage({ params }: any) {
+  const id = (await params).id;
 
   const pageHeader = {
     title: 'Service Booking',
@@ -22,26 +22,12 @@ export default function ServiceDetailPage({ params }: any) {
     ],
   };
 
-  const ServiceData = {
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/categories/bags.webp',
-    name: 'Bag',
-    promocode: 'sale100',
-    selectedservices: 'Cleaning Service',
-    requesteduser: 'Jithin',
-    status: 'Booking_initiated',
-  };
-
   return (
     <>
-      {/* Page Header */}
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb} />
-
-      {/* Container */}
       <div className="@container">
-        {/* Status Dropdown at the Top */}
         <div className="mb-4 flex justify-end">
-          <ServiceDetailGallery service={ServiceData} />
+          <ServiceDetailGallery />
         </div>
       </div>
     </>

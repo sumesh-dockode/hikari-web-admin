@@ -2,7 +2,6 @@ import { Button } from 'rizzui/button';
 import { routes } from '@/config/routes';
 import PageHeader from '@/app/shared/page-header';
 import Link from 'next/link';
-import OrderView from '@/app/shared/ecommerce/order/order-view';
 
 export default async function PromotionDetailsPage({ params }: any) {
   const id = (await params).id;
@@ -34,7 +33,6 @@ export default async function PromotionDetailsPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      {/* <OrderView /> */}
     </>
   );
 }

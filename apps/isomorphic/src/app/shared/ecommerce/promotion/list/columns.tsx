@@ -25,12 +25,12 @@ export const PromotionColumn = [
       </Title>
     ),
   }),
-  columnHelper.accessor('product', {
-    id: 'product',
+  columnHelper.accessor('product_name', {
+    id: 'product_name',
     size: 200,
     header: 'Product Name',
     cell: ({ getValue }) => (
-      <Title as="h6" className="!text-sm font-medium">
+      <Title as="h6" className="line-clamp-2 !text-sm font-medium">
         {getValue()}
       </Title>
     ),

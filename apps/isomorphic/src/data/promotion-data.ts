@@ -9,4 +9,5 @@ export interface PromotionDataType {
   comments: string;
   promotion_image: string;
   promotion_document: string;
+  product_name: string;
 }

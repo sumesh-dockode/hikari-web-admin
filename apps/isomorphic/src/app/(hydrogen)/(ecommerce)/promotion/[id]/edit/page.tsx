@@ -41,38 +41,6 @@ const pageHeader = {
   ],
 };
 
-const promotionData = {
-  productname: 'General',
-  requestedby: 'John Doe',
-  promotionmedium: 'Facebook',
-  comments: 'nil',
-  aspectratio: '16:9',
-  area: 'kerala',
-  images: [
-    {
-      name: 'images',
-      url: 'https://picsum.photos/200/300',
-      size: 10,
-    },
-  ],
-  document: [
-    {
-      name: 'document.pdf',
-      url: 'https://www.soundczech.cz/temp/lorem-ipsum.pdf',
-      size: 10,
-    },
-  ],
-};
-
-const categoryData = {
-  name: 'Vegetables',
-  slug: 'vegetables',
-  type: 'Diet Foods',
-  parentCategory: 'Grocery',
-  description: 'Incredible Granite Ball',
-  images: undefined,
-};
-
 export default async function EditPromotionPage({ params }: any) {
   const id = (await params).id;
   return (
@@ -87,7 +55,7 @@ export default async function EditPromotionPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
-      <CreatePromotion id={id} promotion={promotionData} />
+      <CreatePromotion id={id} />
     </>
   );
 }

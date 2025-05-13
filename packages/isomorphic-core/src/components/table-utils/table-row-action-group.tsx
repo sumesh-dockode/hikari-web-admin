@@ -15,6 +15,7 @@ export default function TableRowActionGroup({
   deletePopoverDescription = "Are you sure you want to delete this item?",
   className,
   children,
+  isLoading,
 }: {
   onDelete?: () => void;
   editUrl?: string;
@@ -23,6 +24,7 @@ export default function TableRowActionGroup({
   deletePopoverDescription?: string;
   className?: string;
   children?: React.ReactNode;
+  isLoading?: boolean;
 }) {
   const isViewUrlAvailable = viewUrl && viewUrl !== "#";
   const isEditUrlAvailable = editUrl && editUrl !== "#";
@@ -67,6 +69,7 @@ export default function TableRowActionGroup({
         title={deletePopoverTitle}
         description={deletePopoverDescription}
         onDelete={onDelete}
+        isLoading={isLoading}
       />
     </Flex>
   );

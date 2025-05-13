@@ -91,7 +91,9 @@ export const ordersColumns = (expanded: boolean = true) => {
           deletePopoverDescription={`Are you sure you want to delete this #${row.original.id} order?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
         >
-          {row.original.status === 'Confirmed' && (
+          {['Confirmed', 'Shipped', 'Delivered'].includes(
+            row.original.status
+          ) && (
             <Tooltip
               size="sm"
               content={'Download QR Code'}

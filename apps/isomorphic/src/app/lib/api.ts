@@ -8,7 +8,7 @@ export const API_ROUTES = {
   orders: '/ecom/admin/orders/',
   specifications: `/ecom/admin/product-specifications/`,
   specificationValues: `/ecom/admin/product-specification-values/`,
-  singleOrder: '/ecom/orders/',
+  singleOrder: '/ecom/admin/orders/',
   orderStatusChange: '/ecom/orders/{id}/status/',
   salesman: '/mingler/admin/users/salesman/',
   storeManager: '/mingler/admin/users/store-manager/',
@@ -17,5 +17,6 @@ export const API_ROUTES = {
   singleService: 'service/admin/services/{service_id}/',
   serviceStatus :`/service/service-statuses/`,
   deliveryManager: '/authentication/admin/users/',
-  
+  promotionList: '/mingler/promotions/',
+  promotion: '/mingler/admin/promotions/',
 };

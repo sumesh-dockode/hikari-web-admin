@@ -31,13 +31,14 @@ const allStatus = {
   refunded: statusColors.default,
   service_started: statusColors.default,
   Booking_initiated: statusColors.warning,
-  confirm: statusColors.success,
+  confirmed: statusColors.success,
+  shipped: statusColors.warning,
 };
 
 export type StatusTypes = keyof typeof allStatus;
 
 export function getStatusBadge(status: string) {
-  const statusLower = status.toLowerCase() as StatusTypes;
+  const statusLower = status?.toLowerCase() as StatusTypes;
   if (statusLower in allStatus) {
     return (
       <Flex align="center" gap="2" className="w-auto">

@@ -1,47 +1,47 @@
 'use client';
 
-import {  CategoryDataType } from '@/data/product-categories';
+import { useEffect, useState } from 'react';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
-import { categoriesColumns } from './columns';
 import TableFooter from '@core/components/table/footer';
 import TablePagination from '@core/components/table/pagination';
-import Filters from './filters';
-import { useEffect, useState } from 'react';
-import usePaginatedCategories from '@/hooks/categories/usePaginatedCategories';
-import { useDeleteCategory } from '@/hooks/categories/useDeleteCategories';
-import PageLoader from '@/app/shared/page-loader';
-import toast from 'react-hot-toast';
+import { PromotionColumn } from './columns';
+import PromotionModal from '../../product/create-edit/promotion-modal';
 import { PaginationState } from '@tanstack/react-table';
+import { PromotionDataType } from '@/data/promotion-data';
+import usePaginatedPromotions from '@/hooks/promotions/usePaginatedPromotion';
+import { useDeletePromotion } from '@/hooks/promotions/useDeletePromotion';
+import toast from 'react-hot-toast';
 import { debounce } from 'lodash';
+import PageLoader from '../../../page-loader';
+import Filters from './filters';
 
 interface FiltersProps {
   search?: string;
 }
 
-export default function CategoryTable() {
+export default function PromotionsTable() {
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
     search: '',
   });
-
-  const { data, isLoading } = usePaginatedCategories(pagination);
-  const { mutate: deleteCategory, status: deleteStatus } = useDeleteCategory();
-
+  const { data, isLoading } = usePaginatedPromotions(pagination);
+  const { mutate: deletePromotion, status: deleteStatus } =
+    useDeletePromotion();
   const pageCount = data?.data?.total_pages || 1;
 
-  const { table, setData } = useTanStackTable<CategoryDataType | any>({
+  const { table, setData } = useTanStackTable<PromotionDataType>({
     tableData: [],
-    columnConfig: categoriesColumns,
+    columnConfig: PromotionColumn,
     options: {
       meta: {
         handleDeleteRow: (row) => {
           setDeleteItemId(row.id);
-          deleteCategory(row.id, {
+          deletePromotion(row.id, {
             onSuccess: () => {
-              toast.success('Category deleted successfully');
+              toast.success('Promotion deleted successfully');
             },
           });
         },
@@ -63,8 +63,8 @@ export default function CategoryTable() {
 
   useEffect(() => {
     if (data) {
-      const categoriesAPIData = data?.data?.results || [];
-      setData(categoriesAPIData);
+      const promotionAPIData = data?.data?.results || [];
+      setData(promotionAPIData);
     }
   }, [data]);
 
@@ -90,9 +90,10 @@ export default function CategoryTable() {
         variant="modern"
         classNames={{
           container: 'border border-muted rounded-md',
-          rowClassName: 'last:border-0',
+          rowClassName: 'last:border-0 cursor-pointer',
         }}
       />
+
       <TableFooter table={table} />
       <TablePagination table={table} className="py-4" />
     </>

@@ -80,7 +80,7 @@ export default function CreateSalesMan({
     status: updateStatus,
   } = useUpdateSalesMan();
 
-  const storeManagerList = storeManagerData?.data?.results || [];
+  const storeManagerList = storeManagerData?.data || [];
   const storeManagerOptions = storeManagerList.map(
     (item: StoreManagerTableDataType) => ({
       label: `${item.first_name || ''} ${item.last_name || ''}`,

@@ -23,7 +23,7 @@ export const routes = {
     cart: '/cart',
     promotion: '/promotion',
     promotionDetails: (id: number) => `/promotion/${id}`,
-    editPromotion: (id: number) => `/promotion/${id}/edit`,
+    editPromotion: (id: string) => `/promotion/${id}/edit`,
     checkout: '/checkout',
     trackingId: (id: string) => `/tracking/${id}`,
     storeManager: '/store-manager',

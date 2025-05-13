@@ -1,7 +1,7 @@
 'use client';
 
 import { Controller, useFormContext } from 'react-hook-form';
-import { Input, MultiSelect, Select, Textarea } from 'rizzui';
+import { Input, MultiSelect, Select, SelectOption, Textarea } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import {
@@ -31,16 +31,14 @@ export default function ProductSummary({ className }: { className?: string }) {
 
   const { data, isLoading } = usePaginatedCategories({
     pageIndex: 0,
-    pageSize: 100,
+    pageSize: 10,
   });
 
   const categoryOptions =
-    data?.pages
-      ?.flatMap((page: any) => page?.data?.results)
-      ?.map((category: any) => ({
-        label: category.name,
-        value: category.id,
-      })) || [];
+    data?.data?.results?.map((category: any) => ({
+      label: category.name,
+      value: category.id,
+    })) || [];
 
   return (
     <FormGroup
@@ -73,7 +71,7 @@ export default function ProductSummary({ className }: { className?: string }) {
         name="category"
         render={({ field }) => {
           const selectedOption = categoryOptions.find(
-            (opt) => opt.value === field.value
+            (opt: SelectOption) => opt.value === field.value
           );
 
           return (

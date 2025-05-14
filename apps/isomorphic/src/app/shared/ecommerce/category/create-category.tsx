@@ -188,7 +188,7 @@ export default function CreateCategory({
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
-      {({ register, control, getValues, setValue, formState: { errors } }) => (
+      {({ register, getValues, setValue, watch, formState: { errors } }) => (
         <>
           <div className="flex-grow pb-10">
             <div
@@ -221,6 +221,7 @@ export default function CreateCategory({
                   name="image"
                   getValues={getValues}
                   setValue={setValue}
+                  watch={watch}
                   className="col-span-full"
                 />
               </HorizontalFormBlockWrapper>
@@ -234,6 +235,7 @@ export default function CreateCategory({
                   name="icon_image"
                   getValues={getValues}
                   setValue={setValue}
+                  watch={watch}
                   className="col-span-full"
                 />
               </HorizontalFormBlockWrapper>

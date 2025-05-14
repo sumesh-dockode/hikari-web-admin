@@ -19,7 +19,7 @@ export default function PromotionModal({
   isOpen,
   onClose,
 }: PromotionModalProps) {
-  const { getValues, setValue } = useFormContext();
+  const { getValues, setValue, watch } = useFormContext();
 
   if (!isOpen) return null;
 
@@ -34,6 +34,7 @@ export default function PromotionModal({
             name="icons"
             getValues={getValues}
             setValue={setValue}
+            watch={watch}
             className="col-span-full"
           />
         </HorizontalFormBlockWrapper>

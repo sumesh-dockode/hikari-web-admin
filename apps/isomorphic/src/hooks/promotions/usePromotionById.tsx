@@ -17,5 +17,8 @@ export function usePromotionById(id: any) {
     queryKey: ['promotion', id],
     queryFn: () => fetchpromotion(),
     enabled: !!id && status === 'authenticated',
+    throwOnError(error, query) {
+      throw error;
+    },
   });
 }

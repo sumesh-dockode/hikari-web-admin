@@ -15,9 +15,15 @@ import toast from 'react-hot-toast';
 import { debounce } from 'lodash';
 import PageLoader from '../../../page-loader';
 import Filters from './filters';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
 
 interface FiltersProps {
   search?: string;
+}
+interface StoreManagerListProps {
+  first_name: string;
+  last_name: string;
+  id: number;
 }
 
 export default function PromotionsTable() {
@@ -27,6 +33,7 @@ export default function PromotionsTable() {
     pageSize: 10,
     search: '',
   });
+  const { data: storeManagerData } = usePaginatedStoreManager({});
   const { data, isLoading } = usePaginatedPromotions(pagination);
   const { mutate: deletePromotion, status: deleteStatus } =
     useDeletePromotion();
@@ -62,11 +69,25 @@ export default function PromotionsTable() {
   });
 
   useEffect(() => {
-    if (data) {
-      const promotionAPIData = data?.data?.results || [];
+    if (data && storeManagerData) {
+      const storeManagersList = storeManagerData?.data?.map(
+        (i: StoreManagerListProps) => ({
+          name: `${i.first_name || ''} ${i.last_name || ''}`,
+          id: i.id,
+        })
+      );
+
+      const promotionAPIData =
+        data?.data?.results?.map((i: PromotionDataType) => ({
+          ...i,
+          store_manager:
+            storeManagersList?.find(
+              (j: StoreManagerListProps) => j.id === i.store_manager
+            )?.name || '',
+        })) || [];
       setData(promotionAPIData);
     }
-  }, [data]);
+  }, [data, storeManagerData]);
 
   const handleSearchChange = debounce((value: string) => {
     setPagination((prev) => ({

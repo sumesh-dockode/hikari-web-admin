@@ -14,6 +14,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
 import useSpecifications from '@/hooks/products/specifications/useSpecifications';
+import { useProductsById } from '@/hooks/products/useProductsById';
 
 interface Specification {
   id?: string;
@@ -50,18 +51,28 @@ export default function ProductSpecifications({
     status: createStatus,
   } = useCreateSpecificationValue();
   const { data: specificationsData } = useSpecifications();
+  const { data: productSpecification, isFetching } = useProductsById(productId);
+  console.log('specificationsData-------------', specificationsData);
+  console.log('productSpecification0000000', productSpecification);
 
   useEffect(() => {
-    if (specificationsData?.pages) {
-      const options = specificationsData.pages.flatMap((page) =>
-        page.data.results.map((spec: Specification) => ({
-          value: spec.id,
-          label: spec.name,
-        }))
-      );
-      setSpecificationOptions(options);
+    // Set specifications from product data when loaded
+    if (productSpecification?.data?.specifications) {
+      setSpecifications(productSpecification.data.specifications);
     }
+  }, [productSpecification]);
+  useEffect(() => {
+    if (!specificationsData?.data) return;
+  
+    const options = specificationsData.data.map((spec: Specification) => ({
+      value: spec.id,
+      label: spec.name,
+    }));
+  
+    setSpecificationOptions(options);
   }, [specificationsData]);
+  
+
   const {
     register,
     control,
@@ -134,7 +145,12 @@ export default function ProductSpecifications({
             <tbody>
               {specifications.map((spec, index) => (
                 <tr key={index} className="border-b bg-white even:bg-gray-50">
-                  <td className="px-4 py-3">{spec.product}</td>
+                  <td className="px-4 py-3">
+                    {specificationOptions.find(
+                      (opt) => opt.value === spec.specification
+                    )?.label ?? spec.specification}
+                  </td>
+
                   <td className="px-4 py-3">{spec.value}</td>
                   {/* <td className="px-4 py-3">
                     <Button

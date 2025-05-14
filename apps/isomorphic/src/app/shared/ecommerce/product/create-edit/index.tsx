@@ -66,6 +66,8 @@ export default function CreateEditProduct({
   // console.log('createdProductId', createdProductId);
 
   const { data, isFetching } = useProductsById(slug);
+  console.log('dataooooooo', data);
+
   const {
     mutate: createProducts,
     data: productData,

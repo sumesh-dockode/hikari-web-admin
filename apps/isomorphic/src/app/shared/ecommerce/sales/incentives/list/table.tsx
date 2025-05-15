@@ -47,6 +47,11 @@ const incentivesData = [
 
 export type IncentivesDataType = (typeof incentivesData)[number];
 
+interface FiltersProps {
+  search?: string;
+  salesManFilter?: number;
+}
+
 export default function IncentivesTable({
   pageSize = 5,
   hideFilters = false,
@@ -65,9 +70,11 @@ export default function IncentivesTable({
   classNames?: TableClassNameProps;
   paginationClassName?: string;
 }) {
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
+    salesManFilter: undefined,
   });
 
   const pageCount = 1;
@@ -117,7 +124,15 @@ export default function IncentivesTable({
 
   return (
     <>
-      {!hideFilters && <Filters table={table} />}
+      {!hideFilters && (
+        <Filters
+          table={table}
+          salesManFilter={pagination.salesManFilter}
+          setSalesManFilter={(value) =>
+            setPagination({ ...pagination, salesManFilter: value })
+          }
+        />
+      )}
       <Table table={table} variant="modern" classNames={classNames} />
       {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
       {!hidePagination && (

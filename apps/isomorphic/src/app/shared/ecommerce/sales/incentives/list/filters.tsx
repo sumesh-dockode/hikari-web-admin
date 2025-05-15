@@ -19,6 +19,12 @@ import {
   PiTrashDuotone,
 } from 'react-icons/pi';
 import { Button, Flex, Input } from 'rizzui';
+import SalesmanSelectionField from '@/app/shared/salesman-selection-field';
+
+interface SalesManFilterProps {
+  salesManFilter: number | undefined;
+  setSalesManFilter: (value?: number) => void;
+}
 
 interface TableToolbarProps<T extends Record<string, any>> {
   table: ReactTableType<T>;
@@ -26,7 +32,9 @@ interface TableToolbarProps<T extends Record<string, any>> {
 
 export default function Filters<TData extends Record<string, any>>({
   table,
-}: TableToolbarProps<TData>) {
+  salesManFilter,
+  setSalesManFilter,
+}: TableToolbarProps<TData> & SalesManFilterProps) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const isMultipleSelected = table.getSelectedRowModel().rows.length > 1;
 
@@ -35,57 +43,79 @@ export default function Filters<TData extends Record<string, any>>({
   } = table;
 
   return (
-    <Flex align="center" justify="between" className="mb-4">
-      <Input
-        type="search"
-        placeholder="Search by product name..."
-        value={table.getState().globalFilter ?? ''}
-        onClear={() => table.setGlobalFilter('')}
-        onChange={(e) => table.setGlobalFilter(e.target.value)}
-        inputClassName="h-9"
-        clearable={true}
-        prefix={<PiMagnifyingGlassBold className="size-4" />}
+    <Flex className="flex-col sm:flex-row">
+      <SalesmanSelectionField
+        value={salesManFilter}
+        onChange={setSalesManFilter}
+        onClear={() => setSalesManFilter(undefined)}
       />
+      {/* <Select
+        className="w-full sm:max-w-[280px]"
+        placeholder="Select Salesman"
+        value={salesMan}
+        onChange={setSalesMan}
+        options={salesManOptions}
+        searchable={true}
+        stickySearch={true}
+        getOptionValue={(option) => option.value}
+        displayValue={(selected) =>
+          salesManOptions.find((o: SelectOption) => o.value === selected)
+            ?.label || ''
+        }
+      /> */}
+      <Flex align="center" justify="between" className="mb-4">
+        <Input
+          type="search"
+          errorClassName="h-20"
+          placeholder="Search by product name..."
+          value={table.getState().globalFilter ?? ''}
+          onClear={() => table.setGlobalFilter('')}
+          onChange={(e) => table.setGlobalFilter(e.target.value)}
+          inputClassName="h-9"
+          clearable={true}
+          prefix={<PiMagnifyingGlassBold className="size-4" />}
+        />
 
-      <FilterDrawerView
-        isOpen={openDrawer}
-        drawerTitle="Table Filters"
-        setOpenDrawer={setOpenDrawer}
-      >
-        <div className="grid grid-cols-1 gap-6">
-          <FilterElements table={table} />
-        </div>
-      </FilterDrawerView>
-
-      <Flex align="center" gap="3" className="w-auto">
-        {isMultipleSelected ? (
-          <Button
-            color="danger"
-            variant="outline"
-            className="h-[34px] gap-2 text-sm"
-            onClick={() =>
-              meta?.handleMultipleDelete &&
-              meta.handleMultipleDelete(
-                table.getSelectedRowModel().rows.map((r) => r.original.id)
-              )
-            }
-          >
-            <PiTrash size={18} />
-            Delete
-          </Button>
-        ) : null}
-
-        <Button
-          variant={'outline'}
-          disabled={true}
-          onClick={() => setOpenDrawer(!openDrawer)}
-          className="h-9 pe-3 ps-2.5"
+        <FilterDrawerView
+          isOpen={openDrawer}
+          drawerTitle="Table Filters"
+          setOpenDrawer={setOpenDrawer}
         >
-          <PiFunnel className="me-1.5 size-[18px]" strokeWidth={1.7} />
-          Filters
-        </Button>
+          <div className="grid grid-cols-1 gap-6">
+            <FilterElements table={table} />
+          </div>
+        </FilterDrawerView>
 
-        <ToggleColumns table={table} />
+        <Flex align="center" gap="3" className="w-auto">
+          {isMultipleSelected ? (
+            <Button
+              color="danger"
+              variant="outline"
+              className="h-[34px] gap-2 text-sm"
+              onClick={() =>
+                meta?.handleMultipleDelete &&
+                meta.handleMultipleDelete(
+                  table.getSelectedRowModel().rows.map((r) => r.original.id)
+                )
+              }
+            >
+              <PiTrash size={18} />
+              Delete
+            </Button>
+          ) : null}
+
+          {/* <Button
+            variant={'outline'}
+            disabled={true}
+            onClick={() => setOpenDrawer(!openDrawer)}
+            className="h-9 pe-3 ps-2.5"
+          >
+            <PiFunnel className="me-1.5 size-[18px]" strokeWidth={1.7} />
+            Filters
+          </Button> */}
+
+          <ToggleColumns table={table} />
+        </Flex>
       </Flex>
     </Flex>
   );

@@ -11,7 +11,9 @@ export const promotionFormSchema = z.object({
   aspect_ratio: z.string().min(1, { message: messages.catNameIsRequired }),
   area_latitude: z.string().min(1, { message: messages.catNameIsRequired }),
   area_longitude: z.string().min(1, { message: messages.catNameIsRequired }),
-  promotion_image: z.array(fileSchema),
+  promotion_image: z.array(fileSchema).min(1, {
+    message: 'Promotion image is required',
+  }),
   promotion_document: z.array(fileSchema).optional(),
 });
 

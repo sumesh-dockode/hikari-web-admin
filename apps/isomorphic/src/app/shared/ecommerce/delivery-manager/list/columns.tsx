@@ -107,7 +107,7 @@ export const DeliveryManagerColumns = [
         >
           <Link
             href={routes.eCommerce.editDeliveryManager(
-              row.original.id as string
+              row.original.id as number
             )}
           >
             <ActionIcon size="sm" variant="outline">

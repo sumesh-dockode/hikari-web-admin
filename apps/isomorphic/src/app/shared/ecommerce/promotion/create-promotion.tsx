@@ -102,7 +102,7 @@ export default function CreatePromotion({
     if (updateStatus === 'pending') return;
 
     if (updateStatus === 'success' && updateResponseData) {
-      toast.success('Category updated successfully');
+      toast.success('Promotion updated successfully');
 
       setReset({
         store_manager: '',

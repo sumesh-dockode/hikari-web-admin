@@ -37,7 +37,7 @@ export default function CreateDeliveryManager({
   id,
   isModalView = true,
 }: {
-  id?: string;
+  id?: number;
   isModalView?: boolean;
 }) {
   const { push } = useRouter();

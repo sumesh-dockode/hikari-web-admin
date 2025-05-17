@@ -39,7 +39,7 @@ export const routes = {
     claimBalanceHistory: '/claim-balance-history',
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
-    editDeliveryManager: (id: string) => `/delivery-manager/${id}/edit`,
+    editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,
   },
   searchAndFilter: {
     realEstate: '/search/real-estate',

@@ -1,5 +1,5 @@
 export interface DeliveryManagerDataType {
-  id: string | null;
+  id: number | null;
   first_name: string;
   last_name: string | null;
   email: string;

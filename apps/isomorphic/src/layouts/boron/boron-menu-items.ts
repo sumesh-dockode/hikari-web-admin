@@ -84,7 +84,7 @@ export const menuItems = [
   // label end
   {
     name: 'Products',
-    href: "#",
+    href: '#',
     icon: PiArmchairDuotone,
     dropdownItems: [
       {
@@ -160,9 +160,19 @@ export const menuItems = [
     icon: MdOutlineLocalOffer,
   },
   {
-    name: 'Service Booking',
-    href: routes.eCommerce.servicebooking,
+    name: 'Service',
+    href: '#',
     icon: MdMiscellaneousServices,
+    dropdownItems: [
+      {
+        name: 'Service Booking',
+        href: routes.eCommerce.servicebooking,
+      },
+      {
+        name: 'Service Types',
+        href: routes.eCommerce.serviceTypes,
+      },
+    ],
   },
 
   // label start

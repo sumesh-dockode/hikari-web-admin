@@ -1,29 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import dynamic from 'next/dynamic';
 import { SubmitHandler, Controller } from 'react-hook-form';
-import QuillLoader from '@core/components/loader/quill-loader';
-import {
-  Button,
-  Input,
-  Password,
-  Select,
-  SelectOption,
-  Switch,
-  Text,
-  Title,
-} from 'rizzui';
+import { Button, Input, Password, Switch } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { Form } from '@core/ui/form';
-import AvatarUploadNew from '@core/ui/file-upload/avatar-upload-new';
 import { PiEnvelopeSimple } from 'react-icons/pi';
 import {
   getSalesmanFormSchema,
   SalesmanFormInput,
 } from '@/validators/create-salesman.schema';
 import FormGroup from '@/app/shared/form-group';
-import { omit } from '@/utils/utils';
 import toast from 'react-hot-toast';
 import { routes } from '@/config/routes';
 import PageLoader from '@/app/shared/page-loader';
@@ -34,7 +21,7 @@ import { useUpdateSalesMan } from '@/hooks/sales/salesman/useUpdateSalesMan';
 import { PhoneNumber } from '@core/ui/phone-input';
 import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
 import { debounce } from 'lodash';
-import { StoreManagerTableDataType } from '@/data/store-manager-data';
+import StoreManagerSelectionField from '@/app/shared/store-manager-selection-field';
 
 export const salesmanDefaultValues = {
   first_name: '',
@@ -79,14 +66,6 @@ export default function CreateSalesMan({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateSalesMan();
-
-  const storeManagerList = storeManagerData?.data || [];
-  const storeManagerOptions = storeManagerList.map(
-    (item: StoreManagerTableDataType) => ({
-      label: `${item.first_name || ''} ${item.last_name || ''}`,
-      value: item.id,
-    })
-  );
 
   useEffect(() => {
     if (data) {
@@ -163,7 +142,7 @@ export default function CreateSalesMan({
       }}
       className="isomorphic-form flex flex-grow flex-col @container"
     >
-      {({ register, control, getValues, setValue, formState: { errors } }) => (
+      {({ register, control, watch, setValue, formState: { errors } }) => (
         <>
           <div className="flex-grow pb-10">
             <div className="mb-10 grid gap-7 divide-y divide-dashed divide-gray-200 @2xl:gap-9 @3xl:gap-11">
@@ -249,27 +228,10 @@ export default function CreateSalesMan({
                 title="Store Manager"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
-                <Controller
-                  control={control}
-                  name="store_manager_id"
-                  render={({ field: { value, onChange } }) => (
-                    <Select
-                      placeholder="Select Store Manager"
-                      value={value}
-                      onChange={onChange}
-                      options={storeManagerOptions}
-                      searchable={true}
-                      stickySearch={true}
-                      getOptionValue={(option) => option.value}
-                      displayValue={(selected) =>
-                        storeManagerOptions.find(
-                          (o: SelectOption) => o.value === selected
-                        )?.label || ''
-                      }
-                      onSearchChange={handleStoreManagerSearch}
-                      error={errors.store_manager_id?.message}
-                    />
-                  )}
+                <StoreManagerSelectionField
+                  value={watch('store_manager_id')}
+                  onChange={(value) => setValue('store_manager_id', value)}
+                  error={errors.store_manager_id?.message}
                 />
               </FormGroup>
               <FormGroup

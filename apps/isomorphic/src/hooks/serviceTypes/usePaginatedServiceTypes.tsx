@@ -5,15 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
-export default function usePaginatedPromotions(options: {
+export default function usePaginatedServiceTypes(options: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
 }) {
   const { status } = useSession();
 
-  const fetchPromotions = async () => {
-    let url = API_ROUTES.promotion;
+  const fetchServiceTypes = async () => {
+    let url = API_ROUTES.serviceTypes;
     let params = [];
 
     if (options?.pageIndex || options?.pageIndex === 0) {
@@ -32,10 +32,9 @@ export default function usePaginatedPromotions(options: {
 
     return data;
   };
-
   return useQuery({
-    queryKey: ['promotionTable', options],
-    queryFn: () => fetchPromotions(),
+    queryKey: ['serviceTypesTable', options],
+    queryFn: fetchServiceTypes,
     enabled: status === 'authenticated',
     throwOnError(error, query) {
       throw error;

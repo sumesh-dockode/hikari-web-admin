@@ -4,21 +4,18 @@ import apiClient from '@/app/lib/apiClient';
 import { useQuery } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
-export function usePromotionById(id: any) {
+export function useServiceTypesById(id: any) {
   const { status } = useSession();
-  const fetchpromotion = async () => {
-    let url = `${API_ROUTES.promotion}${id}/`;
+  const fetchServiceTypes = async () => {
+    let url = `${API_ROUTES.serviceTypes}${id}`;
     const { data } = await apiClient.get(url);
 
     return data;
   };
 
   return useQuery({
-    queryKey: ['promotion', id],
-    queryFn: () => fetchpromotion(),
+    queryKey: ['serviceTypes', id],
+    queryFn: () => fetchServiceTypes(),
     enabled: !!id && status === 'authenticated',
-    throwOnError(error, query) {
-      throw error;
-    },
   });
 }

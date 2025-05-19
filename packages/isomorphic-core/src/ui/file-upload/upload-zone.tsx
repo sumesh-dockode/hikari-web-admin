@@ -19,6 +19,7 @@ interface UploadZoneProps {
   error?: string;
   getValues: any;
   setValue: any;
+  watch?: any;
 }
 
 interface FileType {
@@ -34,9 +35,11 @@ export default function UploadZone({
   error,
   getValues,
   setValue,
+  watch,
 }: UploadZoneProps) {
   // const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
-  const files = getValues(name) || [];
+  // const files = getValues(name) || [];
+  const files = watch(name) || [];
 
   // useEffect(() => {
   //   const currentFiles = getValues(name);

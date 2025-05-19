@@ -68,6 +68,16 @@ export const ordersColumns = (expanded: boolean = true) => {
       header: 'Created',
       cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
     }),
+    columnHelper.display({
+      id: 'assigned_to',
+      size: 150,
+      header: 'Assigned To',
+      cell: ({ row }) => (
+        <Text className="font-medium text-gray-700">
+          {row.original.assigned_to || '-'}
+        </Text>
+      ),
+    }),
     columnHelper.accessor('status', {
       id: 'status',
       size: 140,

@@ -22,7 +22,7 @@ const columns = [
             src={
               row.product_variant.images &&
               row.product_variant.images.length > 0
-                ? row.product_variant.images[0]
+                ? row.product_variant.images[0]?.image
                 : noImage
             }
             fill

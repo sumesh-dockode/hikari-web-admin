@@ -9,6 +9,7 @@ export interface OrdersDataType {
     name: string;
     address: string;
   };
+  assigned_to: number | null;
 }
 
 export interface OrderStatusChangeDataType {

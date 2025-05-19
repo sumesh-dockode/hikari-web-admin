@@ -19,6 +19,9 @@ export const routes = {
     editOrder: (id: string) => `/orders/${id}/edit`,
     reviews: '/reviews',
     servicebooking: '/servicebooking',
+    serviceTypes: '/service-types',
+    createServiceTypes: '/service-types/create',
+    editServiceTypes: (id: string) => `/service-types/${id}/edit`,
     shop: '/shop',
     cart: '/cart',
     promotion: '/promotion',
@@ -39,7 +42,7 @@ export const routes = {
     claimBalanceHistory: '/claim-balance-history',
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
-    editDeliveryManager: (id: string) => `/delivery-manager/${id}/edit`,
+    editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,
   },
   searchAndFilter: {
     realEstate: '/search/real-estate',

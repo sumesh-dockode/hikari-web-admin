@@ -17,7 +17,7 @@ export default function ProductPricing() {
         placeholder="10"
         {...register('price')}
         error={errors.price?.message as string}
-        prefix={'$'}
+        prefix={<b>&#8377;</b>}
         // type="number"
       />
     </>

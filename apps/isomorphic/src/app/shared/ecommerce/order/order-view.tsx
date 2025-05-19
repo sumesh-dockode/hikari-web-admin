@@ -10,6 +10,7 @@ import { useOrderById } from '@/hooks/orders/useOrderById';
 import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
 import PageLoader from '../../page-loader';
 import OrderViewProducts from './order-products/order-view-products';
+import usePaginatedDeliveryManager from '@/hooks/DeliveryManager/usePaginatedDeliveryManager';
 
 const baseStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -53,6 +54,10 @@ export default function OrderView() {
   const { id } = useParams();
   const { data, isLoading: isLoading } = useOrderById(id as string);
   const { mutate: updateOrderStatus, status } = useOrderStatusChange();
+  const { data: deliveryManagerData } = usePaginatedDeliveryManager({});
+  // const [assignedStoreManager, setAssignedStoreManager] = useState<
+  //   number | undefined
+  // >();
 
   const orderData = data?.data;
   const totalItems = orderData?.items?.length || 0;
@@ -98,7 +103,7 @@ export default function OrderView() {
 
   return (
     <div className="@container">
-      <div className="flex flex-wrap justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
+      <div className="flex flex-wrap items-center justify-center border-b border-t border-gray-300 py-4 font-medium text-gray-700 @5xl:justify-start">
         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
           {/* October 22, 2022 at 10:30 pm */}
           {formatDate(new Date(orderData?.created_at), 'MMMM D, YYYY')} at{' '}
@@ -110,6 +115,21 @@ export default function OrderView() {
         <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
           Total {toCurrency(totalPrice)}
         </span>
+        {orderData?.assigned_to && (
+          <span className="my-2 border-r border-muted px-5 py-0.5 first:ps-0 last:border-r-0">
+            Assigned to:{' '}
+            <b>
+              {(() => {
+                const assigned = deliveryManagerData?.data.find(
+                  (item: any) => item.id === orderData.assigned_to
+                );
+                return assigned
+                  ? `${assigned.first_name} ${assigned.last_name}`
+                  : '';
+              })()}
+            </b>
+          </span>
+        )}
       </div>
       <div className="items-start pt-10 @5xl:grid @5xl:grid-cols-12 @5xl:gap-7 @6xl:grid-cols-10 @7xl:gap-10">
         <div className="space-y-7 @5xl:col-span-8 @5xl:space-y-10 @6xl:col-span-7">

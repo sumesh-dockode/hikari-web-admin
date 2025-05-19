@@ -65,6 +65,22 @@ export const salesManColumns = [
     ),
   }),
   columnHelper.display({
+    id: 'store_manager',
+    size: 150,
+    header: 'Store Manager',
+    cell: ({ row }) => (
+      <>
+        <Text className="font-medium text-gray-700">
+          {row.original.store_manager?.first_name || ''}&nbsp;
+          {row.original.store_manager?.last_name || ''}
+        </Text>
+        <Text className="line-clamp-2 text-[13px] text-gray-500">
+          {row.original.store?.name}
+        </Text>
+      </>
+    ),
+  }),
+  columnHelper.display({
     id: 'is_active',
     size: 150,
     header: 'Status',

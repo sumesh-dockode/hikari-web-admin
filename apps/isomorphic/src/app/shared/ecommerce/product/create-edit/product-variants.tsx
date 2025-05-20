@@ -10,7 +10,7 @@ import {
   ActionIcon,
   SelectOption,
 } from 'rizzui';
-import { PiPlusBold } from 'react-icons/pi';
+import { PiMinusBold, PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
 import useVariants from '@/hooks/products/variants/useVariants';
@@ -196,6 +196,7 @@ export default function ProductVariants({
     },
   });
 
+  console.log('errors', errors);
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
     if (formData?.id) {
       updateProductVariant(
@@ -338,6 +339,16 @@ export default function ProductVariants({
     });
   };
 
+  const removeVariantAttribute = (index: number) => {
+    const currentVariants = getValues('variants');
+
+    const updatedVariants = currentVariants.filter((_, i) => i !== index);
+    setValue('variants', updatedVariants);
+
+    const updatedFields = addedVariantAttributes.filter((_, i) => i !== index);
+    setAddedVariantAttributes(updatedFields);
+  };
+
   return (
     <>
       <FormGroup
@@ -478,14 +489,26 @@ export default function ProductVariants({
                   />
                 )}
               />
+              {/* {index === addedVariantAttributes.length - 1 ? (
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addNewVariantAttribute}
+                  className="mt-6 text-sm"
+                >
+                  <PiPlusBold className="h-6 w-4" />
+                </Button>
+              ) : ( */}
               <Button
                 type="button"
                 variant="outline"
-                onClick={addNewVariantAttribute}
-                className="mt-6 text-sm"
+                color="danger"
+                onClick={() => removeVariantAttribute(index)}
+                className="mt-6 text-sm text-red-500"
               >
-                <PiPlusBold className="h-6 w-4" />
+                <PiMinusBold className="h-6 w-4" />
               </Button>
+              {/* )} */}
               {errors.variants?.[index] && (
                 <p className="col-span-3 text-sm text-red-500">
                   {errors.variants[index]?.variantId?.message ||
@@ -494,6 +517,14 @@ export default function ProductVariants({
               )}
             </div>
           ))}
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addNewVariantAttribute}
+            className="mt-6 w-full text-sm"
+          >
+            <PiPlusBold className="h-6 w-4" />
+          </Button>
           <ProductMultipleMedia
             name="images"
             getValues={getValues}
@@ -586,6 +617,7 @@ export default function ProductVariants({
               variant="outline"
               onClick={() => {
                 setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+                setSelectedVariantId(null);
                 setIsModalOpen(false);
               }}
               type="button"

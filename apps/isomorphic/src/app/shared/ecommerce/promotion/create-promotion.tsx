@@ -18,6 +18,8 @@ import { useUpdatePromotion } from '@/hooks/promotions/useUpdatePromotion';
 import toast from 'react-hot-toast';
 import { routes } from '@/config/routes';
 import PageLoader from '../../page-loader';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
+import { StoreManagerListProps } from './list/table';
 
 export default function CreatePromotion({
   id,
@@ -40,10 +42,11 @@ export default function CreatePromotion({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdatePromotion();
+  const { data: storeManagerData } = usePaginatedStoreManager({});
 
   useEffect(() => {
     const setImagesWithSize = async () => {
-      if (data?.status === 'success') {
+      if (data?.status === 'success' && storeManagerData) {
         setImageLoading(true);
         const detailData = data?.data;
         const imageUrl = detailData?.promotion_image;
@@ -54,9 +57,19 @@ export default function CreatePromotion({
           documentUrl ? GetImageSize(documentUrl) : 0,
         ]);
 
+        const storeManagersList = storeManagerData?.data?.map(
+          (i: StoreManagerListProps) => ({
+            name: `${i.first_name || ''} ${i.last_name || ''}`,
+            id: i.id,
+          })
+        );
+
         const resetData = {
           id: detailData?.id || null,
-          store_manager: detailData?.store_manager || null,
+          store_manager:
+            storeManagersList?.find(
+              (j: StoreManagerListProps) => j.id === detailData.store_manager
+            )?.name || null,
           product: detailData?.product || null,
           promotion_medium: detailData?.promotion_medium || null,
           aspect_ratio: detailData?.aspect_ratio || null,
@@ -76,7 +89,7 @@ export default function CreatePromotion({
     };
 
     setImagesWithSize();
-  }, [data]);
+  }, [data, storeManagerData]);
 
   const onSubmit: SubmitHandler<PromotionFormInput> = (data) => {
     setLoading(true);

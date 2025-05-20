@@ -1,6 +1,13 @@
 import { messages } from '@/config/messages';
 import { z } from 'zod';
 
+const imageSchema = z.object({
+  id: z.string().optional(),
+  image: z.string(),
+  alt_text: z.string().optional(),
+  product_variant: z.string().optional(),
+});
+
 export const variantSchema = z.object({
   id: z.string().optional(),
   variants: z
@@ -28,7 +35,7 @@ export const variantSchema = z.object({
     .number()
     .min(1, { message: messages.variantIncentiveValue })
     .refine((val) => !isNaN(Number(val)), 'Incentive value must be a number'),
-  images: z.array(z.string()).optional(),
+  images: z.array(imageSchema).optional(),
 });
 
 export type VariantFormInput = z.infer<typeof variantSchema>;

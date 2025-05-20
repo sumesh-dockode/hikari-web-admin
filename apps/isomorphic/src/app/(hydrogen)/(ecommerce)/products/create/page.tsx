@@ -32,13 +32,12 @@ export default function CreateProductPage() {
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
         <Link
-          href={routes.eCommerce.createProduct}
+          href={routes.eCommerce.products}
           className="mt-4 w-full @lg:mt-0 @lg:w-auto"
         >
-          {/* <Button as="span" className="w-full @lg:w-auto">
-            <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-            Add Product
-          </Button> */}
+          <Button as="span" className="w-full @lg:w-auto" variant="outline">
+            Cancel
+          </Button>
         </Link>
       </PageHeader>
 

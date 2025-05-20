@@ -17,15 +17,16 @@ export type variantDataType = {
 }
 export type ProductVariantDataType = {
   id?: string | null;
-  product?: string;  // Add product field here
+  product?: string; // Add product field here
   variants?: any;
-  attributes?:any;
+  attributes?: any;
   value?: string;
   price?: number;
   sku?: string;
-  image?: any;
+  images?: string[];
   stock: number;
-}
+  extras?: { incentive_type: string; incentive_value?: number };
+};
 
 export type variantValuesDataType = {
   id: string|null;

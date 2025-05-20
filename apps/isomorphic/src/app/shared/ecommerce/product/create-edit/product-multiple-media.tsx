@@ -6,23 +6,31 @@ import { Button } from 'rizzui';
 import { PiPlusBold } from 'react-icons/pi';
 import FormGroup from '@/app/shared/form-group';
 import cn from '@core/utils/class-names';
+import { convertToBase64 } from '@core/utils/image-to-base64';
 
 interface ProductMultipleMediaProps {
   className?: string;
+  name: string;
+  getValues: any;
+  setValue: any;
 }
 
-export default function ProductMultipleMedia({ className }: ProductMultipleMediaProps) {
-  const { getValues, setValue } = useFormContext();
-  const [images, setImages] = useState<File[]>(getValues('productImages') || []);
+export default function ProductMultipleMedia({
+  className,
+  name,
+  getValues,
+  setValue,
+}: ProductMultipleMediaProps) {
+  const [images, setImages] = useState<string[]>(getValues(name) || []);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files?.[0];
     if (!files) return;
-
-    const newImages = [...images, ...Array.from(files)];
+    const imageUrl = await convertToBase64(files);
+    const newImages = [...images, imageUrl];
     setImages(newImages);
-    setValue('productImages', newImages);
+    setValue(name, newImages);
   };
 
   const triggerFileInput = () => {
@@ -42,7 +50,7 @@ export default function ProductMultipleMedia({ className }: ProductMultipleMedia
             className="aspect-square w-full overflow-hidden rounded-lg border bg-gray-100"
           >
             <img
-              src={URL.createObjectURL(file)}
+              src={file}
               alt={`Product image ${index + 1}`}
               className="h-full w-full object-cover"
             />

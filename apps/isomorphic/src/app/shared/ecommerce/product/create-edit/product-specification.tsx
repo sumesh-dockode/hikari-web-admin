@@ -28,6 +28,7 @@ interface SpecificationValue {
   specification: string;
   product: string;
   value: string;
+  name?: string;
 }
 
 export default function ProductSpecifications({
@@ -145,11 +146,7 @@ export default function ProductSpecifications({
             <tbody>
               {specifications.map((spec, index) => (
                 <tr key={index} className="border-b bg-white even:bg-gray-50">
-                  <td className="px-4 py-3">
-                    {specificationOptions.find(
-                      (opt) => opt.value === spec.specification
-                    )?.label ?? spec.specification}
-                  </td>
+                  <td className="px-4 py-3">{spec.name}</td>
 
                   <td className="px-4 py-3">{spec.value}</td>
                   {/* <td className="px-4 py-3">

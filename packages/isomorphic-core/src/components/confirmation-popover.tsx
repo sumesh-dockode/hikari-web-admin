@@ -7,27 +7,40 @@ type ConfirmationPopoverProps = {
   title: string;
   description: string;
   onConfirm?: () => void;
+  tooltipContent?: string;
+  isLoading?: boolean;
 };
 
 export default function ConfirmationPopover({
   title,
   description,
   onConfirm,
+  tooltipContent = "Approve",
+  isLoading = false,
 }: ConfirmationPopoverProps) {
   return (
     <Popover placement="left">
       <Popover.Trigger>
-        <Tooltip size="sm" content="Approve" placement="top" color="invert">
-          <ActionIcon
+        <div>
+          <Tooltip
             size="sm"
-            variant="outline"
-            aria-label={"Confirm Action"}
-            className="cursor-pointer"
+            content={tooltipContent}
+            placement="top"
+            color="invert"
           >
-            <PiCheckBold className="size-4" />
-          </ActionIcon>
-        </Tooltip>
+            <ActionIcon
+              size="sm"
+              variant="outline"
+              aria-label={"Confirm Action"}
+              className="cursor-pointer"
+              isLoading={isLoading}
+            >
+              <PiCheckBold className="size-4" />
+            </ActionIcon>
+          </Tooltip>
+        </div>
       </Popover.Trigger>
+
       <Popover.Content className="z-10">
         {({ setOpen }) => (
           <div className="w-56 pb-2 pt-1 text-left rtl:text-right">

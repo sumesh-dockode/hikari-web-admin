@@ -7,6 +7,7 @@ declare module '@tanstack/react-table' {
     handleApproveRow?: (row: Row<TData>) => void;
     deleteId?: string | null;
     isDeleting?: boolean;
+    isLoading?: boolean;
   }
   interface ColumnMeta<TData extends RowData, TValue> {
     isColumnDraggable?: boolean;

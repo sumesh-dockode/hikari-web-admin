@@ -71,6 +71,7 @@ export default function CreatePromotion({
               (j: StoreManagerListProps) => j.id === detailData.store_manager
             )?.name || null,
           product: detailData?.product || null,
+          product_name: detailData?.product_name || null,
           promotion_medium: detailData?.promotion_medium || null,
           aspect_ratio: detailData?.aspect_ratio || null,
           area_latitude: detailData?.area_latitude || null,
@@ -170,9 +171,9 @@ export default function CreatePromotion({
                 <Input
                   label="Product Name"
                   placeholder="product name"
-                  {...register('product')}
+                  {...register('product_name')}
                   readOnly
-                  error={errors?.product?.message}
+                  error={errors?.product_name?.message}
                 />
                 <Input
                   label="Requested By"

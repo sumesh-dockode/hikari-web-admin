@@ -6,6 +6,7 @@ export const promotionFormSchema = z.object({
   id: z.string().optional(),
   store_manager: z.number(),
   product: z.string().min(1, { message: messages.catNameIsRequired }),
+  product_name: z.string().min(1, { message: messages.catNameIsRequired }),
   promotion_medium: z.string().min(1, { message: messages.catNameIsRequired }),
   comments: z.string().min(1, { message: messages.catNameIsRequired }),
   aspect_ratio: z.string().min(1, { message: messages.catNameIsRequired }),

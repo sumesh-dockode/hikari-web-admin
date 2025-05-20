@@ -33,6 +33,10 @@ import PencilIcon from '@core/components/icons/pencil';
 import { ProductVariantDataType } from '@/data/products-data';
 import { useProductVariantById } from '@/hooks/products/productVariant/useProductVariantsById';
 import { useUpdateProductVariant } from '@/hooks/products/productVariant/useUpdateProductVariant';
+import {
+  UploadProductImagesProps,
+  useUploadProductImages,
+} from '@/hooks/products/useUploadProductImages';
 
 interface VariantOption {
   value: string;
@@ -67,6 +71,7 @@ export default function ProductVariants({
   className?: string;
   productId: string;
 }) {
+  const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [variantOptions, setVariantOptions] = useState<VariantOption[]>([]);
   const [valueOptions, setValueOptions] = useState<VariantValueOption[]>([]);
@@ -89,6 +94,8 @@ export default function ProductVariants({
     useCreateProductVariant();
   const { mutate: updateProductVariant, status: updateStatus } =
     useUpdateProductVariant();
+  const { mutate: uploadImages, status: uploadStatus } =
+    useUploadProductImages();
 
   const { data: variantsData } = useVariants();
   const { data: variantValuesData } = useVariantValue();
@@ -111,6 +118,12 @@ export default function ProductVariants({
             valueId: matched?.id,
           };
         }) || [];
+
+      let images = [];
+
+      // if (productVariant?.images) {
+      //   images = productVariant?.images?.map((i: any) => i.image);
+      // }
 
       setAddedVariantAttributes(addedVariantAttributes);
       setValue('variants', addedVariantAttributes);
@@ -193,18 +206,31 @@ export default function ProductVariants({
           price: formData.price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
-          images: formData.images || [],
+          // images: formData.images?.map((i) => ({ image: i })) || [],
           extras: {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
         },
         {
-          onSuccess: (res: any) => {
+          onSuccess: async (res: any) => {
+            const result = res;
+            const variantId = result?.id;
+
+            if (formData.images && formData.images.length > 0) {
+              const imageUploadPromises = formData.images
+                .filter((i) => !i.id)
+                .map((image: UploadProductImagesProps) =>
+                  uploadImages({
+                    image: image.image,
+                    product_variant: variantId,
+                  })
+                );
+              await Promise.all(imageUploadPromises);
+            }
             setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
             setSelectedVariantId(null);
             setVariantAction(null);
-            const result = res;
             const attributes = result?.attributes?.map((a: any) => {
               const matched = variantValuesData?.data?.find(
                 (v: any) => v.id === a
@@ -214,7 +240,7 @@ export default function ProductVariants({
                 : null;
             });
             const newVariants = {
-              id: result?.id,
+              id: variantId,
               name: result?.name,
               price: result?.price,
               sku: result?.sku,
@@ -228,6 +254,9 @@ export default function ProductVariants({
             setCreatedVariants((prev) =>
               prev.map((v) => (v.id === result?.id ? newVariants : v))
             );
+            queryClient.invalidateQueries({
+              queryKey: ['productVariant', variantId],
+            });
             setIsModalOpen(false);
             reset();
           },
@@ -242,16 +271,30 @@ export default function ProductVariants({
           price: formData.price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
-          images: formData.images || [],
+          // images: formData.images?.map((i) => ({ image: i })) || [],
           extras: {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
         },
         {
-          onSuccess: ({ data }: any) => {
-            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+          onSuccess: async ({ data }: any) => {
             const result = data;
+            const variantId = result?.id;
+
+            if (formData.images && formData.images.length > 0) {
+              const imageUploadPromises = formData.images.map(
+                (i: UploadProductImagesProps) =>
+                  uploadImages({
+                    image: i.image,
+                    product_variant: variantId,
+                  })
+              );
+              await Promise.all(imageUploadPromises);
+            }
+
+            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+
             const attributes = result?.attributes?.map((a: any) => {
               const matched = variantValuesData?.data?.find(
                 (v: any) => v.id === a
@@ -261,7 +304,7 @@ export default function ProductVariants({
                 : null;
             });
             const newVariants = {
-              id: result?.id,
+              id: variantId,
               name: result?.name,
               price: result?.price,
               sku: result?.sku,
@@ -272,6 +315,9 @@ export default function ProductVariants({
               images: result?.images,
             };
             setCreatedVariants((prev) => [...prev, newVariants]);
+            queryClient.invalidateQueries({
+              queryKey: ['productVariant', variantId],
+            });
             setIsModalOpen(false);
             reset();
           },
@@ -331,7 +377,7 @@ export default function ProductVariants({
               </thead>
               <tbody>
                 {createdVariants.map((v, index) => (
-                  <tr key={index} className="border border-gray-200">
+                  <tr key={index} className="border-b even:bg-gray-50">
                     <td className="px-4 py-2">
                       {v.attributes?.map((attr, index) => (
                         <div key={index}>
@@ -382,7 +428,13 @@ export default function ProductVariants({
         </div>
       )}
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setSelectedVariantId(null);
+          setIsModalOpen(false);
+        }}
+      >
         <div className="space-y-5 p-4">
           <h2 className="text-lg font-bold">Add New Variant</h2>
           {addedVariantAttributes.map((field, index) => (
@@ -544,7 +596,9 @@ export default function ProductVariants({
               type="button"
               variant="outline"
               isLoading={
-                createStatus === 'pending' || updateStatus === 'pending'
+                createStatus === 'pending' ||
+                updateStatus === 'pending' ||
+                uploadStatus === 'pending'
               }
               onClick={(e) => {
                 e.stopPropagation();

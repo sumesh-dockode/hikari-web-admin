@@ -23,7 +23,7 @@ export type ProductVariantDataType = {
   value?: string;
   price?: number;
   sku?: string;
-  images?: string[];
+  images?: { image: string }[];
   stock: number;
   extras?: { incentive_type: string; incentive_value?: number };
 };

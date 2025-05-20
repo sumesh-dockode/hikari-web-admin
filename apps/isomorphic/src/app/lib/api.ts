@@ -20,4 +20,5 @@ export const API_ROUTES = {
   promotion: '/mingler/admin/promotions/',
   serviceTypes: '/service/admin/service-types/',
   salesHistory: '/mingler/admin/sales-history/',
+  productImages: '/ecom/admin/product-images/',
 };

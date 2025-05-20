@@ -14,7 +14,7 @@ export function useSpecificationValueById(specificationValueId: any) {
   };
 
   return useQuery({
-    queryKey: ['specificationListValues', specificationValueId],
+    queryKey: ['specificationValue', specificationValueId],
     queryFn: () => fetchSpecifications(),
     enabled: !!specificationValueId && status === 'authenticated',
   });

@@ -30,7 +30,7 @@ export function useUpdateSpecificationValue() {
       updateSpecificationValue(data),
     onSuccess: (response) => {
       queryClient.setQueryData(
-        ['specificationvalue', response.id?.toString()],
+        ['specificationValue', response.id?.toString()],
         response
       );
     },

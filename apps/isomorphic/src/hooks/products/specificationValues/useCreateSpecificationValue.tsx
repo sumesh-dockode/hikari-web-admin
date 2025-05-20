@@ -31,7 +31,7 @@ export function useCreateSpecificationValue() {
     mutationFn: (data: specificationValueDataType) => createSpecification(data),
     onSuccess: (response) => {
       queryClient.setQueryData(
-        ['specificationvalue', response.id?.toString()],
+        ['specificationValue', response.id?.toString()],
         response
       );
     },

@@ -15,6 +15,10 @@ import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
 import useSpecifications from '@/hooks/products/specifications/useSpecifications';
 import { useProductsById } from '@/hooks/products/useProductsById';
+import { useSpecificationValueById } from '@/hooks/products/specificationValues/useSpecificationValueById';
+import { useDeleteSpecificationValue } from '@/hooks/products/specificationValues/useDeleteSpecificationValue';
+import { useUpdateSpecificationValue } from '@/hooks/products/specificationValues/useUpdateSpecificationValue';
+import DeletePopover from '@core/components/delete-popover';
 
 interface Specification {
   id?: string;
@@ -25,8 +29,9 @@ interface Specification {
 }
 
 interface SpecificationValue {
+  id?: string;
   specification: string;
-  product: string;
+  product?: string;
   value: string;
   name?: string;
 }
@@ -46,6 +51,21 @@ export default function ProductSpecifications({
     { value: string; label: string }[]
   >([]);
 
+  const [selectedSpecification, setSelectedSpecification] = useState<
+    string | null
+  >(null);
+  const [specificationAction, setSpecificationAction] = useState<string | null>(
+    null
+  );
+
+  const { data: specificationValueById } = useSpecificationValueById(
+    specificationAction === 'edit' && selectedSpecification
+  );
+  const { mutate: deleteSpecificationValue, status: deleteStatus } =
+    useDeleteSpecificationValue();
+  const { mutate: updateSpecificationValue, status: updateStatus } =
+    useUpdateSpecificationValue();
+
   const {
     mutate: createProductSpecificationValue,
     data: specificationValueData,
@@ -62,17 +82,17 @@ export default function ProductSpecifications({
       setSpecifications(productSpecification.data.specifications);
     }
   }, [productSpecification]);
+
   useEffect(() => {
     if (!specificationsData?.data) return;
-  
+
     const options = specificationsData.data.map((spec: Specification) => ({
       value: spec.id,
       label: spec.name,
     }));
-  
+
     setSpecificationOptions(options);
   }, [specificationsData]);
-  
 
   const {
     register,
@@ -90,15 +110,6 @@ export default function ProductSpecifications({
   console.log('errors', errors);
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
     console.log('Form submitted with:', formData);
-    const selectedSpec = specificationOptions.find(
-      (opt) => opt.value === formData.specification
-    );
-
-    const newSpecification = {
-      specification: formData.specification,
-      product: selectedSpec?.label || '',
-      value: formData.value,
-    };
 
     createProductSpecificationValue(
       {
@@ -107,12 +118,31 @@ export default function ProductSpecifications({
         product: productId,
       },
       {
-        onSuccess: () => {
+        onSuccess: ({ data }: any) => {
+          console.log('res', data);
+          const result = data;
+          const newSpecification = {
+            id: result.id,
+            specification: result.specification_data?.name,
+            value: result.value,
+          };
           setSpecifications((prev) => [...prev, newSpecification]);
           setIsModalOpen(false);
         },
       }
     );
+  };
+
+  const handleDeleteSpecification = (id: string) => {
+    setSpecificationAction('delete');
+    setSelectedSpecification(id);
+    deleteSpecificationValue(id, {
+      onSuccess: () => {
+        setSpecifications((prev) => prev.filter((v) => v.id !== id));
+        setSpecificationAction(null);
+        setSelectedSpecification(null);
+      },
+    });
   };
 
   const removeSpecification = (index: number) => {
@@ -135,33 +165,49 @@ export default function ProductSpecifications({
         </Button>
 
         {specifications.length > 0 && (
-          <table className="mt-4 w-full overflow-hidden rounded-md border border-gray-200 text-left text-sm shadow-sm">
-            <thead className="bg-gray-50 font-semibold text-gray-700">
-              <tr>
-                <th className="border-b px-4 py-3">Specification</th>
-                <th className="border-b px-4 py-3">Value</th>
-                {/* <th className="border-b px-4 py-3">Actions</th> */}
-              </tr>
-            </thead>
-            <tbody>
-              {specifications.map((spec, index) => (
-                <tr key={index} className="border-b bg-white even:bg-gray-50">
-                  <td className="px-4 py-3">{spec.name}</td>
-
-                  <td className="px-4 py-3">{spec.value}</td>
-                  {/* <td className="px-4 py-3">
-                    <Button
-                      variant="text"
-                      onClick={() => removeSpecification(index)}
-                      className="text-red-500 hover:text-red-700"
+          <div className="mt-6">
+            <div className="overflow-x-auto rounded border">
+              <table className="w-full divide-y divide-gray-200 overflow-hidden text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      Specification
+                    </th>
+                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                      Value
+                    </th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {specifications.map((spec, index) => (
+                    <tr
+                      key={index}
+                      className="border-b bg-white even:bg-gray-50"
                     >
-                      <FiTrash className="h-4 w-4" />
-                    </Button>
-                  </td> */}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                      <td className="px-4 py-3">{spec.name}</td>
+
+                      <td className="px-4 py-3">{spec.value}</td>
+                      <td className="space-x-2">
+                        <DeletePopover
+                          title="Delete Variant"
+                          description="Are you sure you want to delete this variant? This action cannot be undone."
+                          onDelete={() =>
+                            handleDeleteSpecification(spec.id as string)
+                          }
+                          isLoading={
+                            deleteStatus === 'pending' &&
+                            selectedSpecification === spec.id
+                          }
+                          className="z-20"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </FormGroup>
 

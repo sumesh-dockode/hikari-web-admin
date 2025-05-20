@@ -193,7 +193,7 @@ export default function ProductVariants({
           price: formData.price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
-          images: formData.images || [],
+          images: formData.images?.map((i) => ({ image: i })) || [],
           extras: {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
@@ -242,7 +242,7 @@ export default function ProductVariants({
           price: formData.price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
-          images: formData.images || [],
+          images: formData.images?.map((i) => ({ image: i })) || [],
           extras: {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
@@ -331,7 +331,7 @@ export default function ProductVariants({
               </thead>
               <tbody>
                 {createdVariants.map((v, index) => (
-                  <tr key={index} className="border border-gray-200">
+                  <tr key={index} className="border-b even:bg-gray-50">
                     <td className="px-4 py-2">
                       {v.attributes?.map((attr, index) => (
                         <div key={index}>

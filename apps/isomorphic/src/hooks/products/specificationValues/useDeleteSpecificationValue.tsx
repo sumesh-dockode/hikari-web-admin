@@ -19,7 +19,7 @@ export function useDeleteSpecificationValue() {
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (specificationValueId: number) =>
+    mutationFn: (specificationValueId: string) =>
       deleteSpecificationValue(specificationValueId),
     onSuccess: (_, specificationValueId) => {
       queryClient.invalidateQueries({

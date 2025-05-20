@@ -132,7 +132,7 @@ function MediaCaption({ name, size }: { name: string; size: number }) {
   return (
     <div className="mt-1 text-xs">
       <p className="break-words font-medium text-gray-700">{name}</p>
-      <p className="mt-1 font-mono">{prettyBytes(size)}</p>
+      <p className="mt-1 font-mono">{size && prettyBytes(size)}</p>
     </div>
   );
 }

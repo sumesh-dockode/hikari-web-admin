@@ -92,4 +92,6 @@ export const messages = {
   nextDayDeliveryRequired: 'Next Day Delivery is required',
   userNameRequired: 'User Name is required',
   storeManagerIsRequired: 'Store Manager is required',
+  variantIncentiveType: 'Incentive Type is required',
+  variantIncentiveValue: 'Incentive Value is required',
 };

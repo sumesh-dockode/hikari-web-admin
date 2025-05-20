@@ -5,7 +5,6 @@ import toast from 'react-hot-toast';
 import { Element } from 'react-scroll';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, FormProvider, SubmitHandler } from 'react-hook-form';
-import { Text } from 'rizzui';
 import cn from '@core/utils/class-names';
 import FormNav, {
   formParts,
@@ -26,12 +25,11 @@ import { useCreateProducts } from '@/hooks/products/useCreateProducts';
 import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
 import { useProductsById } from '@/hooks/products/useProductsById';
 import { productsDataType } from '@/data/products-data';
-import { Form } from '@core/ui/form';
 
 import ProductSpecification from './product-specification';
-import { log } from 'console';
 import { useRouter } from 'next/navigation';
 import ProductVariants from './product-variants';
+import PageLoader from '@/app/shared/page-loader';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
@@ -47,26 +45,15 @@ interface IndexProps {
   slug?: string;
   className?: string;
   product?: CreateProductInput;
-  productId?: string;
 }
 
-export default function CreateEditProduct({
-  slug,
-  product,
-  className,
-  productId,
-}: IndexProps) {
+export default function CreateEditProduct({ slug, product, className }: IndexProps) {
   const { layout } = useLayout();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
-  // const [createdProductId, setCreatedProductId] = useState<string | null>(
-  //   slug || null
-  // );
-  console.log('slug', slug);
-  // console.log('createdProductId', createdProductId);
+  const [productId, setProductId] = useState<string | undefined>(slug);
 
-  const { data, isFetching } = useProductsById(slug);
-  console.log('dataooooooo', data);
+  const { data, isFetching } = useProductsById(productId);
 
   const {
     mutate: createProducts,
@@ -96,9 +83,9 @@ export default function CreateEditProduct({
   const router = useRouter();
   // Populate form if editing an existing product
   useEffect(() => {
-    console.log('data', data);
     if (data?.status === 'success') {
       form.reset({
+        id: data.data.id || '',
         title: data.data.name || '',
         sku: data.data.sku || '',
         price: data.data.price || 0,
@@ -123,10 +110,9 @@ export default function CreateEditProduct({
       description: formData.description,
       is_next_day_shipping_available: formData.is_next_day_shipping_available,
     };
-    if (slug) {
-      // Update existing product
+    if (productId) {
       const productPayload: productsDataType = {
-        id: slug,
+        id: productId,
         ...basePayload,
       };
       updateProducts(productPayload, {
@@ -154,13 +140,13 @@ export default function CreateEditProduct({
         },
       });
     } else {
-      // Create new product
       createProducts(basePayload as productsDataType, {
         onSuccess: (response) => {
           if (response?.id) {
             setLoading(false);
+            setProductId(response.id);
             toast.success('Product created successfully');
-            router.push(`/products/${response.id}/edit`);
+            // router.push(`/products/${response.id}/edit`);
           }
         },
         onError: () => {
@@ -170,6 +156,8 @@ export default function CreateEditProduct({
       });
     }
   };
+
+  if (isFetching) return <PageLoader />;
 
   return (
     <div className="@container">
@@ -194,7 +182,7 @@ export default function CreateEditProduct({
                   key === formParts.productSpecifications;
 
                 // Filter out spec/variant components if product hasn't been created
-                if (!slug && isSpecOrVariant) {
+                if (!productId && isSpecOrVariant) {
                   return false;
                 }
 
@@ -207,7 +195,7 @@ export default function CreateEditProduct({
                 >
                   <Component
                     className="pt-7 @2xl:pt-9 @3xl:pt-11"
-                    productId={slug || ''}
+                    productId={productId || ''}
                   />
                 </Element>
               ))}
@@ -215,7 +203,7 @@ export default function CreateEditProduct({
 
           <FormFooter
             isLoading={isLoading}
-            submitBtnText={slug ? 'Update Product' : 'Create Product'}
+            submitBtnText={productId ? 'Update Product' : 'Create Product'}
           />
         </form>
       </FormProvider>

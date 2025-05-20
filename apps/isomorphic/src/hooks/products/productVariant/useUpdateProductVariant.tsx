@@ -6,25 +6,22 @@ import { ProductVariantDataType } from '@/data/products-data';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useSession } from 'next-auth/react';
 
-export function useCreateProductVariant() {
-  const session = useSession();
+export function useUpdateProductVariant() {
+  const { data: session, status } = useSession();
 
-  const createProductVariant = async (
-    productVariantData: ProductVariantDataType
+  const updateProductVariant = async (
+    variantsData: ProductVariantDataType
   ): Promise<ProductVariantDataType> => {
     if (!session) throw new Error('Session not found');
+    let url = `${API_ROUTES.productvariants}${variantsData.id}/`;
+    const { data } = await apiClient.patch(url, variantsData);
 
-    console.log('productvariantData----', productVariantData);
-
-    let url = `${API_ROUTES.productvariants}`;
-    const { data } = await apiClient.post(url, productVariantData);
-
-    return data as Promise<ProductVariantDataType>;
+    return data.data as Promise<ProductVariantDataType>;
   };
 
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (data: ProductVariantDataType) => createProductVariant(data),
+    mutationFn: (data: ProductVariantDataType) => updateProductVariant(data),
     onSuccess: (response) => {
       queryClient.setQueryData(
         ['productVariant', response.id?.toString()],

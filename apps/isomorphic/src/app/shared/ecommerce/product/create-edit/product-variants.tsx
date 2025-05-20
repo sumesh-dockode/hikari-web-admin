@@ -1,7 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Button, Select, Modal } from 'rizzui';
+import {
+  Input,
+  Button,
+  Select,
+  Modal,
+  Tooltip,
+  ActionIcon,
+  SelectOption,
+} from 'rizzui';
 import { PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
@@ -17,6 +25,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import { useCreateProductVariant } from '@/hooks/products/productVariant/useCreateProductVariant';
 import { useProductsById } from '@/hooks/products/useProductsById';
+import { toCurrency } from '@core/utils/to-currency';
+import { useQueryClient } from '@tanstack/react-query';
+import DeletePopover from '@core/components/delete-popover';
+import { useDeleteProductVariant } from '@/hooks/products/productVariant/useDeleteProductVariant';
+import PencilIcon from '@core/components/icons/pencil';
+import { ProductVariantDataType } from '@/data/products-data';
+import { useProductVariantById } from '@/hooks/products/productVariant/useProductVariantsById';
+import { useUpdateProductVariant } from '@/hooks/products/productVariant/useUpdateProductVariant';
 
 interface VariantOption {
   value: string;
@@ -30,11 +46,19 @@ interface VariantValueOption {
 }
 
 interface CreatedVariant {
+  id?: string;
   name: string;
   price: number;
   sku: string;
-  value: string;
+  value?: string;
+  stock?: number;
+  attributes?: { name: string; value: string }[];
 }
+
+const incentiveTypeOptions = [
+  { value: 'FIXED', label: 'Fixed' },
+  { value: 'PERCENTAGE', label: 'Percentage' },
+];
 
 export default function ProductVariants({
   className,
@@ -51,18 +75,57 @@ export default function ProductVariants({
   ]);
 
   const [createdVariants, setCreatedVariants] = useState<CreatedVariant[]>([]);
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(
+    null
+  );
+  const [variantAction, setVariantAction] = useState<string | null>(null);
 
+  const { data: productVariantById } = useProductVariantById(
+    variantAction === 'edit' && selectedVariantId
+  );
+  const { mutate: deleteProductVariant, status: deleteStatus } =
+    useDeleteProductVariant();
   const { mutate: createProductVariant, status: createStatus } =
     useCreateProductVariant();
+  const { mutate: updateProductVariant, status: updateStatus } =
+    useUpdateProductVariant();
 
   const { data: variantsData } = useVariants();
   const { data: variantValuesData } = useVariantValue();
   const { data: productVariant, isFetching } = useProductsById(productId);
+
   useEffect(() => {
     if (productVariant?.data?.variants) {
       setCreatedVariants(productVariant.data.variants);
     }
-  });
+  }, [productVariant]);
+
+  useEffect(() => {
+    if (productVariantById && selectedVariantId) {
+      const productVariant = productVariantById?.data;
+      const addedVariantAttributes =
+        productVariant?.attributes?.map((a: any) => {
+          const matched = variantValuesData?.data?.find((v: any) => v.id === a);
+          return {
+            variantId: matched?.attribute,
+            valueId: matched?.id,
+          };
+        }) || [];
+
+      setAddedVariantAttributes(addedVariantAttributes);
+      setValue('variants', addedVariantAttributes);
+      setValue('id', productVariant?.id);
+      setValue('sku', productVariant?.sku);
+      setValue('price', productVariant?.price);
+      setValue('stock', productVariant?.stock);
+      setValue('incentive_type', productVariant?.extras?.incentive_type);
+      setValue('incentive_value', productVariant?.extras?.incentive_value);
+      setValue('images', productVariant?.images);
+
+      setIsModalOpen(true);
+    }
+  }, [productVariantById, selectedVariantId]);
+
   useEffect(() => {
     if (!variantValuesData?.data) return;
 
@@ -84,19 +147,6 @@ export default function ProductVariants({
       setVariantOptions(options);
     }
   }, [variantsData]);
-
-  // useEffect(() => {
-  //   if (variantValuesData?.pages) {
-  //     const options = variantValuesData.pages.flatMap((page) =>
-  //       page.data.results.map((value: any) => ({
-  //         value: value.id,
-  //         label: value.value,
-  //         variantId: value.attribute,
-  //       }))
-  //     );
-  //     setValueOptions(options);
-  //   }
-  // }, [variantValuesData]);
 
   const addNewVariantAttribute = () => {
     const currentVariants = getValues('variants');
@@ -127,52 +177,119 @@ export default function ProductVariants({
       price: 1,
       sku: '',
       stock: 1,
+      incentive_type: 'PERCENTAGE',
+      incentive_value: 0,
+      images: [],
     },
   });
 
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
-    createProductVariant(
-      {
-        product: productId,
-        sku: formData.sku,
-        price: formData.price,
-        stock: formData.stock,
-        // variants: formData.variants.map((v) => ({
-        //   variantId: v.variantId,
-        //   valueId: v.valueId,
-        // })),
-        attributes: formData.variants.map((v) => v.valueId),
-      },
-      {
-        onSuccess: () => {
-          // Collect all variant + value labels
-          const variantPairs = formData.variants.map((v) => {
-            const variantName =
-              variantOptions.find((opt) => opt.value === v.variantId)?.label ??
-              'Unknown';
-            const valueName =
-              valueOptions.find((opt) => opt.value === v.valueId)?.label ??
-              'Unknown';
-            return `${variantName}: ${valueName}`;
-          });
-
-          const combinedName = variantPairs.join(' / ');
-
-          setCreatedVariants((prev) => [
-            ...prev,
-            {
-              name: combinedName,
-              value: '', // Not used anymore as name includes all
-              price: formData.price,
-              sku: formData.sku,
-            },
-          ]);
-          setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
-          setIsModalOpen(false);
-          reset();
+    if (formData?.id) {
+      updateProductVariant(
+        {
+          id: formData.id,
+          product: productId,
+          sku: formData.sku,
+          price: formData.price,
+          stock: formData.stock,
+          attributes: formData.variants.map((v) => v.valueId),
+          images: formData.images || [],
+          extras: {
+            incentive_type: formData.incentive_type,
+            incentive_value: formData.incentive_value,
+          },
         },
-      }
-    );
+        {
+          onSuccess: (res: any) => {
+            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+            setSelectedVariantId(null);
+            setVariantAction(null);
+            const result = res;
+            const attributes = result?.attributes?.map((a: any) => {
+              const matched = variantValuesData?.data?.find(
+                (v: any) => v.id === a
+              );
+              return matched
+                ? { value: matched.value, name: matched.attribute_data?.name }
+                : null;
+            });
+            const newVariants = {
+              id: result?.id,
+              name: result?.name,
+              price: result?.price,
+              sku: result?.sku,
+              stock: result?.stock,
+              attributes: attributes,
+              incentive_type: result?.extras?.incentive_type,
+              incentive_value: result?.extras?.incentive_value,
+              images: result?.images,
+            };
+
+            setCreatedVariants((prev) =>
+              prev.map((v) => (v.id === result?.id ? newVariants : v))
+            );
+            setIsModalOpen(false);
+            reset();
+          },
+        }
+      );
+    } else {
+      createProductVariant(
+        {
+          id: formData.id,
+          product: productId,
+          sku: formData.sku,
+          price: formData.price,
+          stock: formData.stock,
+          attributes: formData.variants.map((v) => v.valueId),
+          images: formData.images || [],
+          extras: {
+            incentive_type: formData.incentive_type,
+            incentive_value: formData.incentive_value,
+          },
+        },
+        {
+          onSuccess: ({ data }: any) => {
+            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+            const result = data;
+            const attributes = result?.attributes?.map((a: any) => {
+              const matched = variantValuesData?.data?.find(
+                (v: any) => v.id === a
+              );
+              return matched
+                ? { value: matched.value, name: matched.attribute_data?.name }
+                : null;
+            });
+            const newVariants = {
+              id: result?.id,
+              name: result?.name,
+              price: result?.price,
+              sku: result?.sku,
+              stock: result?.stock,
+              attributes: attributes,
+              incentive_type: result?.extras?.incentive_type,
+              incentive_value: result?.extras?.incentive_value,
+              images: result?.images,
+            };
+            setCreatedVariants((prev) => [...prev, newVariants]);
+            setIsModalOpen(false);
+            reset();
+          },
+        }
+      );
+    }
+  };
+
+  const handleDeleteVariant = (variantId: string) => {
+    setVariantAction('delete');
+    setSelectedVariantId(variantId);
+    deleteProductVariant(variantId, {
+      onSuccess: () => {
+        setCreatedVariants((prev) => prev.filter((v) => v.id !== variantId));
+        setSelectedVariantId(null);
+        setVariantAction(null);
+      },
+    });
   };
 
   return (
@@ -204,16 +321,59 @@ export default function ProductVariants({
                     Price
                   </th>
                   <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Stock
+                  </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
                     SKU
                   </th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {createdVariants.map((v, index) => (
-                  <tr key={index}>
-                    <td className="px-4 py-2">{v.name}</td>
-                    <td className="px-4 py-2">${v.price}</td>
+                  <tr key={index} className="border border-gray-200">
+                    <td className="px-4 py-2">
+                      {v.attributes?.map((attr, index) => (
+                        <div key={index}>
+                          {attr.name} - {attr.value}
+                        </div>
+                      ))}
+                    </td>
+                    <td className="px-4 py-2">{toCurrency(v.price || 0)}</td>
+                    <td className="px-4 py-2">{v.stock}</td>
                     <td className="px-4 py-2">{v.sku}</td>
+                    <td className="space-x-2">
+                      <Tooltip
+                        size="sm"
+                        content="Edit Variant"
+                        placement="top"
+                        color="invert"
+                      >
+                        <ActionIcon
+                          as="span"
+                          size="sm"
+                          variant="outline"
+                          aria-label="Edit Variant"
+                          isLoading={isFetching && selectedVariantId === v.id}
+                          onClick={() => {
+                            setVariantAction('edit');
+                            setSelectedVariantId(v.id as string);
+                          }}
+                        >
+                          <PencilIcon className="size-4" />
+                        </ActionIcon>
+                      </Tooltip>
+                      <DeletePopover
+                        title="Delete Variant"
+                        description="Are you sure you want to delete this variant? This action cannot be undone."
+                        onDelete={() => handleDeleteVariant(v.id as string)}
+                        isLoading={
+                          deleteStatus === 'pending' &&
+                          selectedVariantId === v.id
+                        }
+                        className="z-20"
+                      />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -282,13 +442,18 @@ export default function ProductVariants({
               )}
             </div>
           ))}
-          <ProductMultipleMedia />
+          <ProductMultipleMedia
+            name="images"
+            getValues={getValues}
+            setValue={setValue}
+          />
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Price</label>
               <Input
                 type="number"
                 placeholder="Enter price"
+                onFocus={(e) => e.target.select()}
                 {...register('price', { valueAsNumber: true })}
               />
               {errors.price && (
@@ -299,7 +464,12 @@ export default function ProductVariants({
             </div>
             <div>
               <label className="text-sm font-medium text-gray-700">SKU</label>
-              <Input type="text" placeholder="Enter SKU" {...register('sku')} />
+              <Input
+                type="text"
+                placeholder="Enter SKU"
+                onFocus={(e) => e.target.select()}
+                {...register('sku')}
+              />
               {errors.sku && (
                 <p className="mt-1 text-sm text-red-500">
                   {errors.sku.message}
@@ -311,6 +481,7 @@ export default function ProductVariants({
               <Input
                 type="text"
                 placeholder="Enter Stock"
+                onFocus={(e) => e.target.select()}
                 {...register('stock')}
               />
               {errors.stock && (
@@ -319,11 +490,52 @@ export default function ProductVariants({
                 </p>
               )}
             </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Incentive Type
+              </label>
+              <Select
+                options={incentiveTypeOptions}
+                className="w-full"
+                getOptionValue={(option) => option.value}
+                displayValue={(selected) =>
+                  incentiveTypeOptions.find(
+                    (r: SelectOption) => r.value === selected
+                  )?.label ?? ''
+                }
+                value={watch('incentive_type') ?? ''}
+                onChange={(value: string) => setValue('incentive_type', value)}
+              />
+              {errors.incentive_type && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.incentive_type.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Incentive Value
+              </label>
+              <Input
+                type="number"
+                placeholder="Enter Incentive Value"
+                onFocus={(e) => e.target.select()}
+                {...register('incentive_value', { valueAsNumber: true })}
+              />
+              {errors.incentive_value && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.incentive_value.message}
+                </p>
+              )}
+            </div>
           </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"
-              onClick={() => setIsModalOpen(false)}
+              onClick={() => {
+                setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+                setIsModalOpen(false);
+              }}
               type="button"
             >
               Cancel
@@ -331,7 +543,9 @@ export default function ProductVariants({
             <Button
               type="button"
               variant="outline"
-              isLoading={createStatus === 'pending'}
+              isLoading={
+                createStatus === 'pending' || updateStatus === 'pending'
+              }
               onClick={(e) => {
                 e.stopPropagation();
                 handleSubmit(onSubmit)();

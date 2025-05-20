@@ -17,7 +17,7 @@ export const SalesHistoryColumns = [
     header: 'Date',
     cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
   }),
-  columnHelper.accessor('product_variant.product', {
+  columnHelper.display({
     id: 'name',
     size: 300,
     header: 'Product',
@@ -25,10 +25,10 @@ export const SalesHistoryColumns = [
     cell: ({ row }) => (
       <AvatarCard
         src={row.original.product_variant.images?.[0]}
-        name={row.original.product_variant.product}
+        name={row.original.product_name}
         description={row.original.product_variant.sku}
         avatarProps={{
-          name: row.original.product_variant.product,
+          name: row.original.product_name,
           size: 'lg',
           className: 'rounded-lg',
         }}

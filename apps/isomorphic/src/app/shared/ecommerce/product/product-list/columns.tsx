@@ -2,16 +2,16 @@
 
 import DeletePopover from '@core/components/delete-popover';
 import { routes } from '@/config/routes';
-import { productsData, productsDataType } from '@/data/products-data';
+import { productsDataType } from '@/data/products-data';
 import PencilIcon from '@core/components/icons/pencil';
 // import AvatarCard from '@core/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import AvatarCard from '@core/ui/avatar-card';
-import { BiDownload } from 'react-icons/bi';
-import { downloadQRCode } from '@/app/lib/downloadQrCode';
 import { toCurrency } from '@core/utils/to-currency';
+import { BiCheck } from 'react-icons/bi';
+import ConfirmationPopover from '@core/components/confirmation-popover';
 const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
@@ -42,7 +42,7 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.images}
+        src={row.original.product_images?.[0]}
         name={row.original.name}
         description={row.original.description}
         descriptionClassName="line-clamp-2"
@@ -99,6 +99,15 @@ export const productsListColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
+        <ConfirmationPopover
+          title="Publish Product"
+          description="Are you sure you want to publish this product?"
+          tooltipContent="Publish Product"
+          onConfirm={() =>
+            meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
+          }
+          isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
+        />
         <Tooltip
           size="sm"
           content={'Edit Product'}

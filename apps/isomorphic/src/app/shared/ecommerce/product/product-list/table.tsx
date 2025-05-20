@@ -15,6 +15,7 @@ import { useDeleteProducts } from '@/hooks/products/useDeleteProducts';
 import PageLoader from '@/app/shared/page-loader';
 import { PaginationState } from '@tanstack/react-table';
 import { useGetAllCategories } from '@/hooks/categories/useGetAllCategories';
+import { usePublishProducts } from '@/hooks/products/usePublishProducts';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -40,6 +41,7 @@ export default function ProductsTable({
   onSelectionChange,
   enableRowSelection = false,
 }: ProductsTableProps) {
+  const [currentId, setCurrentId] = useState(null);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -54,6 +56,8 @@ export default function ProductsTable({
     hasNextPage,
     isFetchingNextPage,
   } = usePaginatedProducts(pagination);
+  const { mutate: publishProduct, status: publishStatus } =
+    usePublishProducts();
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
   const { data: categoryData, isLoading: isLoadingCategory } =
     useGetAllCategories();
@@ -80,6 +84,13 @@ export default function ProductsTable({
             },
           });
         },
+        handleApproveRow: (id) => {
+          setCurrentId(id);
+          console.log(' row', id);
+          publishProduct(id);
+        },
+        deleteId: currentId,
+        isLoading: publishStatus === 'pending',
       },
       enableColumnResizing: false,
       enableRowSelection: enableRowSelection,

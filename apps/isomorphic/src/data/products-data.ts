@@ -8,6 +8,7 @@ export type productsDataType = {
   stock?: number;
   price?: string;
   is_next_day_shipping_available?: boolean;
+  product_images?: any;
   // status: string;
   // rating: any;
 };

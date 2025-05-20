@@ -20,7 +20,7 @@ import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreMana
 interface FiltersProps {
   search?: string;
 }
-interface StoreManagerListProps {
+export interface StoreManagerListProps {
   first_name: string;
   last_name: string;
   id: number;

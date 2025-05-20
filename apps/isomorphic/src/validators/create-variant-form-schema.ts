@@ -4,7 +4,7 @@ import { z } from 'zod';
 const imageSchema = z.object({
   id: z.string().optional(),
   image: z.string(),
-  alt_text: z.string().optional(),
+  // alt_text: z.string().optional(),
   product_variant: z.string().optional(),
 });
 

@@ -9,80 +9,27 @@ import cn from '@core/utils/class-names';
 import { exportToCSV } from '@core/utils/export-to-csv';
 import Filters from './filters';
 import { SalesHistoryColumns } from './columns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
+import usePaginatedSalesHistory from '@/hooks/sales/salesHistory/usePaginatedSalesHistory';
+import { SalesHistoryDataType } from '@/data/saleshistory-data';
+import PageLoader from '@/app/shared/page-loader';
 
-const salesData = [
-  {
-    id: 1,
-    name: 'Product 1',
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/products/modern/7.webp',
-    invoice_number: 'INV-001',
-    date: '2023-06-01',
-    createdAt: '2023-06-01',
-    to: 'John Britas',
-    from: 'David Smith',
-    price: '10.00',
-    incentive: '5.00',
-  },
-  {
-    id: 2,
-    name: 'Product 2',
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/products/modern/7.webp',
-    invoice_number: 'INV-002',
-    date: '2023-06-02',
-    createdAt: '2023-06-02',
-    to: 'John Britas',
-    from: 'David Smith',
-    price: '10.00',
-    incentive: '5.00',
-  },
-  {
-    id: 3,
-    name: 'Product 3',
-    image:
-      'https://isomorphic-furyroad.s3.amazonaws.com/public/products/modern/7.webp',
-    invoice_number: 'INV-003',
-    date: '2023-06-03',
-    createdAt: '2023-06-03',
-    to: 'John Britas',
-    from: 'David Smith',
-    price: '10.00',
-    incentive: '5.00',
-  },
-];
+interface FiltersProps {
+  search?: string;
+}
 
-export type SalesHistoryDataType = (typeof salesData)[number];
-
-export default function SalesHistoryTable({
-  pageSize = 5,
-  hideFilters = false,
-  hidePagination = false,
-  hideFooter = false,
-  classNames = {
-    container: 'border border-muted rounded-md',
-    rowClassName: 'last:border-0',
-  },
-  paginationClassName,
-}: {
-  pageSize?: number;
-  hideFilters?: boolean;
-  hidePagination?: boolean;
-  hideFooter?: boolean;
-  classNames?: TableClassNameProps;
-  paginationClassName?: string;
-}) {
-  const [pagination, setPagination] = useState<PaginationState>({
+export default function SalesHistoryTable() {
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
-
-  const pageCount = 1;
+  const { data, isLoading } = usePaginatedSalesHistory(pagination);
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<SalesHistoryDataType>({
-    tableData: salesData,
+    tableData: [],
     columnConfig: SalesHistoryColumns,
     options: {
       meta: {
@@ -106,29 +53,29 @@ export default function SalesHistoryTable({
     pagination,
   });
 
-  const selectedData = table
-    .getSelectedRowModel()
-    .rows.map((row) => row.original);
+  useEffect(() => {
+    if (data) {
+      const salesManAPIData = data?.data?.results || [];
+      setData(salesManAPIData);
+    }
+  }, [data]);
 
-  function handleExportData() {
-    exportToCSV(
-      selectedData,
-      'ID,Name,Category,Sku,Price,Stock,Status,Rating',
-      `product_data_${selectedData.length}`
-    );
-  }
+  if (isLoading) return <PageLoader />;
 
   return (
     <>
-      {!hideFilters && <Filters table={table} />}
-      <Table table={table} variant="modern" classNames={classNames} />
-      {!hideFooter && <TableFooter table={table} onExport={handleExportData} />}
-      {!hidePagination && (
-        <TablePagination
-          table={table}
-          className={cn('py-4', paginationClassName)}
-        />
-      )}
+      <Filters table={table} />
+      <Table
+        table={table}
+        variant="modern"
+        classNames={{
+          container: 'border border-muted rounded-md',
+          rowClassName: 'last:border-0',
+        }}
+      />
+      <TableFooter table={table} />
+
+      <TablePagination table={table} className="py-4" />
     </>
   );
 }

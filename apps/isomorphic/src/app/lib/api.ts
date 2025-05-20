@@ -19,5 +19,5 @@ export const API_ROUTES = {
   deliveryManager: '/authentication/admin/users/',
   promotion: '/mingler/admin/promotions/',
   serviceTypes: '/service/admin/service-types/',
-  salesHistory: '/mingler/sales-history/',
+  salesHistory: '/mingler/admin/sales-history/',
 };

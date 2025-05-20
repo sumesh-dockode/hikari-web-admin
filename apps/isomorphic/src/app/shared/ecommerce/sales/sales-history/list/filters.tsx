@@ -75,7 +75,7 @@ export default function Filters<TData extends Record<string, any>>({
           </Button>
         ) : null}
 
-        <Button
+        {/* <Button
           variant={'outline'}
           disabled={true}
           onClick={() => setOpenDrawer(!openDrawer)}
@@ -83,7 +83,7 @@ export default function Filters<TData extends Record<string, any>>({
         >
           <PiFunnel className="me-1.5 size-[18px]" strokeWidth={1.7} />
           Filters
-        </Button>
+        </Button> */}
 
         <ToggleColumns table={table} />
       </Flex>

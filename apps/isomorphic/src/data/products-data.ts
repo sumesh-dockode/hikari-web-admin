@@ -9,6 +9,7 @@ export type productsDataType = {
   price?: string;
   is_next_day_shipping_available?: boolean;
   product_images?: any;
+  is_published?: string;
   // status: string;
   // rating: any;
 };

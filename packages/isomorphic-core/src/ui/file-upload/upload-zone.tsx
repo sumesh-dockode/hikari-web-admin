@@ -1,16 +1,16 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
 import prettyBytes from "pretty-bytes";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useDropzone, Accept } from "react-dropzone";
-import { PiTrashBold } from "react-icons/pi";
+import { PiArrowsOutSimple, PiFilePdfLight, PiTrashBold } from "react-icons/pi";
 import { Button, Text, FieldError } from "rizzui";
 import cn from "../../utils/class-names";
 import UploadIcon from "../../components/shape/upload";
 import { convertToBase64 } from "@core/utils/image-to-base64";
+import { Modal } from "@core/modal-views/modal";
 
 interface UploadZoneProps {
   label?: string;
@@ -20,6 +20,7 @@ interface UploadZoneProps {
   getValues: any;
   setValue: any;
   watch?: any;
+  acceptedTypes?: Accept;
 }
 
 interface FileType {
@@ -33,20 +34,11 @@ export default function UploadZone({
   name,
   className,
   error,
-  getValues,
   setValue,
   watch,
+  acceptedTypes,
 }: UploadZoneProps) {
-  // const [files, setFiles] = useState<FileType[]>(getValues(name) || []);
-  // const files = getValues(name) || [];
   const files = watch(name) || [];
-
-  // useEffect(() => {
-  //   const currentFiles = getValues(name);
-  //   if (currentFiles && currentFiles.length !== files.length) {
-  //     setFiles(currentFiles);
-  //   }
-  // }, [getValues, name]);
 
   const onDrop = useCallback(async (acceptedFiles: File[]) => {
     const newFiles = await Promise.all(
@@ -57,19 +49,18 @@ export default function UploadZone({
       }))
     );
     const updatedFiles = [...files, ...newFiles];
-    // setFiles(updatedFiles);
     setValue(name, updatedFiles);
   }, []);
 
   function handleRemoveFile(index: number) {
     const updatedFiles = files.filter((_: any, i: number) => i !== index);
-    // setFiles(updatedFiles);
     setValue(name, updatedFiles);
   }
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: { "image/*": [], "application/pdf": [] } as Accept,
+    accept:
+      acceptedTypes || ({ "image/*": [], "application/pdf": [] } as Accept),
   });
 
   return (
@@ -91,21 +82,38 @@ export default function UploadZone({
       </div>
       {!isEmpty(files) && (
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {files.map((file: FileType, index: number) => (
-            <div key={`${file.name}-${index}`} className="relative">
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview name={file.name} url={file.url} />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveFile(index)}
-                  className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
-                >
-                  <PiTrashBold className="text-white" />
-                </button>
-              </figure>
-              <MediaCaption name={file.name} size={file.size} />
-            </div>
-          ))}
+          {files.map((file: FileType, index: number) => {
+            const isPDF =
+              file?.name?.toLowerCase().endsWith(".pdf") ||
+              file?.url?.toLowerCase().endsWith(".pdf");
+            if (isPDF) {
+              return (
+                <div key={`${file.name}-${index}`} className="relative">
+                  <MediaPreview
+                    name={file.name}
+                    url={file.url}
+                    size={file.size}
+                    deleteClick={() => handleRemoveFile(index)}
+                  />
+                </div>
+              );
+            }
+            return (
+              <div key={`${file.name}-${index}`} className="relative">
+                <figure className="group relative h-40 rounded-md bg-gray-50">
+                  <MediaPreview name={file.name} url={file.url} />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveFile(index)}
+                    className="absolute right-0 top-0 rounded-full bg-gray-700/70 p-1.5 opacity-20 transition duration-300 hover:bg-red-dark group-hover:opacity-100"
+                  >
+                    <PiTrashBold className="text-white" />
+                  </button>
+                </figure>
+                <MediaCaption name={file.name} size={file.size} />
+              </div>
+            );
+          })}
         </div>
       )}
       {error && <FieldError error={error} />}
@@ -113,18 +121,84 @@ export default function UploadZone({
   );
 }
 
-function MediaPreview({ name, url }: { name: string; url: string }) {
+function MediaPreview({
+  name,
+  url,
+  size,
+  deleteClick,
+}: {
+  name: string;
+  url: string;
+  size?: number;
+  deleteClick?: () => void;
+}) {
+  const [isOpen, setIsOpen] = useState(false);
+
   if (!url) return null;
-  console.log("url9999999999",url);
-  
-  return name.endsWith(".pdf") ? (
-    <object data={url} type="application/pdf" width="100%" height="100%">
-      <p>
-        Alternative text - include a link <a href={url}>to the PDF!</a>
-      </p>
-    </object>
-  ) : (
-    <Image fill src={url || ""} alt={name} className="rounded-md object-contain" />
+  const isPDF =
+    name?.toLowerCase().endsWith(".pdf") || url?.toLowerCase().endsWith(".pdf");
+
+  if (isPDF) {
+    return (
+      <>
+        <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <PiFilePdfLight className="text-red-500 h-6 w-6" />
+            <span className="text-sm font-medium text-gray-800 truncate">
+              {name}
+            </span>
+            <span className="text-xs text-gray-500">
+              {size && prettyBytes(size)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsOpen(true)}
+              className="text-gray-600 hover:text-black"
+            >
+              <PiArrowsOutSimple className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              color="danger"
+              onClick={deleteClick}
+            >
+              <PiTrashBold className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="lg">
+          <div className="relative h-[80vh]">
+            <object
+              data={url}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            >
+              <p>
+                PDF preview not supported.{" "}
+                <a href={url} target="_blank">
+                  Open PDF
+                </a>
+              </p>
+            </object>
+          </div>
+        </Modal>
+      </>
+    );
+  }
+
+  return (
+    <Image
+      fill
+      src={url || ""}
+      alt={name}
+      className="rounded-md object-contain"
+    />
   );
 }
 

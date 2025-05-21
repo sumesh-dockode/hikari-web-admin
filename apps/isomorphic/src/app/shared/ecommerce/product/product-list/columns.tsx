@@ -10,8 +10,8 @@ import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import AvatarCard from '@core/ui/avatar-card';
 import { toCurrency } from '@core/utils/to-currency';
-import { BiCheck } from 'react-icons/bi';
 import ConfirmationPopover from '@core/components/confirmation-popover';
+import { PiCheckBold } from 'react-icons/pi';
 const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
@@ -99,15 +99,29 @@ export const productsListColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
-        <ConfirmationPopover
-          title="Publish Product"
-          description="Are you sure you want to publish this product?"
-          tooltipContent="Publish Product"
-          onConfirm={() =>
-            meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
-          }
-          isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
-        />
+        {!row.original.is_published ? (
+          <ConfirmationPopover
+            title="Publish Product"
+            description="Are you sure you want to publish this product?"
+            tooltipContent="Publish Product"
+            onConfirm={() =>
+              meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
+            }
+            isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
+          />
+        ) : (
+          <Tooltip content="Published" placement="top" size="sm">
+            <ActionIcon
+              size="sm"
+              variant="solid"
+              color="primary"
+              aria-label="Published"
+              className="cursor-default"
+            >
+              <PiCheckBold className="size-4" />
+            </ActionIcon>
+          </Tooltip>
+        )}
         <Tooltip
           size="sm"
           content={'Edit Product'}

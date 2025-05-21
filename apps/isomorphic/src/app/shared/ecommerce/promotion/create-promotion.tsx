@@ -13,7 +13,7 @@ import {
 import FormGroup from '../../form-group';
 import { useRouter } from 'next/navigation';
 import { usePromotionById } from '@/hooks/promotions/usePromotionById';
-import { GetImageSize, omit } from '@/utils/utils';
+import { getFileNameFromUrl, GetImageSize, omit } from '@/utils/utils';
 import { useUpdatePromotion } from '@/hooks/promotions/useUpdatePromotion';
 import toast from 'react-hot-toast';
 import { routes } from '@/config/routes';
@@ -57,6 +57,9 @@ export default function CreatePromotion({
           documentUrl ? GetImageSize(documentUrl) : 0,
         ]);
 
+        const imageName = getFileNameFromUrl(imageUrl);
+        const documentName = getFileNameFromUrl(documentUrl);
+
         const storeManagersList = storeManagerData?.data?.map(
           (i: StoreManagerListProps) => ({
             name: `${i.first_name || ''} ${i.last_name || ''}`,
@@ -78,10 +81,10 @@ export default function CreatePromotion({
           area_longitude: detailData?.area_longitude || null,
           comments: detailData?.comments || null,
           promotion_image: imageUrl
-            ? [{ url: imageUrl, name: 'image', size: imageSize }]
+            ? [{ url: imageUrl, name: imageName, size: imageSize }]
             : [],
           promotion_document: documentUrl
-            ? [{ url: documentUrl, name: 'image', size: documentSize }]
+            ? [{ url: documentUrl, name: documentName, size: documentSize }]
             : [],
         };
         setReset(resetData);
@@ -95,7 +98,7 @@ export default function CreatePromotion({
   const onSubmit: SubmitHandler<PromotionFormInput> = (data) => {
     setLoading(true);
     let payload = {
-      ...data,
+      // ...data,
       id: data.id || (id as string),
       promotion_image: data.promotion_image?.[0]?.url || null,
       promotion_document: data.promotion_document?.[0]?.url || null,
@@ -244,6 +247,7 @@ export default function CreatePromotion({
                   setValue={setValue}
                   watch={watch}
                   className="col-span-full"
+                  acceptedTypes={{ 'application/pdf': [] }}
                   error={errors.promotion_document?.message}
                 />
               </FormGroup>

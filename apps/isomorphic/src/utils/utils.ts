@@ -9,6 +9,15 @@ export const GetImageSize = async (url: string) => {
   }
 };
 
+export const getFileNameFromUrl = (url?: string) => {
+  try {
+    if (typeof url !== 'string') return 'unknown';
+    return decodeURIComponent(url.split('/').pop() || 'unknown');
+  } catch {
+    return 'unknown';
+  }
+};
+
 export const omit = (obj: any, key: string) => {
   const { [key]: _, ...rest } = obj;
   return rest;

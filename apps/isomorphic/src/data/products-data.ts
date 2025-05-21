@@ -10,6 +10,7 @@ export type productsDataType = {
   is_next_day_shipping_available?: boolean;
   product_images?: any;
   is_published?: string;
+  similar_products?: string[];
   // status: string;
   // rating: any;
 };

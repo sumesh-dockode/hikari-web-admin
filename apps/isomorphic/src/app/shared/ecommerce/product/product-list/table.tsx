@@ -26,6 +26,7 @@ interface ProductsTableProps {
   paginationClassName?: string;
   onSelectionChange?: (selectedRows: productsDataType[]) => void;
   enableRowSelection?: boolean;
+  initialSelection?: productsDataType[];
 }
 
 export default function ProductsTable({
@@ -40,6 +41,7 @@ export default function ProductsTable({
   paginationClassName,
   onSelectionChange,
   enableRowSelection = false,
+  initialSelection = [],
 }: ProductsTableProps) {
   const [currentId, setCurrentId] = useState(null);
   const [pagination, setPagination] = useState<PaginationState>({
@@ -47,23 +49,14 @@ export default function ProductsTable({
     pageSize: 10,
   });
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedProducts(pagination);
+  const { data, isLoading } = usePaginatedProducts(pagination);
   const { mutate: publishProduct, status: publishStatus } =
     usePublishProducts();
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
   const { data: categoryData, isLoading: isLoadingCategory } =
     useGetAllCategories();
 
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<productsDataType>({
     tableData: [],
@@ -112,8 +105,7 @@ export default function ProductsTable({
         (categoryData?.data || []).map((cat: any) => [cat.id, cat.name])
       );
 
-      const productsAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const productsAPIData = data?.data?.results || [];
 
       const mappedProducts = productsAPIData.map((product: any) => ({
         ...product,
@@ -129,12 +121,14 @@ export default function ProductsTable({
     .getSelectedRowModel()
     .rows.map((row) => row.original);
 
-  // Notify parent component when selection changes
   useEffect(() => {
     if (onSelectionChange) {
-      onSelectionChange(selectedData);
+      const selected = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+      onSelectionChange(selected);
     }
-  }, []);
+  }, [table.getSelectedRowModel().rows]);
 
   if (isLoading || isLoadingCategory) return <PageLoader />;
 

@@ -1,30 +1,36 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
 export default function usePaginatedProducts(options: {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
 }) {
   const { status } = useSession();
 
   const fetchProducts = async () => {
-    let url = `${API_ROUTES.products}?page=${options.pageIndex + 1}&page_size=${options.pageSize}`;
+    let url = `${API_ROUTES.products}`;
+    let params = [];
+
+    if (options?.pageIndex || options?.pageIndex === 0) {
+      params.push(`page=${options.pageIndex + 1}`);
+    }
+    if (options?.pageSize) {
+      params.push(`page_size=${options.pageSize}`);
+    }
+    if (params.length > 0) {
+      url += `?${params.join('&')}`;
+    }
     const { data } = await apiClient.get(url);
 
     return data;
   };
-  return useInfiniteQuery({
+  return useQuery({
     queryKey: ['productTable', options],
     queryFn: fetchProducts,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage, allPages) => {
-      if (!lastPage?.data?.next) return undefined;
-      return allPages.length + 1;
-    },
     enabled: status === 'authenticated',
   });
 }

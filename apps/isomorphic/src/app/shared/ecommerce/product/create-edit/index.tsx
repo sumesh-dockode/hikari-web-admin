@@ -33,7 +33,7 @@ import PageLoader from '@/app/shared/page-loader';
 
 const MAP_STEP_TO_COMPONENT = {
   [formParts.summary]: ProductSummary,
-  [formParts.media]: ProductMedia,
+  // [formParts.media]: ProductMedia,
   [formParts.pricingInventory]: PricingInventory,
   [formParts.shipping]: ShippingInfo,
   [formParts.variantOptions]: ProductVariants,
@@ -47,7 +47,11 @@ interface IndexProps {
   product?: CreateProductInput;
 }
 
-export default function CreateEditProduct({ slug, product, className }: IndexProps) {
+export default function CreateEditProduct({
+  slug,
+  product,
+  className,
+}: IndexProps) {
   const { layout } = useLayout();
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
@@ -76,6 +80,7 @@ export default function CreateEditProduct({ slug, product, className }: IndexPro
       stock: 0,
       description: '',
       is_next_day_shipping_available: false,
+      similar_products: [],
       ...product,
     },
   });
@@ -92,6 +97,7 @@ export default function CreateEditProduct({ slug, product, className }: IndexPro
         stock: data.data.stock || 0,
         category: data.data.category || '',
         description: data.data.description || '',
+        similar_products: data.data.similar_products || [],
         is_next_day_shipping_available:
           data.data.is_next_day_shipping_available || false,
       });
@@ -108,6 +114,7 @@ export default function CreateEditProduct({ slug, product, className }: IndexPro
       stock: formData.stock,
       category: formData.category,
       description: formData.description,
+      similar_products: formData.similar_products,
       is_next_day_shipping_available: formData.is_next_day_shipping_available,
     };
     if (productId) {
@@ -127,6 +134,7 @@ export default function CreateEditProduct({ slug, product, className }: IndexPro
               price: 0,
               catagoryName: '',
               description: '',
+              similar_products: [],
               is_next_day_shipping_available: false,
               stock: 0,
             });

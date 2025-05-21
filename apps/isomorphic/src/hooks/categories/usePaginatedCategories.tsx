@@ -6,8 +6,8 @@ import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
 export default function usePaginatedCategories(options: {
-  pageIndex: number;
-  pageSize: number;
+  pageIndex?: number;
+  pageSize?: number;
   search?: string;
 }) {
   const { status } = useSession();

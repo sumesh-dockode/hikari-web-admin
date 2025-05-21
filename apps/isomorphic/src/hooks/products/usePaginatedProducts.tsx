@@ -8,6 +8,8 @@ import apiClient from '@/app/lib/apiClient';
 export default function usePaginatedProducts(options: {
   pageIndex?: number;
   pageSize?: number;
+  search?: string;
+  category?: number;
 }) {
   const { status } = useSession();
 
@@ -20,6 +22,12 @@ export default function usePaginatedProducts(options: {
     }
     if (options?.pageSize) {
       params.push(`page_size=${options.pageSize}`);
+    }
+    if (options?.search) {
+      params.push(`q=${options.search}`);
+    }
+    if (options?.category) {
+      params.push(`category=${options.category}`);
     }
     if (params.length > 0) {
       url += `?${params.join('&')}`;

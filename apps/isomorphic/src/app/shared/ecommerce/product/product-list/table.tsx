@@ -16,6 +16,7 @@ import PageLoader from '@/app/shared/page-loader';
 import { PaginationState } from '@tanstack/react-table';
 import { useGetAllCategories } from '@/hooks/categories/useGetAllCategories';
 import { usePublishProducts } from '@/hooks/products/usePublishProducts';
+import { debounce } from 'lodash';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -27,6 +28,11 @@ interface ProductsTableProps {
   onSelectionChange?: (selectedRows: productsDataType[]) => void;
   enableRowSelection?: boolean;
   initialSelection?: productsDataType[];
+}
+
+interface FiltersProps {
+  search?: string;
+  category?: number;
 }
 
 export default function ProductsTable({
@@ -44,9 +50,10 @@ export default function ProductsTable({
   initialSelection = [],
 }: ProductsTableProps) {
   const [currentId, setCurrentId] = useState(null);
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
 
   const { data, isLoading } = usePaginatedProducts(pagination);
@@ -130,11 +137,35 @@ export default function ProductsTable({
     }
   }, [table.getSelectedRowModel().rows]);
 
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
+
+  const handleFilters = (filters: FiltersProps) => {
+    console.log('filters', filters);
+
+    setPagination((prev) => ({
+      ...prev,
+      ...filters,
+      pageIndex: 0,
+    }));
+  };
+
   if (isLoading || isLoadingCategory) return <PageLoader />;
 
   return (
     <>
-      {/* {!hideFilters && <Filters table={table} />} */}
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+        handleFilters={handleFilters}
+        category={pagination.category}
+      />
       <Table
         table={table}
         variant="modern"

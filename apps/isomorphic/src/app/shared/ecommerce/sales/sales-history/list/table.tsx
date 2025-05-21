@@ -14,9 +14,11 @@ import { PaginationState } from '@tanstack/react-table';
 import usePaginatedSalesHistory from '@/hooks/sales/salesHistory/usePaginatedSalesHistory';
 import { SalesHistoryDataType } from '@/data/saleshistory-data';
 import PageLoader from '@/app/shared/page-loader';
+import { debounce } from 'lodash';
 
 interface FiltersProps {
   search?: string;
+  salesman?: number;
 }
 
 export default function SalesHistoryTable() {
@@ -60,11 +62,32 @@ export default function SalesHistoryTable() {
     }
   }, [data]);
 
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
+
+  const handleSalesManFilter = (value?: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      salesman: value,
+    }));
+  };
+
   if (isLoading) return <PageLoader />;
 
   return (
     <>
-      <Filters table={table} />
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+        salesManFilter={pagination.salesman}
+        handleSalesManFilter={handleSalesManFilter}
+      />
       <Table
         table={table}
         variant="modern"

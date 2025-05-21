@@ -9,6 +9,7 @@ export default function usePaginatedSalesHistory(options: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
+  salesman?: number;
 }) {
   const { status } = useSession();
 
@@ -24,6 +25,9 @@ export default function usePaginatedSalesHistory(options: {
     }
     if (options?.search) {
       params.push(`search=${options.search}`);
+    }
+    if (options?.salesman) {
+      params.push(`salesman=${options.salesman}`);
     }
     if (params.length > 0) {
       url += `?${params.join('&')}`;

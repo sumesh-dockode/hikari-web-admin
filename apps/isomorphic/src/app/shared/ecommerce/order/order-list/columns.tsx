@@ -1,6 +1,7 @@
 'use client';
 
-import { downloadQRCode } from '@/app/lib/downloadQrCode';
+import { downloadAllQRCodesFromStockAPI } from '@/app/lib/downloadQrCode';
+// import { downloadQRCodeWithLogo } from '@/app/lib/downloadQrCode';
 import { routes } from '@/config/routes';
 import { OrdersDataType } from '@/data/orders';
 import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
@@ -16,6 +17,18 @@ import { ActionIcon, Box, Text, Tooltip } from 'rizzui';
 const columnHelper = createColumnHelper<OrdersDataType>();
 
 export const ordersColumns = (expanded: boolean = true) => {
+  // const [isLoading, setIsLoading] = useState(false);
+
+  const handleDownload = async (orderId: string) => {
+    await downloadAllQRCodesFromStockAPI({
+      loaderCallbacks: {
+        onStart: () => {},
+        onFinish: () => {},
+      },
+      orderId: orderId, // replace with actual ID
+    });
+  };
+
   const columns = [
     columnHelper.display({
       id: 'id',
@@ -115,7 +128,7 @@ export const ordersColumns = (expanded: boolean = true) => {
                 size="sm"
                 variant="outline"
                 aria-label={'Download QR Code'}
-                onClick={async () => await downloadQRCode(row.original.id)}
+                onClick={() => handleDownload(row.original.id)}
               >
                 <BiDownload className="size-4" />
               </ActionIcon>

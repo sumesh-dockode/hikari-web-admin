@@ -16,6 +16,7 @@ import PageLoader from '@/app/shared/page-loader';
 import { PaginationState } from '@tanstack/react-table';
 import { useGetAllCategories } from '@/hooks/categories/useGetAllCategories';
 import { usePublishProducts } from '@/hooks/products/usePublishProducts';
+import { debounce } from 'lodash';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -26,6 +27,12 @@ interface ProductsTableProps {
   paginationClassName?: string;
   onSelectionChange?: (selectedRows: productsDataType[]) => void;
   enableRowSelection?: boolean;
+  initialSelection?: productsDataType[];
+}
+
+interface FiltersProps {
+  search?: string;
+  category?: number;
 }
 
 export default function ProductsTable({
@@ -40,30 +47,23 @@ export default function ProductsTable({
   paginationClassName,
   onSelectionChange,
   enableRowSelection = false,
+  initialSelection = [],
 }: ProductsTableProps) {
   const [currentId, setCurrentId] = useState(null);
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
+    search: '',
   });
 
-  const {
-    data,
-    isLoading,
-    isError,
-    error,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = usePaginatedProducts(pagination);
+  const { data, isLoading } = usePaginatedProducts(pagination);
   const { mutate: publishProduct, status: publishStatus } =
     usePublishProducts();
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
   const { data: categoryData, isLoading: isLoadingCategory } =
     useGetAllCategories();
 
-  const pageCount =
-    data?.pages?.flatMap((page: any) => page?.data.total_pages) || 1;
+  const pageCount = data?.data?.total_pages || 1;
 
   const { table, setData } = useTanStackTable<productsDataType>({
     tableData: [],
@@ -112,8 +112,7 @@ export default function ProductsTable({
         (categoryData?.data || []).map((cat: any) => [cat.id, cat.name])
       );
 
-      const productsAPIData =
-        data?.pages?.flatMap((page: any) => page?.data?.results) || [];
+      const productsAPIData = data?.data?.results || [];
 
       const mappedProducts = productsAPIData.map((product: any) => ({
         ...product,
@@ -129,18 +128,44 @@ export default function ProductsTable({
     .getSelectedRowModel()
     .rows.map((row) => row.original);
 
-  // Notify parent component when selection changes
   useEffect(() => {
     if (onSelectionChange) {
-      onSelectionChange(selectedData);
+      const selected = table
+        .getSelectedRowModel()
+        .rows.map((row) => row.original);
+      onSelectionChange(selected);
     }
-  }, []);
+  }, [table.getSelectedRowModel().rows]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
+
+  const handleFilters = (filters: FiltersProps) => {
+    console.log('filters', filters);
+
+    setPagination((prev) => ({
+      ...prev,
+      ...filters,
+      pageIndex: 0,
+    }));
+  };
 
   if (isLoading || isLoadingCategory) return <PageLoader />;
 
   return (
     <>
-      {/* {!hideFilters && <Filters table={table} />} */}
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+        handleFilters={handleFilters}
+        category={pagination.category}
+      />
       <Table
         table={table}
         variant="modern"

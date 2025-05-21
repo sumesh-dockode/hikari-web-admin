@@ -2,45 +2,53 @@
 
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
-import TablePagination from '@core/components/table/pagination';
 import TableFooter from '@core/components/table/footer';
-import { TableClassNameProps } from '@core/components/table/table-types';
-import cn from '@core/utils/class-names';
-import { exportToCSV } from '@core/utils/export-to-csv';
-import Filters from './filters';
-import { SalesHistoryColumns } from './columns';
-import { useEffect, useState } from 'react';
+import TablePagination from '@core/components/table/pagination';
+import { useEffect, useMemo, useState } from 'react';
 import { PaginationState } from '@tanstack/react-table';
-import usePaginatedSalesHistory from '@/hooks/sales/salesHistory/usePaginatedSalesHistory';
-import { SalesHistoryDataType } from '@/data/saleshistory-data';
+import usePaginatedSalesMan from '@/hooks/sales/salesman/usePaginatedSalesMan';
+import { useDeleteSalesMan } from '@/hooks/sales/salesman/useDeleteSalesMan';
+import toast from 'react-hot-toast';
 import PageLoader from '@/app/shared/page-loader';
+import { SalesmanDataType } from '@/data/salesman-data';
 import { debounce } from 'lodash';
+import usePaginatedSuggestions from '@/hooks/sales/suggestions/usePaginatedSuggestions';
+import { useDeleteSuggestions } from '@/hooks/sales/suggestions/useDeleteSuggestions';
+import Filters from './filters';
+import { suggestionColumns } from './columns';
+import { SuggestionsDataType } from '@/data/suggestions-data';
 
 interface FiltersProps {
   search?: string;
-  salesman?: number;
 }
 
-export default function SalesHistoryTable() {
+export default function SuggestionsTable() {
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
     search: '',
   });
-  const { data, isLoading } = usePaginatedSalesHistory(pagination);
+  const { data, isLoading } = usePaginatedSuggestions(pagination);
+  const { mutate: deleteSuggestions, status: deleteStatus } =
+    useDeleteSuggestions();
   const pageCount = data?.data?.total_pages || 1;
 
-  const { table, setData } = useTanStackTable<SalesHistoryDataType>({
+  const { table, setData } = useTanStackTable<SuggestionsDataType>({
     tableData: [],
-    columnConfig: SalesHistoryColumns,
+    columnConfig: suggestionColumns,
     options: {
       meta: {
         handleDeleteRow: (row) => {
-          setData((prev) => prev.filter((r) => r.id !== row.id));
+          setDeleteItemId(row.id);
+          deleteSuggestions(row.id, {
+            onSuccess: () => {
+              toast.success('Suggestions deleted successfully');
+            },
+          });
         },
-        handleMultipleDelete: (rows) => {
-          setData((prev) => prev.filter((r) => !rows.includes(r)));
-        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
       },
       enableColumnResizing: false,
       manualPagination: true,
@@ -57,8 +65,8 @@ export default function SalesHistoryTable() {
 
   useEffect(() => {
     if (data) {
-      const salesManAPIData = data?.data?.results || [];
-      setData(salesManAPIData);
+      const suggestionsAPIData = data?.data?.results || [];
+      setData(suggestionsAPIData);
     }
   }, [data]);
 
@@ -70,13 +78,6 @@ export default function SalesHistoryTable() {
     }));
   }, 500);
 
-  const handleSalesManFilter = (value?: number) => {
-    setPagination((prev) => ({
-      ...prev,
-      salesman: value,
-    }));
-  };
-
   if (isLoading) return <PageLoader />;
 
   return (
@@ -85,8 +86,6 @@ export default function SalesHistoryTable() {
         table={table}
         handleSearchChange={handleSearchChange}
         searchText={pagination.search}
-        salesManFilter={pagination.salesman}
-        handleSalesManFilter={handleSalesManFilter}
       />
       <Table
         table={table}
@@ -97,7 +96,6 @@ export default function SalesHistoryTable() {
         }}
       />
       <TableFooter table={table} />
-
       <TablePagination table={table} className="py-4" />
     </>
   );

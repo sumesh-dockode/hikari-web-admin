@@ -5,16 +5,15 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
-export default function usePaginatedSalesHistory(options: {
+export default function usePaginatedSuggestions(options: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
-  salesman?: number;
 }) {
   const { status } = useSession();
 
-  const fetchSalesHistory = async () => {
-    let url = API_ROUTES.salesHistory;
+  const fetchSuggestions = async () => {
+    let url = API_ROUTES.suggestions;
     let params = [];
 
     if (options?.pageIndex || options?.pageIndex === 0) {
@@ -26,9 +25,6 @@ export default function usePaginatedSalesHistory(options: {
     if (options?.search) {
       params.push(`search=${options.search}`);
     }
-    if (options?.salesman) {
-      params.push(`salesman=${options.salesman}`);
-    }
     if (params.length > 0) {
       url += `?${params.join('&')}`;
     }
@@ -38,8 +34,8 @@ export default function usePaginatedSalesHistory(options: {
   };
 
   return useQuery({
-    queryKey: ['salesHistoryTable', options],
-    queryFn: () => fetchSalesHistory(),
+    queryKey: ['suggestionsTable', options],
+    queryFn: () => fetchSuggestions(),
     enabled: status === 'authenticated',
     throwOnError(error, query) {
       throw error;

@@ -7,28 +7,38 @@ import { productsDataType } from '@/data/products-data';
 import { Modal } from '@core/modal-views/modal';
 import ProductsTable from '../product-list/table';
 import { PiTrashDuotone } from 'react-icons/pi';
-import Image from 'next/image';
+import usePaginatedProducts from '@/hooks/products/usePaginatedProducts';
+import { useFormContext } from 'react-hook-form';
+import AvatarCard from '@core/ui/avatar-card';
+import { toCurrency } from '@core/utils/to-currency';
 
 interface SimilarProductsProps {
   className?: string;
 }
 
 export default function SimilarProducts({ className }: SimilarProductsProps) {
-  const [tempSelected, setTempSelected] = useState<productsDataType[]>([]);
+  const { data } = usePaginatedProducts({});
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedProducts, setSelectedProducts] = useState<productsDataType[]>(
-    []
-  );
+  const [tempSelected, setTempSelected] = useState<productsDataType[]>([]);
+  // const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
+  const { control, setValue, getValues, watch } = useFormContext();
+  const productsList = data?.data || [];
+  const similarProducts = watch('similar_products') || [];
 
-  const handleAddProducts = (selectedRows: productsDataType[]) => {
-    setSelectedProducts(selectedRows);
+  const selectedProducts = productsList.filter((p: productsDataType) =>
+    similarProducts.includes(p.id)
+  );
+  console.log('productsList', productsList);
+
+  const handleAddProducts = () => {
+    const ids = tempSelected?.map((p) => p.id) || [];
+    setValue('similar_products', ids);
     setIsModalOpen(false);
   };
 
   const removeProduct = (productId: string) => {
-    setSelectedProducts((prev) =>
-      prev.filter((product) => product.id !== productId)
-    );
+    const updated = similarProducts.filter((id: any) => id !== productId);
+    setValue('similar_products', updated);
   };
 
   return (
@@ -41,34 +51,56 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
         <Button
           variant="outline"
           className="col-span-full ml-auto w-auto"
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            const selected = productsList.filter((p: productsDataType) =>
+              similarProducts.includes(p.id)
+            );
+            setTempSelected(selected); // Sync previous selections
+            setIsModalOpen(true);
+          }}
         >
           Add Product
         </Button>
 
         {selectedProducts.length > 0 && (
           <div className="col-span-full mt-4">
-            <h4 className="mb-2 font-medium">Selected Similar Products:</h4>
+            <div className="mb-2">Selected Similar Products:</div>
             <div className="space-y-3">
-              {selectedProducts.map((product) => (
+              {selectedProducts.map((product: productsDataType) => (
                 <div
                   key={product.id}
                   className="flex items-center justify-between rounded-lg border border-gray-200 p-3"
                 >
                   <div className="flex items-center gap-3">
-                    {product.images && (
-                      <Image
-                        src={product.images}
-                        alt={product.name}
-                        className="h-10 w-10 rounded object-cover"
+                    {product.product_images && (
+                      <AvatarCard
+                        src={product.product_images?.[0]}
+                        name={product.name}
+                        description={
+                          <div className="flex gap-2">
+                            <span className="line-clamp-1 text-sm text-gray-500">
+                              {product.description}
+                            </span>{' '}
+                            |
+                            <span className="text-sm text-gray-500">
+                              {toCurrency(product.price || 0)}
+                            </span>
+                          </div>
+                        }
+                        descriptionClassName="line-clamp-2"
+                        avatarProps={{
+                          name: product.name,
+                          size: 'lg',
+                          className: 'rounded-lg',
+                        }}
                       />
                     )}
-                    <div>
-                      <h5 className="font-medium">{product.name}</h5>
+                    {/* <div>
+                      <div className="font-medium">{product.name}</div>
                       <p className="text-sm text-gray-500">
                         {product.category} • ${product.price}
                       </p>
-                    </div>
+                    </div> */}
                   </div>
                   <Button
                     variant="text"
@@ -90,11 +122,12 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
         size="xl"
         overlayClassName="backdrop-blur"
       >
-        <div className="h-[calc(100vh-200px)] overflow-auto">
+        <div className="h-[calc(100vh-200px)] overflow-auto p-6">
           <ProductsTable
             pageSize={5}
             hideFooter
             enableRowSelection={true}
+            initialSelection={similarProducts}
             onSelectionChange={(selected) => setTempSelected(selected)}
             classNames={{
               container: 'border-0 shadow-none',
@@ -102,12 +135,12 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
             }}
           />
         </div>
-        <div className="flex justify-end gap-3 pt-4">
+        <div className="sticky bottom-0 left-0 right-0 z-10 -mb-8 flex items-center justify-end gap-4 border-t bg-white px-4 py-4 dark:bg-gray-50 md:px-5 lg:px-6 3xl:px-8 4xl:px-10">
           <Button variant="outline" onClick={() => setIsModalOpen(false)}>
             Cancel
           </Button>
           <Button
-            onClick={() => handleAddProducts(tempSelected)}
+            onClick={handleAddProducts}
             disabled={tempSelected.length === 0}
           >
             Save Products ({tempSelected.length})

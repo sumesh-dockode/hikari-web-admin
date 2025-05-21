@@ -33,6 +33,10 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
   row: Row<TData>
 ) {
   const products = row?.original?.items as OrderItem[];
+  const isShowQRDownload = ['Confirmed', 'Shipped', 'Delivered'].includes(
+    row?.original?.status
+  );
+
   if (!Array.isArray(products) || products.length === 0) {
     return (
       <Flex align="center" justify="center">
@@ -86,9 +90,11 @@ export function OrderExpandedComponent<TData extends Record<string, any>>(
                 {product.quantity}
               </Text>
             </div>
-            <Text className="font-medium text-gray-900 dark:text-gray-700">
-              {toCurrency(Number(product.quantity) * Number(product.price))}
-            </Text>
+            <div className="flex items-center gap-2">
+              <Text className="font-medium text-gray-900 dark:text-gray-700">
+                {toCurrency(Number(product.quantity) * Number(product.price))}
+              </Text>
+            </div>
           </div>
         </article>
       ))}

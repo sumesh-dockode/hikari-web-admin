@@ -1,22 +1,124 @@
-import QRCode from 'qrcode';
+import QRCodeStyling from 'qr-code-styling';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import apiClient from './apiClient';
 
-export async function downloadQRCode(productId: string): Promise<void> {
+type Product = {
+  id: string;
+  product_name: string;
+};
+
+type LoaderCallbacks = {
+  onStart?: () => void;
+  onProgress?: (completed: number, total: number) => void;
+  onFinish?: () => void;
+};
+
+async function generateQRCodeWithNameBlob(
+  productId: string,
+  productName: string
+): Promise<Blob> {
+  const qrSize = 300;
+  const labelHeight = 40;
+
+  const qr = new QRCodeStyling({
+    width: qrSize,
+    height: qrSize,
+    margin: 2,
+    data: productId,
+    image: '/mLogo.png',
+    dotsOptions: {
+      type: 'classy-rounded',
+      color: '#0d9488',
+      roundSize: true,
+    },
+    backgroundOptions: {
+      round: 0,
+      color: '#ffffff',
+    },
+    imageOptions: {
+      crossOrigin: 'anonymous',
+      margin: 0,
+    },
+    cornersSquareOptions: {
+      type: 'extra-rounded',
+      color: '#000000',
+    },
+  });
+
+  // Render the QR to a Blob
+  const qrBlob = await qr.getRawData('png');
+
+  if (!qrBlob || !(qrBlob instanceof Blob)) {
+    throw new Error('Failed to generate QR blob');
+  }
+
+  const qrImage = new Image();
+  qrImage.src = URL.createObjectURL(qrBlob);
+  await qrImage.decode();
+
+  // Create a final canvas to combine QR and product name
+  const canvas = document.createElement('canvas');
+  canvas.width = qrSize;
+  canvas.height = qrSize + labelHeight;
+
+  const ctx = canvas.getContext('2d');
+  if (!ctx) throw new Error('Canvas context not available');
+
+  // Draw QR code
+  ctx.drawImage(qrImage, 0, 0, qrSize, qrSize);
+
+  // Draw label background
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, qrSize, qrSize, labelHeight);
+
+  // Draw product name
+  ctx.fillStyle = '#000000';
+  ctx.font = 'bold 20px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(productName, qrSize / 2, qrSize + labelHeight / 2);
+
+  // Export combined image to Blob
+  return new Promise((resolve) => {
+    canvas.toBlob((finalBlob) => {
+      if (!finalBlob) throw new Error('Final canvas toBlob failed');
+      resolve(finalBlob);
+    }, 'image/png');
+  });
+}
+
+export async function downloadAllQRCodesFromStockAPI({
+  loaderCallbacks,
+  orderId,
+}: {
+  loaderCallbacks: LoaderCallbacks;
+  orderId: string;
+}) {
   try {
-    const canvas = document.createElement('canvas');
+    const res = await apiClient.get(
+      `/mingler/admin/stocks/?order_id=${orderId}`
+    );
+    const products: Product[] = res.data.data || [];
 
-    // Encode QR with productId (can also be a full URL if needed)
-    await QRCode.toCanvas(canvas, productId, {
-      errorCorrectionLevel: 'H',
-      width: 256,
-    });
+    const zip = new JSZip();
+    const total = products.length;
 
-    const dataUrl = canvas.toDataURL('image/png');
+    loaderCallbacks?.onStart?.();
 
-    const link = document.createElement('a');
-    link.href = dataUrl;
-    link.download = `${productId}-qr.png`;
-    link.click();
+    for (let i = 0; i < total; i++) {
+      const { id: productId, product_name: productName } = products[i];
+      const blob = await generateQRCodeWithNameBlob(productId, productName);
+      zip.file(`${productName}-${productId}.png`, blob);
+      loaderCallbacks?.onProgress?.(i + 1, total);
+    }
+
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+    saveAs(zipBlob, 'qr-codes.zip');
+
+    loaderCallbacks?.onFinish?.();
   } catch (error) {
-    console.error('QR code generation failed:', error);
+    console.error('Error generating QR codes:', error);
+    loaderCallbacks?.onFinish?.(); // Make sure to hide loader even on error
   }
 }

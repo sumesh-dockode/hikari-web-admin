@@ -43,6 +43,7 @@ export const routes = {
     deliveryManager: '/delivery-manager',
     createDeliveryManager: '/delivery-manager/create',
     editDeliveryManager: (id: number) => `/delivery-manager/${id}/edit`,
+    suggestions: '/suggestions',
   },
   searchAndFilter: {
     realEstate: '/search/real-estate',

@@ -21,4 +21,5 @@ export const API_ROUTES = {
   serviceTypes: '/service/admin/service-types/',
   salesHistory: '/mingler/admin/sales-history/',
   productImages: '/ecom/admin/product-images/',
+  suggestions: '/review/',
 };

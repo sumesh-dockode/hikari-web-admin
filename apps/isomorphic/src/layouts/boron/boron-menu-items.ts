@@ -133,6 +133,10 @@ export const menuItems = [
         name: 'Claim Balance History',
         href: routes.eCommerce.claimBalanceHistory,
       },
+      {
+        name: 'Suggestions',
+        href: routes.eCommerce.suggestions,
+      },
     ],
   },
   {

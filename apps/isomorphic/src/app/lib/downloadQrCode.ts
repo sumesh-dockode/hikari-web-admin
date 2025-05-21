@@ -114,7 +114,7 @@ export async function downloadAllQRCodesFromStockAPI({
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
-    saveAs(zipBlob, 'qr-codes.zip');
+    saveAs(zipBlob, `qr-codes-${orderId}.zip`);
 
     loaderCallbacks?.onFinish?.();
   } catch (error) {

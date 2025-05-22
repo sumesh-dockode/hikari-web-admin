@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
 import { Button } from 'rizzui';
-import { PiPlusBold } from 'react-icons/pi';
+import { PiPlusBold, PiTrashBold, PiXBold } from 'react-icons/pi';
 import FormGroup from '@/app/shared/form-group';
 import cn from '@core/utils/class-names';
 import { convertToBase64 } from '@core/utils/image-to-base64';
@@ -14,6 +14,8 @@ interface ProductMultipleMediaProps {
   name: string;
   getValues: any;
   setValue: any;
+  deletedImages: any;
+  setDeletedImages?: any;
 }
 
 export default function ProductMultipleMedia({
@@ -21,6 +23,8 @@ export default function ProductMultipleMedia({
   name,
   getValues,
   setValue,
+  deletedImages,
+  setDeletedImages,
 }: ProductMultipleMediaProps) {
   const [images, setImages] = useState<UploadProductImagesProps[]>(
     getValues(name) || []
@@ -39,6 +43,14 @@ export default function ProductMultipleMedia({
     setValue(name, newImages);
   };
 
+  const handleRemoveImage = (index: number) => {
+    const updatedImages = images.filter((_, i) => i !== index);
+    const deleted = images.filter((_, i) => i === index);
+    setImages(updatedImages);
+    setDeletedImages([...deletedImages, ...deleted]);
+    setValue(name, updatedImages);
+  };
+
   const triggerFileInput = () => {
     fileInputRef.current?.click();
   };
@@ -53,13 +65,20 @@ export default function ProductMultipleMedia({
         {images.map((file, index) => (
           <div
             key={index}
-            className="aspect-square w-full overflow-hidden rounded-lg border bg-gray-100"
+            className="relative aspect-square w-full overflow-hidden rounded-lg border bg-gray-100"
           >
             <img
               src={file.image}
               alt={`Product image ${index + 1}`}
               className="h-full w-full object-cover"
             />
+            <button
+              type="button"
+              onClick={() => handleRemoveImage(index)}
+              className="absolute right-1 top-1 rounded-full bg-gray-500/20 p-1.5 transition duration-300 hover:bg-gray-500/40"
+            >
+              <PiTrashBold className="h-3 w-3 text-red-500" />
+            </button>
           </div>
         ))}
 

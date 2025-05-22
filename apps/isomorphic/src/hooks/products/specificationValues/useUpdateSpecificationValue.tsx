@@ -16,12 +16,10 @@ export function useUpdateSpecificationValue() {
     specificationValueData: specificationValueDataType
   ): Promise<specificationValueDataType> => {
     if (!session) throw new Error('Session not found');
-    let url = `${API_ROUTES.specificationValues}${specificationValueData.id}`;
+    let url = `${API_ROUTES.specificationValues}${specificationValueData.id}/`;
     const { data } = await apiClient.patch(url, specificationValueData);
 
-    console.log('data', data);
-
-    return data.data as Promise<specificationValueDataType>;
+    return data as Promise<specificationValueDataType>;
   };
 
   const queryClient = useQueryClient();

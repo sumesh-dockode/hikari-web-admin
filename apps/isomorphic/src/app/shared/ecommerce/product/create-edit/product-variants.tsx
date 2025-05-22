@@ -16,7 +16,6 @@ import FormGroup from '@/app/shared/form-group';
 import useVariants from '@/hooks/products/variants/useVariants';
 import useVariantValue from '@/hooks/products/variantValues/useVariantValue';
 import ProductMultipleMedia from './product-multiple-media';
-import { Form } from '@core/ui/form';
 import {
   VariantFormInput,
   variantSchema,
@@ -30,13 +29,13 @@ import { useQueryClient } from '@tanstack/react-query';
 import DeletePopover from '@core/components/delete-popover';
 import { useDeleteProductVariant } from '@/hooks/products/productVariant/useDeleteProductVariant';
 import PencilIcon from '@core/components/icons/pencil';
-import { ProductVariantDataType } from '@/data/products-data';
 import { useProductVariantById } from '@/hooks/products/productVariant/useProductVariantsById';
 import { useUpdateProductVariant } from '@/hooks/products/productVariant/useUpdateProductVariant';
 import {
   UploadProductImagesProps,
   useUploadProductImages,
 } from '@/hooks/products/useUploadProductImages';
+import { useDeleteProductImages } from '@/hooks/products/useDeleteUploadedImages';
 
 interface VariantOption {
   value: string;
@@ -84,6 +83,9 @@ export default function ProductVariants({
     null
   );
   const [variantAction, setVariantAction] = useState<string | null>(null);
+  const [deletedImages, setDeletedImages] = useState<
+    UploadProductImagesProps[]
+  >([]);
 
   const { data: productVariantById } = useProductVariantById(
     variantAction === 'edit' && selectedVariantId
@@ -96,6 +98,8 @@ export default function ProductVariants({
     useUpdateProductVariant();
   const { mutate: uploadImages, status: uploadStatus } =
     useUploadProductImages();
+  const { mutate: deleteProductImage, status: deleteImageStatus } =
+    useDeleteProductImages();
 
   const { data: variantsData } = useVariants();
   const { data: variantValuesData } = useVariantValue();
@@ -118,12 +122,6 @@ export default function ProductVariants({
             valueId: matched?.id,
           };
         }) || [];
-
-      let images = [];
-
-      // if (productVariant?.images) {
-      //   images = productVariant?.images?.map((i: any) => i.image);
-      // }
 
       setAddedVariantAttributes(addedVariantAttributes);
       setValue('variants', addedVariantAttributes);
@@ -196,7 +194,6 @@ export default function ProductVariants({
     },
   });
 
-  console.log('errors', errors);
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
     if (formData?.id) {
       updateProductVariant(
@@ -214,10 +211,11 @@ export default function ProductVariants({
           },
         },
         {
-          onSuccess: async (res: any) => {
-            const result = res;
+          onSuccess: async ({ data }: any) => {
+            const result = data;
             const variantId = result?.id;
 
+            //calling upload api for each image
             if (formData.images && formData.images.length > 0) {
               const imageUploadPromises = formData.images
                 .filter((i) => !i.id)
@@ -229,6 +227,15 @@ export default function ProductVariants({
                 );
               await Promise.all(imageUploadPromises);
             }
+
+            //calling delete api for each deleted image
+            if (deletedImages && deletedImages.length > 0) {
+              const imageDeletePromises = deletedImages
+                .filter((i) => i.id)
+                .map((image: any) => deleteProductImage(image.id));
+              await Promise.all(imageDeletePromises);
+            }
+
             setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
             setSelectedVariantId(null);
             setVariantAction(null);
@@ -529,6 +536,8 @@ export default function ProductVariants({
             name="images"
             getValues={getValues}
             setValue={setValue}
+            deletedImages={deletedImages}
+            setDeletedImages={setDeletedImages}
           />
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -562,10 +571,10 @@ export default function ProductVariants({
             <div>
               <label className="text-sm font-medium text-gray-700">Stock</label>
               <Input
-                type="text"
+                type="number"
                 placeholder="Enter Stock"
                 onFocus={(e) => e.target.select()}
-                {...register('stock')}
+                {...register('stock', { valueAsNumber: true })}
               />
               {errors.stock && (
                 <p className="mt-1 text-sm text-red-500">

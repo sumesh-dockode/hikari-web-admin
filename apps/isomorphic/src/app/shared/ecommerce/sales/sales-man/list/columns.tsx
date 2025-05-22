@@ -65,6 +65,27 @@ export const salesManColumns = [
     ),
   }),
   columnHelper.display({
+    id: 'bank_account_info',
+    size: 200,
+    header: 'Bank Account Info',
+    cell: ({ row }) => (
+      <>
+        {row.original.bank_account_info ? (
+          <div>
+            {row.original.bank_account_info?.account_holder_name} |{' '}
+            {row.original.bank_account_info?.bank_name} |{' '}
+            {row.original.bank_account_info?.account_number} |{' '}
+            {row.original.bank_account_info?.ifsc_code} |{' '}
+            {row.original.bank_account_info?.branch_name} |{' '}
+            {row.original.bank_account_info?.upi_id}
+          </div>
+        ) : (
+          <>-</>
+        )}
+      </>
+    ),
+  }),
+  columnHelper.display({
     id: 'store_manager',
     size: 150,
     header: 'Store Manager',

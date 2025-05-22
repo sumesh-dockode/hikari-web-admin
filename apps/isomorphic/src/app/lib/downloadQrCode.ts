@@ -2,6 +2,7 @@ import QRCodeStyling from 'qr-code-styling';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import apiClient from './apiClient';
+import { API_ROUTES } from './api';
 
 type Product = {
   id: string;
@@ -96,9 +97,7 @@ export async function downloadAllQRCodesFromStockAPI({
   orderId: string;
 }) {
   try {
-    const res = await apiClient.get(
-      `/mingler/admin/stocks/?order_id=${orderId}`
-    );
+    const res = await apiClient.get(`${API_ROUTES.stocks}?order=${orderId}`);
     const products: Product[] = res.data.data || [];
 
     const zip = new JSZip();

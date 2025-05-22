@@ -16,7 +16,7 @@ export default function SignIn() {
           </span>
         </>
       }
-      bannerTitle="The simplest way to manage your workspace."
+      // bannerTitle="The simplest way to manage your workspace."
       pageImage={
         <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[498px] 2xl:w-[498px]">
           <Image

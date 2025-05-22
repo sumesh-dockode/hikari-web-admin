@@ -12,6 +12,17 @@ interface Store {
   name: string;
   address: string;
 }
+
+interface BankAccountInfo {
+  id: string;
+  account_holder_name: string;
+  account_number: string;
+  bank_name: string;
+  ifsc_code: string;
+  branch_name: string;
+  upi_id: string;
+}
+
 export interface SalesmanDataType {
   id: string | null;
   first_name: string;
@@ -24,4 +35,5 @@ export interface SalesmanDataType {
   store_manager?: StoreManager | null;
   store?: Store | null;
   store_manager_id?: number | null;
+  bank_account_info?: BankAccountInfo | null;
 }

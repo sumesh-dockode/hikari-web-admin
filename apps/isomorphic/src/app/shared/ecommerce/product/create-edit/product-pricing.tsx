@@ -8,7 +8,6 @@ export default function ProductPricing() {
     register,
     formState: { errors },
   } = useFormContext();
-  console.log('priceerror', errors);
 
   return (
     <>

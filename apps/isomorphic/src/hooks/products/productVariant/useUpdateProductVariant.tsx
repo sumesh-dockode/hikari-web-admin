@@ -16,7 +16,7 @@ export function useUpdateProductVariant() {
     let url = `${API_ROUTES.productvariants}${variantsData.id}/`;
     const { data } = await apiClient.patch(url, variantsData);
 
-    return data.data as Promise<ProductVariantDataType>;
+    return data as Promise<ProductVariantDataType>;
   };
 
   const queryClient = useQueryClient();

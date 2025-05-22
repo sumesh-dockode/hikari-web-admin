@@ -1,11 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Input, Button, Select, Modal } from 'rizzui';
+import { Input, Button, Select, Modal, Tooltip, ActionIcon } from 'rizzui';
 import { PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
 import FormGroup from '@/app/shared/form-group';
-import { Form } from '@core/ui/form';
 import {
   ProductSpecificationFormInput,
   SpecificationSchema,
@@ -19,6 +18,7 @@ import { useSpecificationValueById } from '@/hooks/products/specificationValues/
 import { useDeleteSpecificationValue } from '@/hooks/products/specificationValues/useDeleteSpecificationValue';
 import { useUpdateSpecificationValue } from '@/hooks/products/specificationValues/useUpdateSpecificationValue';
 import DeletePopover from '@core/components/delete-popover';
+import PencilIcon from '@core/components/icons/pencil';
 
 interface Specification {
   id?: string;
@@ -73,8 +73,6 @@ export default function ProductSpecifications({
   } = useCreateSpecificationValue();
   const { data: specificationsData } = useSpecifications();
   const { data: productSpecification, isFetching } = useProductsById(productId);
-  console.log('specificationsData-------------', specificationsData);
-  console.log('productSpecification0000000', productSpecification);
 
   useEffect(() => {
     // Set specifications from product data when loaded
@@ -82,6 +80,18 @@ export default function ProductSpecifications({
       setSpecifications(productSpecification.data.specifications);
     }
   }, [productSpecification]);
+
+  useEffect(() => {
+    if (specificationValueById?.data && selectedSpecification) {
+      const specificationValue = specificationValueById.data;
+
+      setValue('id', specificationValue?.id);
+      setValue('specification', specificationValue?.specification);
+      setValue('value', specificationValue?.value);
+
+      setIsModalOpen(true);
+    }
+  }, [specificationValueById, selectedSpecification]);
 
   useEffect(() => {
     if (!specificationsData?.data) return;
@@ -99,6 +109,7 @@ export default function ProductSpecifications({
     control,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ProductSpecificationFormInput>({
     resolver: zodResolver(SpecificationSchema),
@@ -107,30 +118,55 @@ export default function ProductSpecifications({
       value: '',
     },
   });
-  console.log('errors', errors);
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    console.log('Form submitted with:', formData);
-
-    createProductSpecificationValue(
-      {
-        specification: formData.specification,
-        value: formData.value,
-        product: productId,
-      },
-      {
-        onSuccess: ({ data }: any) => {
-          console.log('res', data);
-          const result = data;
-          const newSpecification = {
-            id: result.id,
-            specification: result.specification_data?.name,
-            value: result.value,
-          };
-          setSpecifications((prev) => [...prev, newSpecification]);
-          setIsModalOpen(false);
+    if (formData?.id) {
+      updateSpecificationValue(
+        {
+          id: formData.id,
+          specification: formData.specification,
+          value: formData.value,
+          product: productId,
         },
-      }
-    );
+        {
+          onSuccess: ({ data }: any) => {
+            const result = data;
+            const newSpecification = {
+              id: result.id,
+              specification: result.specification,
+              name: result.specification_data?.name,
+              value: result.value,
+            };
+            setSpecifications((prev) =>
+              prev.map((v) => (v.id === result.id ? newSpecification : v))
+            );
+            setSelectedSpecification(null);
+            setIsModalOpen(false);
+          },
+        }
+      );
+    } else {
+      createProductSpecificationValue(
+        {
+          specification: formData.specification,
+          value: formData.value,
+          product: productId,
+        },
+        {
+          onSuccess: ({ data }: any) => {
+            const result = data;
+            const newSpecification = {
+              id: result.id,
+              specification: result.specification,
+              name: result.specification_data?.name,
+              value: result.value,
+            };
+            setSpecifications((prev) => [...prev, newSpecification]);
+            setSelectedSpecification(null);
+            setIsModalOpen(false);
+          },
+        }
+      );
+    }
   };
 
   const handleDeleteSpecification = (id: string) => {
@@ -143,10 +179,6 @@ export default function ProductSpecifications({
         setSelectedSpecification(null);
       },
     });
-  };
-
-  const removeSpecification = (index: number) => {
-    setSpecifications((prev) => prev.filter((_, i) => i !== index));
   };
 
   return (
@@ -189,6 +221,28 @@ export default function ProductSpecifications({
 
                       <td className="px-4 py-3">{spec.value}</td>
                       <td className="space-x-2">
+                        <Tooltip
+                          size="sm"
+                          content="Edit Variant"
+                          placement="top"
+                          color="invert"
+                        >
+                          <ActionIcon
+                            as="span"
+                            size="sm"
+                            variant="outline"
+                            aria-label="Edit Variant"
+                            isLoading={
+                              isFetching && selectedSpecification === spec.id
+                            }
+                            onClick={() => {
+                              setSpecificationAction('edit');
+                              setSelectedSpecification(spec.id as string);
+                            }}
+                          >
+                            <PencilIcon className="size-4" />
+                          </ActionIcon>
+                        </Tooltip>
                         <DeletePopover
                           title="Delete Variant"
                           description="Are you sure you want to delete this variant? This action cannot be undone."
@@ -211,19 +265,14 @@ export default function ProductSpecifications({
         )}
       </FormGroup>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        {/* <Form<ProductSpecificationFormInput>
-          validationSchema={SpecificationSchema}
-          onSubmit={onSubmit}
-          useFormProps={{
-            mode: 'onSubmit',
-            resolver: zodResolver(SpecificationSchema),
-            defaultValues: {
-              specification: '',
-              value: '',
-            },
-          }}
-        > */}
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => {
+          setSelectedSpecification(null);
+          setSpecificationAction(null);
+          setIsModalOpen(false);
+        }}
+      >
         <>
           <div className="space-y-5 p-4">
             <h2 className="text-lg font-bold">Add New Specification</h2>
@@ -261,7 +310,11 @@ export default function ProductSpecifications({
             <div className="flex justify-end gap-2 pt-4">
               <Button
                 variant="outline"
-                onClick={() => setIsModalOpen(false)}
+                onClick={() => {
+                  setSelectedSpecification(null);
+                  setSpecificationAction(null);
+                  setIsModalOpen(false);
+                }}
                 type="button"
               >
                 Cancel
@@ -269,17 +322,20 @@ export default function ProductSpecifications({
               <Button
                 type="submit"
                 variant="outline"
+                isLoading={
+                  createStatus === 'pending' || updateStatus === 'pending'
+                }
                 onClick={(e) => {
                   e.stopPropagation();
                   handleSubmit(onSubmit)();
                 }}
               >
-                Save Specification
+                {specificationAction === 'edit' ? 'Update ' : 'Save '}
+                Specification
               </Button>
             </div>
           </div>
         </>
-        {/* </Form> */}
       </Modal>
     </>
   );

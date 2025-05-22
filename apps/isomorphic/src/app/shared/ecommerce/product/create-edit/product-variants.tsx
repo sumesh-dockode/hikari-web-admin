@@ -16,7 +16,6 @@ import FormGroup from '@/app/shared/form-group';
 import useVariants from '@/hooks/products/variants/useVariants';
 import useVariantValue from '@/hooks/products/variantValues/useVariantValue';
 import ProductMultipleMedia from './product-multiple-media';
-import { Form } from '@core/ui/form';
 import {
   VariantFormInput,
   variantSchema,
@@ -30,7 +29,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import DeletePopover from '@core/components/delete-popover';
 import { useDeleteProductVariant } from '@/hooks/products/productVariant/useDeleteProductVariant';
 import PencilIcon from '@core/components/icons/pencil';
-import { ProductVariantDataType } from '@/data/products-data';
 import { useProductVariantById } from '@/hooks/products/productVariant/useProductVariantsById';
 import { useUpdateProductVariant } from '@/hooks/products/productVariant/useUpdateProductVariant';
 import {
@@ -196,7 +194,6 @@ export default function ProductVariants({
     },
   });
 
-  console.log('errors', errors);
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
     if (formData?.id) {
       updateProductVariant(
@@ -214,8 +211,8 @@ export default function ProductVariants({
           },
         },
         {
-          onSuccess: async (res: any) => {
-            const result = res;
+          onSuccess: async ({ data }: any) => {
+            const result = data;
             const variantId = result?.id;
 
             //calling upload api for each image

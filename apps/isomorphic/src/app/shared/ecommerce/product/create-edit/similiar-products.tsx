@@ -28,7 +28,6 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
   const selectedProducts = productsList.filter((p: productsDataType) =>
     similarProducts.includes(p.id)
   );
-  console.log('productsList', productsList);
 
   const handleAddProducts = () => {
     const ids = tempSelected?.map((p) => p.id) || [];
@@ -122,29 +121,31 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
         size="xl"
         overlayClassName="backdrop-blur"
       >
-        <div className="h-[calc(100vh-200px)] overflow-auto p-6">
-          <ProductsTable
-            pageSize={5}
-            hideFooter
-            enableRowSelection={true}
-            initialSelection={similarProducts}
-            onSelectionChange={(selected) => setTempSelected(selected)}
-            classNames={{
-              container: 'border-0 shadow-none',
-              rowClassName: 'hover:bg-gray-50',
-            }}
-          />
-        </div>
-        <div className="sticky bottom-0 left-0 right-0 z-10 -mb-8 flex items-center justify-end gap-4 border-t bg-white px-4 py-4 dark:bg-gray-50 md:px-5 lg:px-6 3xl:px-8 4xl:px-10">
-          <Button variant="outline" onClick={() => setIsModalOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAddProducts}
-            disabled={tempSelected.length === 0}
-          >
-            Save Products ({tempSelected.length})
-          </Button>
+        <div className="h-[calc(100vh-200px)]">
+          <div className="h-[calc(100vh-280px)] overflow-auto p-6">
+            <ProductsTable
+              pageSize={5}
+              hideFooter
+              enableRowSelection={true}
+              initialSelection={similarProducts}
+              onSelectionChange={(selected) => setTempSelected(selected)}
+              classNames={{
+                container: 'border-0 shadow-none',
+                rowClassName: 'hover:bg-gray-50',
+              }}
+            />
+          </div>
+          <div className="sticky bottom-0 left-0 right-0 z-10 -mb-8 flex items-center justify-end gap-4 border-t bg-white px-4 py-4 dark:bg-gray-50 md:px-5 lg:px-6 3xl:px-8 4xl:px-10">
+            <Button variant="outline" onClick={() => setIsModalOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleAddProducts}
+              disabled={tempSelected.length === 0}
+            >
+              Save Products ({tempSelected.length})
+            </Button>
+          </div>
         </div>
       </Modal>
     </>

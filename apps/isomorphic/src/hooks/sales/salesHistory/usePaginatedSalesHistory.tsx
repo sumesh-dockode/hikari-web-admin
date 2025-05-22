@@ -9,7 +9,7 @@ export default function usePaginatedSalesHistory(options: {
   pageIndex?: number;
   pageSize?: number;
   search?: string;
-  salesman?: number;
+  sold_by?: number;
 }) {
   const { status } = useSession();
 
@@ -26,8 +26,8 @@ export default function usePaginatedSalesHistory(options: {
     if (options?.search) {
       params.push(`search=${options.search}`);
     }
-    if (options?.salesman) {
-      params.push(`salesman=${options.salesman}`);
+    if (options?.sold_by) {
+      params.push(`sold_by=${options.sold_by}`);
     }
     if (params.length > 0) {
       url += `?${params.join('&')}`;

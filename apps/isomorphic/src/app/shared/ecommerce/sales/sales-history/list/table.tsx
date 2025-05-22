@@ -4,9 +4,6 @@ import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
 import TableFooter from '@core/components/table/footer';
-import { TableClassNameProps } from '@core/components/table/table-types';
-import cn from '@core/utils/class-names';
-import { exportToCSV } from '@core/utils/export-to-csv';
 import Filters from './filters';
 import { SalesHistoryColumns } from './columns';
 import { useEffect, useState } from 'react';
@@ -18,7 +15,7 @@ import { debounce } from 'lodash';
 
 interface FiltersProps {
   search?: string;
-  salesman?: number;
+  sold_by?: number;
 }
 
 export default function SalesHistoryTable() {
@@ -73,7 +70,7 @@ export default function SalesHistoryTable() {
   const handleSalesManFilter = (value?: number) => {
     setPagination((prev) => ({
       ...prev,
-      salesman: value,
+      sold_by: value,
     }));
   };
 
@@ -85,7 +82,7 @@ export default function SalesHistoryTable() {
         table={table}
         handleSearchChange={handleSearchChange}
         searchText={pagination.search}
-        salesManFilter={pagination.salesman}
+        salesManFilter={pagination.sold_by}
         handleSalesManFilter={handleSalesManFilter}
       />
       <Table

@@ -14,23 +14,30 @@ import { toCurrency } from '@core/utils/to-currency';
 
 interface SimilarProductsProps {
   className?: string;
+  productId: string;
 }
 
-export default function SimilarProducts({ className }: SimilarProductsProps) {
+export default function SimilarProducts({
+  className,
+  productId,
+}: SimilarProductsProps) {
   const { data } = usePaginatedProducts({});
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempSelected, setTempSelected] = useState<productsDataType[]>([]);
   // const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
   const { control, setValue, getValues, watch } = useFormContext();
-  const productsList = data?.data || [];
+  // const productsList = data?.data || [];
   const similarProducts = watch('similar_products') || [];
+  const productsList = (data?.data || []).filter(
+    (p: productsDataType) => p.id !== productId
+  );
 
   const selectedProducts = productsList.filter((p: productsDataType) =>
     similarProducts.includes(p.id)
   );
 
   const handleAddProducts = () => {
-    const ids = tempSelected?.map((p) => p.id) || [];
+    const ids = tempSelected.map((p) => p.id).filter((id) => id !== productId);
     setValue('similar_products', ids);
     setIsModalOpen(false);
   };
@@ -127,8 +134,13 @@ export default function SimilarProducts({ className }: SimilarProductsProps) {
               pageSize={5}
               hideFooter
               enableRowSelection={true}
-              initialSelection={similarProducts}
-              onSelectionChange={(selected) => setTempSelected(selected)}
+              initialSelection={similarProducts.filter(
+                (id: any) => id !== productId
+              )} // remove main product ID
+              onSelectionChange={
+                (selected) =>
+                  setTempSelected(selected.filter((p) => p.id !== productId)) // filter out main product
+              }
               classNames={{
                 container: 'border-0 shadow-none',
                 rowClassName: 'hover:bg-gray-50',

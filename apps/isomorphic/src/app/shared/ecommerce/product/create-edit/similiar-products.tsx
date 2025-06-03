@@ -35,10 +35,13 @@ export default function SimilarProducts({
   const selectedProducts = productsList.filter((p: productsDataType) =>
     similarProducts.includes(p.id)
   );
-
   const handleAddProducts = () => {
-    const ids = tempSelected.map((p) => p.id).filter((id) => id !== productId);
-    setValue('similar_products', ids);
+    const newIds = tempSelected?.map((p) => p.id) || [];
+    const existingIds = watch('similar_products') || [];
+
+    const mergedIds = Array.from(new Set([...existingIds, ...newIds]));
+
+    setValue('similar_products', mergedIds);
     setIsModalOpen(false);
   };
 

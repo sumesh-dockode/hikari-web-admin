@@ -38,7 +38,8 @@ const MAP_STEP_TO_COMPONENT = {
   [formParts.shipping]: ShippingInfo,
   [formParts.variantOptions]: ProductVariants,
   [formParts.productSpecifications]: ProductSpecification,
-  [formParts.similiarProducts]: similiarProducts,
+  // [formParts.similiarProducts]: similiarProducts,
+  [formParts.similarProducts]: similiarProducts,
 };
 
 interface IndexProps {
@@ -56,6 +57,7 @@ export default function CreateEditProduct({
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [productId, setProductId] = useState<string | undefined>(slug);
+  
 
   const { data, isFetching } = useProductsById(productId);
 
@@ -170,6 +172,7 @@ export default function CreateEditProduct({
   return (
     <div className="@container">
       <FormNav
+      showImagesAndVariants={!!productId}
         className={cn(
           layout === LAYOUT_OPTIONS.BERYLLIUM && 'z-[999] 2xl:top-[72px]'
         )}

@@ -186,7 +186,7 @@ export default function ProductSpecifications({
       <FormGroup
         title="Product Specifications"
         description="Add your product specifications here"
-        className={cn(className)}
+        className={cn(className, 'space-y-6')}
       >
         <Button
           onClick={() => setIsModalOpen(true)}
@@ -202,24 +202,26 @@ export default function ProductSpecifications({
               <table className="w-full divide-y divide-gray-200 overflow-hidden text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
                       Specification
                     </th>
-                    <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
                       Value
                     </th>
-                    <th></th>
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-200 bg-white">
                   {specifications.map((spec, index) => (
                     <tr
                       key={index}
                       className="border-b bg-white even:bg-gray-50"
                     >
-                      <td className="px-4 py-3">{spec.name}</td>
+                      <td className="px-6 py-4">{spec.name}</td>
 
-                      <td className="px-4 py-3">{spec.value}</td>
+                      <td className="px-6 py-4">{spec.value}</td>
                       <td className="space-x-2">
                         <Tooltip
                           size="sm"

@@ -36,6 +36,7 @@ import {
   useUploadProductImages,
 } from '@/hooks/products/useUploadProductImages';
 import { useDeleteProductImages } from '@/hooks/products/useDeleteUploadedImages';
+import toast from 'react-hot-toast';
 
 interface VariantOption {
   value: string;
@@ -339,7 +340,14 @@ export default function ProductVariants({
     setSelectedVariantId(variantId);
     deleteProductVariant(variantId, {
       onSuccess: () => {
+        toast.success('Variant deleted successfully');
         setCreatedVariants((prev) => prev.filter((v) => v.id !== variantId));
+        setSelectedVariantId(null);
+        setVariantAction(null);
+      },
+      onError: (error) => {
+        toast.error('Failed to delete variant. Please try again.');
+        console.error('Delete variant error:', error);
         setSelectedVariantId(null);
         setVariantAction(null);
       },

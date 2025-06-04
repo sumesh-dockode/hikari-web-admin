@@ -239,6 +239,7 @@ export default function ProductVariantsPage() {
         },
         {
           onSuccess: () => {
+            toast.success('Variant updated successfully');
             queryClient.invalidateQueries({ queryKey: ['variantsList'] });
             setIsModalOpen(false);
             setIsEditMode(false);
@@ -255,6 +256,7 @@ export default function ProductVariantsPage() {
         },
         {
           onSuccess: () => {
+            toast.success('Variant created successfully');
             queryClient.invalidateQueries({ queryKey: ['variantsList'] });
             setIsModalOpen(false);
             resetForm();

@@ -1,5 +1,6 @@
 export interface OrdersDataType {
   id: string;
+  short_id: string;
   items: [];
   total_price: string;
   status: string;

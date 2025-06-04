@@ -87,17 +87,19 @@ export default function CreateSalesMan({
 
   const onSubmit: SubmitHandler<SalesmanFormInput> = (data) => {
     setLoading(true);
-    let payload = {
+    let payload: any = {
       id: id || null,
       first_name: data.first_name || '',
       last_name: data.last_name || '',
       email: data.email || '',
       phone_number: data.phone_number || '',
       username: data.username || '',
-      password: data.password || undefined,
       is_active: data.is_active || false,
       store_manager_id: data.store_manager_id || null,
     };
+    if (data.password?.trim()) {
+      payload.password = data.password;
+    }
 
     id ? updateSalesMan(payload) : createSalesMan(payload);
   };
@@ -204,25 +206,29 @@ export default function CreateSalesMan({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
-                {!id && (
-                  <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value } }) => (
-                      <Password
-                        placeholder="Enter your password"
-                        helperText={
-                          value &&
-                          value?.length < 8 &&
-                          'Your current password must be more than 8 characters'
-                        }
-                        value={value}
-                        onChange={onChange}
-                        error={errors.password?.message}
-                      />
-                    )}
-                  />
-                )}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <Password
+                      placeholder={
+                        id
+                          ? 'Enter new password (optional)'
+                          : 'Enter your password'
+                      }
+                      onChange={onChange}
+                      value={value}
+                      error={errors.password?.message}
+                      helperText={
+                        id
+                          ? 'Leave blank to keep current password'
+                          : value && value?.length < 8
+                            ? 'Password must be at least 8 characters'
+                            : ''
+                      }
+                    />
+                  )}
+                />
               </FormGroup>
               <FormGroup
                 title="Store Manager"

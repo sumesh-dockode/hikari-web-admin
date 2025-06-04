@@ -59,7 +59,14 @@ export default function ServiceBookingTable() {
     if (data) {
       console.log('data??????????????', data);
       const serviceBookingAPIData =
-        data?.pages.flatMap((page: any) => page?.data?.results) || [];
+        data?.pages
+          .flatMap((page: any) => page?.data?.results)
+          .sort(
+            (a, b) =>
+              new Date(b.created_at).getTime() -
+              new Date(a.created_at).getTime()
+          ) || [];
+
       setData(serviceBookingAPIData);
     }
   }, [data]);

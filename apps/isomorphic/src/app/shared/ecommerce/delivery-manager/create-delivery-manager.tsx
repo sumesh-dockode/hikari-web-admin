@@ -79,20 +79,25 @@ export default function CreateDeliveryManager({
   }, [data]);
 
   const onSubmit: SubmitHandler<DeliveryManagerFormInput> = (data) => {
-    setLoading(true);
-    let payload = {
+    const basePayload: any = {
       id: id || null,
-      first_name: data.first_name || '',
-      last_name: data.last_name || '',
-      email: data.email || '',
-      phone_number: data.phone_number || '',
-      username: data.username || '',
-      password: data.password || undefined,
-      is_active: data.is_active || false,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      email: data.email,
+      phone_number: data.phone_number,
+      username: data.username,
+      is_active: data.is_active,
       user_role: 'DELIVERYMANAGER',
     };
 
-    id ? updateDeliveryManager(payload) : createDeliveryManager(payload);
+    // Add password only if it's provided and non-empty
+    if (data.password?.trim()) {
+      basePayload.password = data.password;
+    }
+
+    id
+      ? updateDeliveryManager(basePayload)
+      : createDeliveryManager(basePayload);
   };
 
   useEffect(() => {
@@ -198,24 +203,29 @@ export default function CreateDeliveryManager({
                   error={errors.username?.message}
                   className="flex-grow"
                 />
-                {!id && (
-                  <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value } }) => (
-                      <Password
-                        placeholder="Enter your password"
-                        helperText={
-                          value &&
-                          value?.length < 8 &&
-                          'Your current password must be more than 8 characters'
-                        }
-                        onChange={onChange}
-                        error={errors.password?.message}
-                      />
-                    )}
-                  />
-                )}
+                <Controller
+                  control={control}
+                  name="password"
+                  render={({ field: { onChange, value } }) => (
+                    <Password
+                      placeholder={
+                        id
+                          ? 'Enter new password (optional)'
+                          : 'Enter your password'
+                      }
+                      onChange={onChange}
+                      value={value}
+                      error={errors.password?.message}
+                      helperText={
+                        id
+                          ? 'Leave blank to keep current password'
+                          : value && value?.length < 8
+                            ? 'Password must be at least 8 characters'
+                            : ''
+                      }
+                    />
+                  )}
+                />
               </FormGroup>
               <FormGroup
                 title={'Status'}

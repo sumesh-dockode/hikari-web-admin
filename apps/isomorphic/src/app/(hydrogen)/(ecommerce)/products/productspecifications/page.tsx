@@ -28,6 +28,7 @@ import useSpecificationValue from '@/hooks/products/specificationValues/useSpeci
 import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
 import { useUpdateSpecificationValue } from '@/hooks/products/specificationValues/useUpdateSpecificationValue';
 import { useDeleteSpecificationValue } from '@/hooks/products/specificationValues/useDeleteSpecificationValue';
+import toast from 'react-hot-toast';
 
 const pageHeader = {
   title: 'Product Specifications',
@@ -150,38 +151,47 @@ export default function ProductSpecificationPage() {
   };
 
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    const specificationData =
+    const specificationName =
       selectedSpecificationType === 'Custom'
         ? formData.value
         : selectedSpecificationType;
 
+    if (!specificationName) {
+      toast.error('Specification name is required');
+      return;
+    }
+
     if (isEditMode && editingSpecification) {
       updateSpecification(
-        { id: editingSpecification.id, name: specificationData },
+        { id: editingSpecification.id, name: specificationName },
         {
           onSuccess: () => {
+            toast.success('Specification updated successfully');
+            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
             setIsModalOpen(false);
             resetForm();
             setIsEditMode(false);
             setEditingSpecification(null);
-            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
           },
           onError: (error) => {
-            console.error('Error updating specification:', error);
+            console.error(error);
+            toast.error('Failed to update specification');
           },
         }
       );
     } else {
       createSpecifications(
-        { name: specificationData },
+        { name: specificationName },
         {
           onSuccess: () => {
+            toast.success('Specification created successfully');
+            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
             setIsModalOpen(false);
             resetForm();
-            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
           },
           onError: (error) => {
-            console.error('Error creating specification:', error);
+            console.error(error);
+            toast.error('Failed to create specification');
           },
         }
       );

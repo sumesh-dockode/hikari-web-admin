@@ -93,14 +93,24 @@ export const authOptions: NextAuthOptions = {
             body: requestBody,
           });
 
-          if (!res.ok) {
-            throw new Error('Invalid credentials');
-          }
+          // if (!res.ok) {
+          //   throw new Error('Invalid credentials');
+          // }
 
           const responseData = (await res.json()) as AuthResponse;
           if (responseData.status === 'success') {
+            console.log('Login API response:', responseData);
             const authResponse = responseData.data;
 
+          if (!res.ok) {
+          throw new Error('Credentials');
+          }
+
+
+          if (authResponse.user.role === 'SHOP') {
+            throw new Error('ShopAccessDenied');
+          }
+            
             return {
               id: authResponse.user.id,
               name: authResponse.user.username,
@@ -112,10 +122,15 @@ export const authOptions: NextAuthOptions = {
             console.error('Authentication failed:', responseData);
             return null;
           }
-        } catch (error) {
+        // } catch (error) {
+        //   console.error('Login error:', error);
+        //   return null;
+        // }
+        } catch (error: any) {
           console.error('Login error:', error);
-          return null;
+          throw new Error(error?.message || 'Credentials');
         }
+
       },
     }),
     // GoogleProvider({

@@ -11,7 +11,8 @@ export const formParts = {
   deliveryEvent: 'deliveryEvent',
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
-  similiarProducts: 'similarProducts',
+  // similiarProducts: 'similarProducts',
+  similarProducts: 'similarProducts', 
   productSpecifications: 'productSpecifications',
 };
 
@@ -45,16 +46,24 @@ export const menuItems = [
     value: formParts.variantOptions,
   },
   {
-    label: 'Similiar Products',
-    value: formParts.similiarProducts,
+    // label: 'Similiar Products',
+    // value: formParts.similiarProducts,
+    label: 'Similar Products', 
+    value: formParts.similarProducts,
   },
 ];
 
 interface FormNavProps {
   className?: string;
+  showImagesAndVariants?: boolean;
 }
 
-export default function FormNav({ className }: FormNavProps) {
+export default function FormNav({ className, showImagesAndVariants = true }: FormNavProps) {
+    const filteredMenuItems = menuItems.filter(
+      (item) =>
+          showImagesAndVariants ||
+          (item.value !== formParts.media && item.value !== formParts.variantOptions)
+    );
   return (
     <div
       className={cn(
@@ -64,7 +73,7 @@ export default function FormNav({ className }: FormNavProps) {
     >
       <div className="custom-scrollbar overflow-x-auto scroll-smooth">
         <div className="inline-grid grid-flow-col gap-5 md:gap-7 lg:gap-10">
-          {menuItems.map((tab, idx) => (
+         {filteredMenuItems.map((tab, idx) => (
             <Link
               key={tab.value}
               to={tab.value}

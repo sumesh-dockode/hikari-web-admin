@@ -9,6 +9,7 @@ import { Checkbox, Password, Button, Input, Text } from 'rizzui';
 import { Form } from '@core/ui/form';
 import { routes } from '@/config/routes';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
+import { useSearchParams } from 'next/navigation';
 
 const initialValues: LoginSchema = {
   username: '',
@@ -19,6 +20,8 @@ export default function SignInForm() {
   //TODO: why we need to reset it here
   const [reset, setReset] = useState({});
   const [loading, setLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
@@ -30,9 +33,26 @@ export default function SignInForm() {
       setLoading(false);
     }
   };
+  const errorMessages: Record<string, string> = {
+    CredentialsSignin: 'Invalid username or password.',
+     ShopAccessDenied: 'You cannot access or authorize to admin portal.',
+    Credentials: 'Invalid username or password.',
+  };
+
+  const displayError =
+    error && errorMessages[error]
+      ? errorMessages[error]
+      : error
+        ? decodeURIComponent(error)
+        : '';
 
   return (
     <>
+      {displayError && (
+        <div className="mb-4 text-center text-sm text-red-600 font-semibold">
+          {displayError}
+        </div>
+      )}
       <Form<LoginSchema>
         validationSchema={loginSchema}
         resetValues={reset}

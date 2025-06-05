@@ -117,7 +117,7 @@ export default function ServiceDetailsGallery({
         new_status: statusId,
         new_price: currentService.price?.toString() || '0',
         // service_type_id: currentService.service_type_id || '',
-        image: currentService.image || '',
+        // image: currentService.image || '',
       };
       updateServiceStatus(payload);
     }

@@ -223,7 +223,7 @@ export default function ProductSpecifications({
                       <td className="space-x-2">
                         <Tooltip
                           size="sm"
-                          content="Edit Variant"
+                          content="Edit Specification"
                           placement="top"
                           color="invert"
                         >
@@ -231,7 +231,7 @@ export default function ProductSpecifications({
                             as="span"
                             size="sm"
                             variant="outline"
-                            aria-label="Edit Variant"
+                            aria-label="Edit Specification"
                             isLoading={
                               isFetching && selectedSpecification === spec.id
                             }

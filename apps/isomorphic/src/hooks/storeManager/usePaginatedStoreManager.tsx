@@ -28,12 +28,15 @@ export default function usePaginatedStoreManager(options: {
     if (params.length > 0) {
       url += `?${params.join('&')}`;
     }
+    
     const { data } = await apiClient.get(url);
 
     return data;
   };
   return useQuery({
-    queryKey: ['storeManagerTable', options],
+    // queryKey: ['storeManagerTable', options],
+    queryKey: ['storeManagerTable', options.pageIndex, options.pageSize, options.search],
+
     queryFn: fetchStoreManager,
     enabled: status === 'authenticated',
     throwOnError(error, query) {

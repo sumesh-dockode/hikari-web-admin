@@ -6,7 +6,7 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: 10 * 1000, // 10 second
+      staleTime: 0,
       retry: (failureCount, error) => {
         const err = error as AxiosError;
         console.log('err', err);

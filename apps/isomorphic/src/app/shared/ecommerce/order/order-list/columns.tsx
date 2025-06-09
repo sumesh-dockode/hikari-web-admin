@@ -15,7 +15,12 @@ import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
 import { ActionIcon, Box, Text, Tooltip } from 'rizzui';
 
 const columnHelper = createColumnHelper<OrdersDataType>();
-
+const formatOrderId = (uuid: string) => {
+  const base36 = BigInt(`0x${uuid.replace(/-/g, '')}`)
+    .toString(36)
+    .toUpperCase();
+  return `ORD-${base36.substring(0, 8)}`;
+};
 export const ordersColumns = (expanded: boolean = true) => {
   // const [isLoading, setIsLoading] = useState(false);
 
@@ -34,7 +39,11 @@ export const ordersColumns = (expanded: boolean = true) => {
       id: 'id',
       size: 120,
       header: 'Order Id',
-      cell: ({ row }) => <>#{row.original.id}</>,
+      cell: ({ row }) => (
+        <Tooltip content={row.original.id} color="invert">
+          <span>{formatOrderId(row.original.id)}</span>
+        </Tooltip>
+      ),
     }),
     columnHelper.accessor('order_info', {
       id: 'order-info',

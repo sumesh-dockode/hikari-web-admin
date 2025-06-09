@@ -3,9 +3,7 @@ import PageHeader from '@/app/shared/page-header';
 import { routes } from '@/config/routes';
 import {
   ProductSpecificationFormInput,
-  ProductSpecificationValueFormInput,
   SpecificationSchema,
-  SpecificationValueSchema,
 } from '@/validators/product-specification-schema';
 import { Modal } from '@core/modal-views/modal';
 import React, { useState } from 'react';
@@ -24,11 +22,6 @@ import useSpecifications from '@/hooks/products/specifications/useSpecifications
 import { useCreateSpecifications } from '@/hooks/products/specifications/useCreateSpecification';
 import { useUpdateSpecification } from '@/hooks/products/specifications/useUpdateSpecification';
 import { useDeleteSpecification } from '@/hooks/products/specifications/useDeleteSpecification';
-import useSpecificationValue from '@/hooks/products/specificationValues/useSpecificationValue';
-import { useCreateSpecificationValue } from '@/hooks/products/specificationValues/useCreateSpecificationValue';
-import { useUpdateSpecificationValue } from '@/hooks/products/specificationValues/useUpdateSpecificationValue';
-import { useDeleteSpecificationValue } from '@/hooks/products/specificationValues/useDeleteSpecificationValue';
-import toast from 'react-hot-toast';
 
 const pageHeader = {
   title: 'Product Specifications',
@@ -41,108 +34,35 @@ const pageHeader = {
 
 export default function ProductSpecificationPage() {
   const queryClient = useQueryClient();
-  const { data, isLoading, isError, error } = useSpecifications();
-  // const { isLoading: isFetching } = useSpecificationById(specificationId || '');
-  const {
-    mutate: createSpecifications,
-    data: specificationData,
-    status: createStatus,
-  } = useCreateSpecifications();
-  const {
-    mutate: updateSpecification,
-    data: updateResponseData,
-    status: updateStatus,
-  } = useUpdateSpecification();
-  const { mutate: deleteSpecification, status: deleteStatus } =
-    useDeleteSpecification();
-  const {
-    data: specificationValuesData,
-    isLoading: isSpecificationValueLoading,
-    isError: isSpecificationValueError,
-  } = useSpecificationValue();
-  const {
-    mutate: createSpecificationValue,
-    data: specificationValueData,
-    status: createsStatus,
-  } = useCreateSpecificationValue();
-  const {
-    mutate: updateSpecificationValue,
-    data: updateValueResponseData,
-    status: updateValueStatus,
-  } = useUpdateSpecificationValue();
-  const { mutate: deleteVariantValue } = useDeleteSpecificationValue();
+  const { data } = useSpecifications();
+  const { mutate: createSpecifications } = useCreateSpecifications();
+  const { mutate: updateSpecification } = useUpdateSpecification();
+  const { mutate: deleteSpecification } = useDeleteSpecification();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedSpecificationType, setSelectedSpecificationType] =
-    useState<string>('Color');
-  const [specificationName, setSpecificationName] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
-  const specificationAPIData = data?.data || [];
-  const specificationValueAPIData = specificationValuesData?.data || [];
-
-  const openValueModal = (specificationId: string) => {
-    setActiveSpecificationId(specificationId);
-    setIsValueModalOpen(true);
-  };
-
-  const confirmDelete = () => {
-    if (specificationToDelete) {
-      deleteSpecification(specificationToDelete);
-    }
-    setDeleteConfirmationOpen(false);
-  };
-
-  const [activeSpecificationId, setActiveSpecificationId] = useState<
-    string | null
-  >(null);
-  const [editingSpecification, setEditingSpecification] = useState<any>(null);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [editingValue, setEditingValue] = useState<any>(null);
-  const [isValueEditMode, setIsValueEditMode] = useState(false);
-  const [isValueModalOpen, setIsValueModalOpen] = useState(false);
   const [deleteConfirmationOpen, setDeleteConfirmationOpen] = useState(false);
   const [specificationToDelete, setSpecificationToDelete] = useState<
     any | null
   >(null);
+  const [editingSpecification, setEditingSpecification] = useState<any>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
+
+  const specificationAPIData = data?.data || [];
 
   const {
-    reset: resetForm,
     handleSubmit,
-    formState: { errors },
     register,
+    reset,
+    formState: { errors },
   } = useForm<ProductSpecificationFormInput>({
     resolver: zodResolver(SpecificationSchema),
-    defaultValues: {
-      value: '',
-    },
-  });
-
-  const {
-    reset: resetValueForm,
-    handleSubmit: handleSubmitValue,
-    formState: { errors: valueErrors },
-    register: registerValue,
-  } = useForm<ProductSpecificationValueFormInput>({
-    resolver: zodResolver(SpecificationValueSchema),
-    defaultValues: {
-      value: '',
-    },
   });
 
   const handleEditSpecification = (specification: any) => {
     setEditingSpecification(specification);
     setIsEditMode(true);
     setIsModalOpen(true);
-
-    if (
-      specification.name === 'Color' ||
-      specification.name === 'Material' ||
-      specification.name === 'Seater'
-    ) {
-      setSelectedSpecificationType(specification.name);
-    } else {
-      setSelectedSpecificationType('Custom');
-      setSpecificationName(specification.name);
-    }
+    reset({ specification: specification.name });
   };
 
   const handleDeleteClick = (specificationId: string) => {
@@ -150,79 +70,44 @@ export default function ProductSpecificationPage() {
     setDeleteConfirmationOpen(true);
   };
 
-  const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    const specificationName =
-      selectedSpecificationType === 'Custom'
-        ? formData.value
-        : selectedSpecificationType;
-
-    if (!specificationName) {
-      toast.error('Specification name is required');
-      return;
+  const confirmDelete = () => {
+    if (specificationToDelete) {
+      deleteSpecification(specificationToDelete, {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
+        },
+      });
     }
+    setDeleteConfirmationOpen(false);
+  };
 
+  const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
+    console.log('Form Submitted:', formData);
     if (isEditMode && editingSpecification) {
       updateSpecification(
-        { id: editingSpecification.id, name: specificationName },
+        { id: editingSpecification.id, name: formData.specification },
         {
           onSuccess: () => {
-            toast.success('Specification updated successfully');
-            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
             setIsModalOpen(false);
-            resetForm();
+            reset({ specification: '' });
             setIsEditMode(false);
             setEditingSpecification(null);
-          },
-          onError: (error) => {
-            console.error(error);
-            toast.error('Failed to update specification');
+            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
           },
         }
       );
     } else {
       createSpecifications(
-        { name: specificationName },
+        { name: formData.specification },
         {
           onSuccess: () => {
-            toast.success('Specification created successfully');
-            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
             setIsModalOpen(false);
-            resetForm();
-          },
-          onError: (error) => {
-            console.error(error);
-            toast.error('Failed to create specification');
+            reset({ specification: '' });
+            queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
           },
         }
       );
     }
-  };
-
-  const getModalContent = () => {
-    if (!activeSpecificationId) return null;
-
-    const specification = specificationAPIData.find(
-      (spec: any) => spec.id === activeSpecificationId
-    );
-
-    if (!specification) return null;
-
-    if (specification.name.toLowerCase() === 'color') {
-      return (
-        <div>
-          <label className="mb-2 block text-sm font-medium text-gray-700">
-            Select Color
-          </label>
-          <input
-            type="color"
-            value={selectedColor}
-            onChange={(e) => setSelectedColor(e.target.value)}
-            className="h-10 w-full cursor-pointer"
-          />
-        </div>
-      );
-    }
-    return null;
   };
 
   return (
@@ -233,23 +118,23 @@ export default function ProductSpecificationPage() {
             onClick={() => {
               setIsEditMode(false);
               setEditingSpecification(null);
-              setSelectedSpecificationType('Color');
-              setSpecificationName('');
+              reset({ specification: '' });
               setIsModalOpen(true);
             }}
             variant="outline"
-            type="submit"
             className="col-span-full ml-auto w-auto"
           >
             <PiPlusBold className="me-2 h-4 w-4" /> Add Specification
           </Button>
         </div>
       </PageHeader>
+
+      {/* Add/Edit Specification Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          resetForm();
+          reset({ specification: '' });
           setIsEditMode(false);
           setEditingSpecification(null);
         }}
@@ -258,74 +143,35 @@ export default function ProductSpecificationPage() {
           <h2 className="mb-4 text-lg font-semibold">
             {isEditMode ? 'Edit Specification' : 'Add New Specification'}
           </h2>
-          <Form<ProductSpecificationFormInput>
-            validationSchema={SpecificationSchema}
-            // resetValues={reset}
-            onSubmit={onSubmit}
-            useFormProps={{
-              mode: 'onChange',
-              defaultValues: isEditMode
-                ? {
-                    value: editingSpecification?.name || '',
-                  }
-                : { value: '' },
-              resolver: zodResolver(SpecificationSchema),
-            }}
-            className="space-y-4 p-6"
-          >
-            {({ register, formState: { errors } }) => (
-              <>
-                <label className="text-sm font-medium text-gray-700">
-                  Choose a variant type
-                </label>
-                <select
-                  value={selectedSpecificationType}
-                  onChange={(e) => setSelectedSpecificationType(e.target.value)}
-                  className="w-full rounded border-gray-300 px-3 py-2 text-sm"
-                >
-                  <option value="Color">Color</option>
-                  <option value="Material">Material</option>
-                  <option value="Seater">Seater</option>
-                  <option value="Custom">Custom</option>
-                </select>
-                {selectedSpecificationType === 'Custom' && (
-                  <div>
-                    <Input
-                      type="text"
-                      label="Enter custom variant name"
-                      placeholder="e.g. Fabric, Height"
-                      {...register('value')}
-                    />
-                    {errors.value && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.value?.message}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsModalOpen(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button type="submit">Save Specification</Button>
-                </div>
-              </>
-            )}
-          </Form>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6">
+            <Input
+              type="text"
+              label="Specification Name"
+              placeholder="e.g. Color, Material, Size"
+              {...register('specification')}
+              error={errors.specification?.message}
+            />
+            <div className="flex justify-end gap-3 pt-4">
+              <Button
+                variant="outline"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsModalOpen(false);
+                  setIsEditMode(false);
+                  setEditingSpecification(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">
+                {isEditMode ? 'Update' : 'Save'} Specification
+              </Button>
+            </div>
+          </form>
         </div>
       </Modal>
-      <Modal
-        isOpen={isValueModalOpen}
-        onClose={() => {
-          setIsValueModalOpen(false);
-          resetValueForm();
-          setSelectedColor('');
-        }}
-      ></Modal>
+
+      {/* Delete Confirmation Modal */}
       <Modal
         isOpen={deleteConfirmationOpen}
         onClose={() => setDeleteConfirmationOpen(false)}
@@ -348,27 +194,19 @@ export default function ProductSpecificationPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Specifications List */}
       <div className="mt-8 space-y-4 px-6">
-        {specificationAPIData.map((specification: any, index: number) => (
+        {specificationAPIData.map((specification: any) => (
           <div
-            key={index}
+            key={specification.id}
             className="space-y-2 rounded border border-gray-200 p-4 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="text-sm font-medium text-gray-800">
                 {specification.name}
               </div>
-
               <div className="flex gap-2">
-                {/* <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    openValueModal(specification.id);
-                  }}
-                >
-                  <PiPlusBold className="me-2 h-4 w-4" /> Add Value
-                </Button> */}
                 <Tooltip
                   size="sm"
                   content="Edit Specification"
@@ -386,7 +224,6 @@ export default function ProductSpecificationPage() {
                     <PencilIcon className="size-4" />
                   </ActionIcon>
                 </Tooltip>
-
                 <ActionIcon
                   size="sm"
                   variant="outline"
@@ -398,32 +235,6 @@ export default function ProductSpecificationPage() {
                 </ActionIcon>
               </div>
             </div>
-            {specificationValueAPIData.filter(
-              (value: any) => value.product === specification.id
-            ).length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {specificationValueAPIData
-                  .filter((value: any) => value.product === specification.id)
-                  .map((valueData: any) => (
-                    <div
-                      key={valueData.id}
-                      className="relative flex items-center"
-                    >
-                      {specification.name.toLowerCase() === 'color' ? (
-                        <div
-                          className="h-6 w-6 rounded-full border"
-                          style={{ backgroundColor: valueData.value }}
-                          title={valueData.value}
-                        />
-                      ) : (
-                        <div className="rounded border bg-gray-100 px-3 py-1 text-xs text-gray-700">
-                          {valueData.value}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            )}
           </div>
         ))}
       </div>

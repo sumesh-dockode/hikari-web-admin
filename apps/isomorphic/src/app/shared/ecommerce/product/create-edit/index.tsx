@@ -57,7 +57,6 @@ export default function CreateEditProduct({
   const [reset, setReset] = useState({});
   const [isLoading, setLoading] = useState(false);
   const [productId, setProductId] = useState<string | undefined>(slug);
-  
 
   const { data, isFetching } = useProductsById(productId);
 
@@ -172,7 +171,7 @@ export default function CreateEditProduct({
   return (
     <div className="@container">
       <FormNav
-      showImagesAndVariants={!!productId}
+        showImagesAndVariants={!!productId}
         className={cn(
           layout === LAYOUT_OPTIONS.BERYLLIUM && 'z-[999] 2xl:top-[72px]'
         )}

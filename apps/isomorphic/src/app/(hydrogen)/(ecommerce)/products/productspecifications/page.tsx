@@ -46,13 +46,13 @@ export default function ProductSpecificationPage() {
   >(null);
   const [editingSpecification, setEditingSpecification] = useState<any>(null);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [reset, setReset] = useState({ specification: '' });
 
   const specificationAPIData = data?.data || [];
 
   const {
     handleSubmit,
     register,
-    reset,
     formState: { errors },
   } = useForm<ProductSpecificationFormInput>({
     resolver: zodResolver(SpecificationSchema),
@@ -62,7 +62,7 @@ export default function ProductSpecificationPage() {
     setEditingSpecification(specification);
     setIsEditMode(true);
     setIsModalOpen(true);
-    reset({ specification: specification.name });
+    setReset({ specification: specification.name });
   };
 
   const handleDeleteClick = (specificationId: string) => {
@@ -82,14 +82,13 @@ export default function ProductSpecificationPage() {
   };
 
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    console.log('Form Submitted:', formData);
     if (isEditMode && editingSpecification) {
       updateSpecification(
         { id: editingSpecification.id, name: formData.specification },
         {
           onSuccess: () => {
             setIsModalOpen(false);
-            reset({ specification: '' });
+            setReset({ specification: '' });
             setIsEditMode(false);
             setEditingSpecification(null);
             queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
@@ -102,7 +101,7 @@ export default function ProductSpecificationPage() {
         {
           onSuccess: () => {
             setIsModalOpen(false);
-            reset({ specification: '' });
+            setReset({ specification: '' });
             queryClient.invalidateQueries({ queryKey: ['specificationsList'] });
           },
         }
@@ -118,7 +117,7 @@ export default function ProductSpecificationPage() {
             onClick={() => {
               setIsEditMode(false);
               setEditingSpecification(null);
-              reset({ specification: '' });
+              setReset({ specification: '' });
               setIsModalOpen(true);
             }}
             variant="outline"
@@ -134,7 +133,7 @@ export default function ProductSpecificationPage() {
         isOpen={isModalOpen}
         onClose={() => {
           setIsModalOpen(false);
-          reset({ specification: '' });
+          setReset({ specification: '' });
           setIsEditMode(false);
           setEditingSpecification(null);
         }}
@@ -143,31 +142,45 @@ export default function ProductSpecificationPage() {
           <h2 className="mb-4 text-lg font-semibold">
             {isEditMode ? 'Edit Specification' : 'Add New Specification'}
           </h2>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-6">
-            <Input
-              type="text"
-              label="Specification Name"
-              placeholder="e.g. Color, Material, Size"
-              {...register('specification')}
-              error={errors.specification?.message}
-            />
-            <div className="flex justify-end gap-3 pt-4">
-              <Button
-                variant="outline"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsModalOpen(false);
-                  setIsEditMode(false);
-                  setEditingSpecification(null);
-                }}
-              >
-                Cancel
-              </Button>
-              <Button type="submit">
-                {isEditMode ? 'Update' : 'Save'} Specification
-              </Button>
-            </div>
-          </form>
+          <Form<ProductSpecificationFormInput>
+            validationSchema={SpecificationSchema}
+            resetValues={reset}
+            onSubmit={onSubmit}
+            useFormProps={{
+              mode: 'onChange',
+              resolver: zodResolver(SpecificationSchema),
+            }}
+            className="space-y-4 p-6"
+          >
+            {({ register, formState: { errors } }) => (
+              <>
+                <Input
+                  type="text"
+                  label="Specification Name"
+                  placeholder="e.g. Color, Material, Size"
+                  {...register('specification')}
+                  error={errors.specification?.message}
+                />
+                <div className="flex justify-end gap-3 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => setIsModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSubmit(onSubmit)();
+                    }}
+                  >
+                    {isEditMode ? 'Update' : 'Save'} Specification
+                  </Button>
+                </div>
+              </>
+            )}
+          </Form>
         </div>
       </Modal>
 

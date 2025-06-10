@@ -86,7 +86,7 @@ export default function SimilarProducts({
                         src={product.product_images?.[0]}
                         name={product.name}
                         description={
-                          <div className="flex gap-2">
+                          <span className="flex gap-2">
                             <span className="line-clamp-1 text-sm text-gray-500">
                               {product.description}
                             </span>{' '}
@@ -94,7 +94,7 @@ export default function SimilarProducts({
                             <span className="text-sm text-gray-500">
                               {toCurrency(product.price || 0)}
                             </span>
-                          </div>
+                          </span>
                         }
                         descriptionClassName="line-clamp-2"
                         avatarProps={{

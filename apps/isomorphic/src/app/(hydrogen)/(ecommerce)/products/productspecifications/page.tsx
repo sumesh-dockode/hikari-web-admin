@@ -150,10 +150,7 @@ export default function ProductSpecificationPage() {
   };
 
   const onSubmit: SubmitHandler<ProductSpecificationFormInput> = (formData) => {
-    const specificationData =
-      selectedSpecificationType === 'Custom'
-        ? formData.value
-        : selectedSpecificationType;
+    const specificationData = formData.value;
 
     if (isEditMode && editingSpecification) {
       updateSpecification(
@@ -256,8 +253,8 @@ export default function ProductSpecificationPage() {
               mode: 'onChange',
               defaultValues: isEditMode
                 ? {
-                    value: editingSpecification?.name || '',
-                  }
+                  value: editingSpecification?.name || '',
+                }
                 : { value: '' },
               resolver: zodResolver(SpecificationSchema),
             }}
@@ -265,34 +262,24 @@ export default function ProductSpecificationPage() {
           >
             {({ register, formState: { errors } }) => (
               <>
-                <label className="text-sm font-medium text-gray-700">
-                  Choose a variant type
-                </label>
-                <select
-                  value={selectedSpecificationType}
-                  onChange={(e) => setSelectedSpecificationType(e.target.value)}
-                  className="w-full rounded border-gray-300 px-3 py-2 text-sm"
+                {/* <select
+                  value="Custom"
+                  disabled
+                  className="w-full rounded border-gray-300 px-3 py-2 text-sm text-gray-500 cursor-not-allowed mb-2"
                 >
-                  <option value="Color">Color</option>
-                  <option value="Material">Material</option>
-                  <option value="Seater">Seater</option>
                   <option value="Custom">Custom</option>
-                </select>
-                {selectedSpecificationType === 'Custom' && (
-                  <div>
-                    <Input
-                      type="text"
-                      label="Enter custom variant name"
-                      placeholder="e.g. Fabric, Height"
-                      {...register('value')}
-                    />
-                    {errors.value && (
-                      <p className="mt-1 text-xs text-red-500">
-                        {errors.value?.message}
-                      </p>
-                    )}
-                  </div>
+                </select> */}
+                <Input
+                  type="text"
+                  label="Enter custom specification name"
+                  placeholder="e.g. Fabric, Height"
+                  {...register('value')}
+                // Optionally: onChange={() => setDuplicateError(null)}
+                />
+                {errors.value && (
+                  <p className="mt-1 text-xs text-red-500">{errors.value?.message}</p>
                 )}
+
 
                 <div className="flex justify-end gap-3 pt-4">
                   <Button
@@ -391,29 +378,29 @@ export default function ProductSpecificationPage() {
             {specificationValueAPIData.filter(
               (value: any) => value.product === specification.id
             ).length > 0 && (
-              <div className="flex flex-wrap gap-2 pt-2">
-                {specificationValueAPIData
-                  .filter((value: any) => value.product === specification.id)
-                  .map((valueData: any) => (
-                    <div
-                      key={valueData.id}
-                      className="relative flex items-center"
-                    >
-                      {specification.name.toLowerCase() === 'color' ? (
-                        <div
-                          className="h-6 w-6 rounded-full border"
-                          style={{ backgroundColor: valueData.value }}
-                          title={valueData.value}
-                        />
-                      ) : (
-                        <div className="rounded border bg-gray-100 px-3 py-1 text-xs text-gray-700">
-                          {valueData.value}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-              </div>
-            )}
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {specificationValueAPIData
+                    .filter((value: any) => value.product === specification.id)
+                    .map((valueData: any) => (
+                      <div
+                        key={valueData.id}
+                        className="relative flex items-center"
+                      >
+                        {specification.name.toLowerCase() === 'color' ? (
+                          <div
+                            className="h-6 w-6 rounded-full border"
+                            style={{ backgroundColor: valueData.value }}
+                            title={valueData.value}
+                          />
+                        ) : (
+                          <div className="rounded border bg-gray-100 px-3 py-1 text-xs text-gray-700">
+                            {valueData.value}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              )}
           </div>
         ))}
       </div>

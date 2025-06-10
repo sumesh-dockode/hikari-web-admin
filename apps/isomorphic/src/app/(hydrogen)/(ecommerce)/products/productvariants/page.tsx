@@ -65,8 +65,8 @@ export default function ProductVariantsPage() {
   const [duplicateError, setDuplicateError] = useState<string | null>(null);
   const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string>('#000000');
-  const [selectedVariantType, setSelectedVariantType] =
-    useState<string>('Color');
+// const [selectedVariantType] = useState<string>('Custom');
+
 
   const variantsAPIData = data?.data || [];
   const variantvalueAPIData = variantValuesData?.data || [];
@@ -134,71 +134,75 @@ export default function ProductVariantsPage() {
   };
 
   const onSubmitValue: SubmitHandler<ProductVariantValueFormInput> = (data) => {
-    if (activeVariantId === null) return;
+  if (activeVariantId === null) return;
 
-    const currentVariant = variantsAPIData.find(
-      (variant: any) => variant.id === activeVariantId
+  const valueToAdd = data.value?.trim();
+
+  if (!valueToAdd) {
+    toast.error('Please provide a value');
+    return;
+  }
+
+  if (isValueEditMode && editingValue) {
+    updateVariantValue(
+      {
+        id: editingValue.id,
+        value: valueToAdd,
+        attribute: activeVariantId,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['variantValues'] });
+          setIsValueModalOpen(false);
+          setIsValueEditMode(false);
+          setEditingValue(null);
+          resetValueForm();
+          setSelectedColor('#000000');
+        },
+        onError: (err) => {
+          console.error(err);
+          toast.error('Failed to update value');
+        },
+      }
     );
-
-    const isColorVariant = currentVariant?.name.toLowerCase() === 'color';
-    const valueToAdd = isColorVariant ? selectedColor : data.value.trim();
-
-    if (!valueToAdd) {
-      toast.error('Please provide a value');
-      return;
-    }
-
-    if (isValueEditMode && editingValue) {
-      updateVariantValue(
-        {
-          id: editingValue.id,
-          value: valueToAdd,
-          attribute: activeVariantId,
+  } else {
+    createVariantValue(
+      {
+        id: null,
+        value: valueToAdd,
+        attribute: activeVariantId,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['variantValues'] });
+          setIsValueModalOpen(false);
+          resetValueForm();
+          setSelectedColor('#000000');
         },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['variantValues'] });
-            setIsValueModalOpen(false);
-            setIsValueEditMode(false);
-            setEditingValue(null);
-            resetValueForm();
-            setSelectedColor('#000000');
-          },
-        }
-      );
-    } else {
-      createVariantValue(
-        {
-          id: null,
-          value: valueToAdd,
-          attribute: activeVariantId,
+        onError: (err) => {
+          console.error(err);
+          toast.error('Failed to create value');
         },
-        {
-          onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['variantValues'] });
-            setIsValueModalOpen(false);
-            resetValueForm();
-            setSelectedColor('#000000');
-          },
-        }
-      );
-    }
-  };
+      }
+    );
+  }
+};
+
 
   const handleEditVariant = (variant: any) => {
     setEditingVariant(variant);
     setIsEditMode(true);
     setIsModalOpen(true);
 
-    if (
-      variant.name === 'Color' ||
-      variant.name === 'Material' ||
-      variant.name === 'Seater'
-    ) {
-      setSelectedVariantType(variant.name);
-    } else {
-      setSelectedVariantType('Custom');
-    }
+    // if (
+    //   variant.name === 'Color' ||
+    //   variant.name === 'Material' ||
+    //   variant.name === 'Seater'
+    // ) {
+    //   setSelectedVariantType(variant.name);
+    // } else {
+    //   setSelectedVariantType('Custom');
+    // }
   };
 
   const handleEditValue = (valueData: any) => {
@@ -209,10 +213,8 @@ export default function ProductVariantsPage() {
   };
 
   const onSubmit: SubmitHandler<ProductVariantFormInput> = (formData) => {
-    const nameToSave =
-      selectedVariantType === 'Custom'
-        ? formData.name.trim()
-        : selectedVariantType;
+    const nameToSave = formData.name.trim();
+
 
     if (!nameToSave) return;
 
@@ -223,9 +225,9 @@ export default function ProductVariantsPage() {
     );
 
     if (isDuplicate) {
-      setDuplicateError(
-        `A variant with the name "${nameToSave}" already exists.`
-      );
+     setDuplicateError(
+  `A variant with the name "${nameToSave}" already exists.`
+);
       return;
     }
 
@@ -239,6 +241,7 @@ export default function ProductVariantsPage() {
         },
         {
           onSuccess: () => {
+            toast.success('Variant updated successfully');
             queryClient.invalidateQueries({ queryKey: ['variantsList'] });
             setIsModalOpen(false);
             setIsEditMode(false);
@@ -255,6 +258,7 @@ export default function ProductVariantsPage() {
         },
         {
           onSuccess: () => {
+            toast.success('Variant created successfully');
             queryClient.invalidateQueries({ queryKey: ['variantsList'] });
             setIsModalOpen(false);
             resetForm();
@@ -268,7 +272,7 @@ export default function ProductVariantsPage() {
     reset();
     setEditingVariant(null);
     setIsEditMode(false);
-    setSelectedVariantType('Color');
+    // setSelectedVariantType('Color');
     setIsModalOpen(false);
   };
 
@@ -285,34 +289,35 @@ export default function ProductVariantsPage() {
       return (
         <div className="space-y-4">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">
-              Select Color
-            </label>
-            <div className="flex items-center gap-3">
-              <input
-                type="color"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value || '#000000')}
-                className="h-10 w-10 cursor-pointer rounded border border-gray-300"
-              />
-              <Input
-                type="text"
-                value={selectedColor}
-                onChange={(e) => setSelectedColor(e.target.value || '#000000')}
-                placeholder="Enter hex code (e.g. #FF0000)"
-                className="flex-1"
-              />
-            </div>
-            {selectedColor && (
-              <div className="mt-3 flex items-center gap-2 rounded-md bg-gray-50 p-2">
-                <div
-                  className="h-5 w-5 rounded-full border border-gray-300"
-                  style={{ backgroundColor: selectedColor }}
-                />
-                <span className="text-sm font-medium">{selectedColor}</span>
-              </div>
-            )}
-          </div>
+  <label className="mb-2 block text-sm font-medium text-gray-700">
+    Select Color
+  </label>
+  <div className="flex items-center gap-3">
+    <input
+      type="color"
+      {...registerValueForm('value')}
+      value={selectedColor}
+      onChange={(e) => {
+        setSelectedColor(e.target.value || '#000000');
+        // sync with form value
+        resetValueForm({ value: e.target.value });
+      }}
+      className="h-10 w-10 cursor-pointer rounded border border-gray-300"
+    />
+    <Input
+      type="text"
+      value={selectedColor}
+      onChange={(e) => {
+        const val = e.target.value || '#000000';
+        setSelectedColor(val);
+        resetValueForm({ value: val });
+      }}
+      placeholder="Enter hex code (e.g. #FF0000)"
+      className="flex-1"
+    />
+  </div>
+</div>
+
         </div>
       );
     }
@@ -341,7 +346,7 @@ export default function ProductVariantsPage() {
           setDuplicateError(null);
           setEditingVariant(null);
           setIsEditMode(false);
-          setSelectedVariantType('Color');
+          // setSelectedVariantType('Color');
           reset();
         }}
       >
@@ -350,27 +355,21 @@ export default function ProductVariantsPage() {
             {isEditMode ? 'Edit Variant' : 'Add New Variant'}
           </h2>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-700">
-                Choose a variant type
+                 variant type
               </label>
               <select
-                value={selectedVariantType}
-                onChange={(e) => {
-                  setSelectedVariantType(e.target.value);
-                  setDuplicateError(null);
-                }}
-                className="w-full rounded border-gray-300 px-3 py-2 text-sm"
+                value="Custom"
+                disabled
+                className="w-full rounded border-gray-300 px-3 py-2 text-sm  text-gray-500 cursor-not-allowed"
               >
-                <option value="Color">Color</option>
-                <option value="Material">Material</option>
-                <option value="Seater">Seater</option>
                 <option value="Custom">Custom</option>
               </select>
-            </div>
 
-            {selectedVariantType === 'Custom' && (
-              <div>
+            </div> */}
+
+            <div>
                 <Input
                   type="text"
                   label="Enter custom variant name"
@@ -385,7 +384,7 @@ export default function ProductVariantsPage() {
                   </p>
                 )}
               </div>
-            )}
+
 
             {duplicateError && (
               <p className="text-sm text-red-500">{duplicateError}</p>
@@ -399,7 +398,7 @@ export default function ProductVariantsPage() {
                   setDuplicateError(null);
                   setEditingVariant(null);
                   setIsEditMode(false);
-                  setSelectedVariantType('Color');
+                  // setSelectedVariantType('Color');
                   reset();
                 }}
               >

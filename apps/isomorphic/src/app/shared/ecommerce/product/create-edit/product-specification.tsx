@@ -195,6 +195,76 @@ export default function ProductSpecifications({
         >
           <PiPlusBold className="me-2 h-4 w-4" /> Add Specification
         </Button>
+
+        {specifications.length > 0 && (
+          <div className="mt-6">
+            <div className="overflow-x-auto rounded border">
+              <table className="w-full divide-y divide-gray-200 overflow-hidden text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
+                      Specification
+                    </th>
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
+                      Value
+                    </th>
+                    <th className="px-6 py-3 text-left font-medium text-gray-600">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200 bg-white">
+                  {specifications.map((spec, index) => (
+                    <tr
+                      key={index}
+                      className="border-b bg-white even:bg-gray-50"
+                    >
+                      <td className="px-6 py-4">{spec.name}</td>
+
+                      <td className="px-6 py-4">{spec.value}</td>
+                      <td className="space-x-2">
+                        <Tooltip
+                          size="sm"
+                          content="Edit Specification"
+                          placement="top"
+                          color="invert"
+                        >
+                          <ActionIcon
+                            as="span"
+                            size="sm"
+                            variant="outline"
+                            aria-label="Edit Specification"
+                            isLoading={
+                              isFetching && selectedSpecification === spec.id
+                            }
+                            onClick={() => {
+                              setSpecificationAction('edit');
+                              setSelectedSpecification(spec.id as string);
+                            }}
+                          >
+                            <PencilIcon className="size-4" />
+                          </ActionIcon>
+                        </Tooltip>
+                        <DeletePopover
+                          title="Delete Variant"
+                          description="Are you sure you want to delete this variant? This action cannot be undone."
+                          onDelete={() =>
+                            handleDeleteSpecification(spec.id as string)
+                          }
+                          isLoading={
+                            deleteStatus === 'pending' &&
+                            selectedSpecification === spec.id
+                          }
+                          className="z-20"
+                        />
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </FormGroup>
       {specifications.length > 0 && (
         <div className="mt-5 overflow-x-auto">

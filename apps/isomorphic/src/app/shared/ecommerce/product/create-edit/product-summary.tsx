@@ -22,7 +22,7 @@ const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   loading: () => <QuillLoader className="col-span-full h-[143px]" />,
 });
 
-export default function ProductSummary({ className }: { className?: string }) {
+export default function ProductSummary({ className, productId }: { className?: string; productId?: string }) {
   const {
     register,
     control,
@@ -41,11 +41,15 @@ export default function ProductSummary({ className }: { className?: string }) {
     })) || [];
 
   return (
-    <FormGroup
-      title="summary"
-      description="Edit your product description and necessary information from here"
-      className={cn(className)}
-    >
+   <FormGroup
+  title="summary"
+  description={
+    productId
+      ? "Edit your product description and necessary information from here"
+      : "Add your product description and necessary information from here"
+  }
+  className={cn(className)}
+>
       <Input
         label="Title"
         placeholder="Product title"

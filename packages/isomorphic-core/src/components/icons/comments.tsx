@@ -1,9 +1,13 @@
-export default function CommentsIcon({ ...props }: React.SVGProps<SVGSVGElement>) {
+export default function CommentsIcon({
+  ...props
+}: React.SVGProps<SVGSVGElement>) {
   return (
     <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 12 12"
+      width="38"
+      height="28"
+      viewBox="0 0 38 28"
       fill="none"
+      xmlns="http://www.w3.org/2000/svg"
       {...props}
     >
       <path

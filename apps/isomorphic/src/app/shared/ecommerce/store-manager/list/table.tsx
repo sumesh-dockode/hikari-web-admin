@@ -1,0 +1,101 @@
+'use client';
+
+
+import Table from '@core/components/table';
+import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
+import TableFooter from '@core/components/table/footer';
+import TablePagination from '@core/components/table/pagination';
+import Filters from './filters';
+import { storeManagerColumns } from './columns';
+import { useEffect, useState } from 'react';
+import { PaginationState } from '@tanstack/react-table';
+import usePaginatedStoreManager from '@/hooks/storeManager/usePaginatedStoreManager';
+import { useDeleteStoreManager } from '@/hooks/storeManager/useDeleteStoreManager';
+import PageLoader from '@/app/shared/page-loader';
+import toast from 'react-hot-toast';
+import { StoreManagerTableDataType } from '@/data/store-manager-data';
+import { debounce } from 'lodash';
+
+interface FiltersProps {
+  search?: string;
+}
+
+export default function StoreManagerTable() {
+  const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+  const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
+    pageIndex: 0,
+    pageSize: 10,
+    search: '',
+  });
+
+  const { data, isLoading } = usePaginatedStoreManager(pagination);
+  const { mutate: deleteStoreManager, status: deleteStatus } =
+    useDeleteStoreManager();
+  const pageCount = data?.data?.total_pages || 1;
+
+  const { table, setData } = useTanStackTable<StoreManagerTableDataType>({
+    tableData: [],
+    columnConfig: storeManagerColumns,
+    options: {
+      meta: {
+        handleDeleteRow: (row) => {
+          setDeleteItemId(row.id);
+          deleteStoreManager(row.id, {
+            onSuccess: () => {
+              toast.success('Store Manager deleted successfully');
+            },
+          });
+        },
+        deleteId: deleteItemId,
+        isDeleting: deleteStatus === 'pending',
+      },
+      enableColumnResizing: false,
+      manualPagination: true,
+      pageCount: pageCount as number,
+      onPaginationChange: (updater) => {
+        const nextPagination =
+          typeof updater === 'function' ? updater(pagination) : updater;
+
+        setPagination(nextPagination);
+      },
+    },
+    pagination,
+  });
+
+  useEffect(() => {
+    if (data) {
+      const APIData = data?.data?.results || [];
+      setData(APIData);
+    }
+  }, [data]);
+
+  const handleSearchChange = debounce((value: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      search: value,
+      pageIndex: 0,
+    }));
+  }, 500);
+
+  if (isLoading) return <PageLoader />;
+
+  return (
+    <>
+      <Filters
+        table={table}
+        handleSearchChange={handleSearchChange}
+        searchText={pagination.search}
+      />
+      <Table
+        table={table}
+        variant="modern"
+        classNames={{
+          container: 'border border-muted rounded-md',
+          rowClassName: 'last:border-0',
+        }}
+      />
+      <TableFooter table={table} />
+      <TablePagination table={table} className="py-4" />
+    </>
+  );
+}

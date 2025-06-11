@@ -14,6 +14,7 @@ import NextProgress from '@core/components/next-progress';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import '@/app/globals.css';
+import Providers from './providers';
 
 export const metadata = {
   title: siteConfig.title,
@@ -42,7 +43,7 @@ export default async function RootLayout({
           <ThemeProvider>
             <NextProgress />
             <JotaiProvider>
-              {children}
+              <Providers>{children}</Providers>
               <Toaster />
               <GlobalDrawer />
               <GlobalModal />

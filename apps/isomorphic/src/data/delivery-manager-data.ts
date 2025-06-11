@@ -1,0 +1,11 @@
+export interface DeliveryManagerDataType {
+  id: number | null;
+  first_name: string;
+  last_name: string | null;
+  email: string;
+  phone_number: string;
+  username: string;
+  password?: string;
+  is_active: boolean;
+  user_role: string;
+}

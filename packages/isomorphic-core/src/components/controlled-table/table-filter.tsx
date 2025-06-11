@@ -16,12 +16,14 @@ export function FilterDrawerView({
   isOpen,
   drawerTitle,
   setOpenDrawer,
+  applyFilter,
   children,
 }: React.PropsWithChildren<{
   drawerTitle?: string;
   hasSearched?: boolean;
   setOpenDrawer: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen?: boolean;
+  applyFilter?: () => void;
 }>) {
   return (
     <Drawer
@@ -52,7 +54,7 @@ export function FilterDrawerView({
         </div>
         <Button
           size="lg"
-          onClick={() => setOpenDrawer(false)}
+          onClick={applyFilter}
           className="mt-5 h-11 w-full text-sm"
         >
           Show Results

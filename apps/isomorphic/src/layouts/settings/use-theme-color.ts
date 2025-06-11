@@ -12,8 +12,7 @@ import {
 // color preset hook
 function getLocalStoragePreset() {
   if (typeof window !== 'undefined') {
-    const localStorageValue = localStorage.getItem('isomorphic-preset');
-    return JSON.parse(String(localStorageValue));
+    return DEFAULT_PRESET_COLORS;
   }
 }
 

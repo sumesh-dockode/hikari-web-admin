@@ -11,6 +11,9 @@ export const formParts = {
   deliveryEvent: 'deliveryEvent',
   variantOptions: 'variantOptions',
   tagsAndCategory: 'tagsAndCategory',
+  // similiarProducts: 'similarProducts',
+  similarProducts: 'similarProducts', 
+  productSpecifications: 'productSpecifications',
 };
 
 export const menuItems = [
@@ -26,29 +29,41 @@ export const menuItems = [
     label: 'Pricing & Inventory',
     value: formParts.pricingInventory,
   },
-  {
-    label: 'Product Identifiers & Custom Fields',
-    value: formParts.productIdentifiers,
-  },
+  // {
+  //   label: 'Product Identifiers & Custom Fields',
+  //   value: formParts.productIdentifiers,
+  // },
   {
     label: 'Shipping',
     value: formParts.shipping,
   },
-  {
-    label: 'SEO',
-    value: formParts.seo,
-  },
+  // {
+  //   label: 'SEO',
+  //   value: formParts.seo,
+  // },
   {
     label: 'Variant Options',
     value: formParts.variantOptions,
+  },
+  {
+    // label: 'Similiar Products',
+    // value: formParts.similiarProducts,
+    label: 'Similar Products', 
+    value: formParts.similarProducts,
   },
 ];
 
 interface FormNavProps {
   className?: string;
+  showImagesAndVariants?: boolean;
 }
 
-export default function FormNav({ className }: FormNavProps) {
+export default function FormNav({ className, showImagesAndVariants = true }: FormNavProps) {
+    const filteredMenuItems = menuItems.filter(
+      (item) =>
+          showImagesAndVariants ||
+          (item.value !== formParts.media && item.value !== formParts.variantOptions)
+    );
   return (
     <div
       className={cn(
@@ -56,9 +71,9 @@ export default function FormNav({ className }: FormNavProps) {
         className
       )}
     >
-      <div className='custom-scrollbar overflow-x-auto scroll-smooth'>
+      <div className="custom-scrollbar overflow-x-auto scroll-smooth">
         <div className="inline-grid grid-flow-col gap-5 md:gap-7 lg:gap-10">
-          {menuItems.map((tab, idx) => (
+         {filteredMenuItems.map((tab, idx) => (
             <Link
               key={tab.value}
               to={tab.value}

@@ -14,7 +14,7 @@ import { routes } from '@/config/routes';
 import EyeIcon from '@core/components/icons/eye';
 import PencilIcon from '@core/components/icons/pencil';
 import AvatarCard from '@core/ui/avatar-card';
-import { ProductType } from '@/data/products-data';
+import { productsData, productsDataType } from '@/data/products-data';
 import { PiStarFill } from 'react-icons/pi';
 import DeletePopover from '@core/components/delete-popover';
 
@@ -155,9 +155,9 @@ export const getColumns = ({
     dataIndex: 'product',
     key: 'product',
     width: 300,
-    render: (_: string, row: ProductType) => (
+    render: (_: string, row: productsDataType) => (
       <AvatarCard
-        src={row.image}
+        src={row.images}
         name={row.name}
         description={row.category}
         avatarProps={{
@@ -229,7 +229,7 @@ export const getColumns = ({
     dataIndex: 'action',
     key: 'action',
     width: 120,
-    render: (_: string, row: ProductType) => (
+    render: (_: string, row: productsDataType) => (
       <div className="flex items-center justify-end gap-3 pe-4">
         <Tooltip
           size="sm"

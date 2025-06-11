@@ -10,6 +10,7 @@ interface AvatarCardProps {
   nameClassName?: string;
   avatarProps?: AvatarProps;
   description?: React.ReactNode;
+  descriptionClassName?: string;
 }
 
 export default function AvatarCard({
@@ -19,6 +20,7 @@ export default function AvatarCard({
   description,
   avatarProps,
   nameClassName,
+  descriptionClassName,
 }: AvatarCardProps) {
   return (
     <figure className={cn("flex items-center gap-3", className)}>
@@ -33,7 +35,11 @@ export default function AvatarCard({
           {name}
         </Text>
         {description && (
-          <Text className="text-[13px] text-gray-500">{description}</Text>
+          <Text
+            className={cn("text-[13px] text-gray-500", descriptionClassName)}
+          >
+            {description}
+          </Text>
         )}
       </figcaption>
     </figure>

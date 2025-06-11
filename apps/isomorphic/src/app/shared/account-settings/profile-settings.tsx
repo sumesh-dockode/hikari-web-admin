@@ -21,7 +21,6 @@ import Link from 'next/link';
 import FormFooter from '@core/components/form-footer';
 import UploadZone from '@core/ui/file-upload/upload-zone';
 import { useLayout } from '@/layouts/use-layout';
-import { useBerylliumSidebars } from '@/layouts/beryllium/beryllium-utils';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 const QuillEditor = dynamic(() => import('@core/ui/quill-editor'), {
   ssr: false,
@@ -80,17 +79,18 @@ export default function ProfileSettingsView() {
                 </FormGroup>
 
                 <FormGroup
-                  title="Website"
+                  title=" email"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
                   <Input
-                    type="url"
+                    prefix={
+                      <PiEnvelopeSimple className="h-6 w-6 text-gray-500" />
+                    }
+                    type="email"
                     className="col-span-full"
-                    prefix="https://"
-                    prefixClassName="relative pe-2.5 before:w-[1px] before:h-[38px] before:absolute before:bg-gray-300 before:-top-[9px] before:right-0"
-                    placeholder="Enter your website url"
-                    {...register('website')}
-                    error={errors.website?.message}
+                    placeholder="georgia.young@example.com"
+                    {...register('email')}
+                    error={errors.email?.message}
                   />
                 </FormGroup>
 
@@ -109,7 +109,7 @@ export default function ProfileSettingsView() {
                   </div>
                 </FormGroup>
 
-                <FormGroup
+                {/* <FormGroup
                   title="Your Bio"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
@@ -126,9 +126,9 @@ export default function ProfileSettingsView() {
                       )}
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Job Title"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                 >
@@ -158,9 +158,9 @@ export default function ProfileSettingsView() {
                       className="mt-3"
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Alternative contact email"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
                   description="Enter an alternative email if you’d like to be contacted via a different email."
@@ -175,9 +175,9 @@ export default function ProfileSettingsView() {
                     {...register('email')}
                     error={errors.email?.message}
                   />
-                </FormGroup>
+                </FormGroup> */}
 
-                <FormGroup
+                {/* <FormGroup
                   title="Portfolio Projects"
                   description="Share a few snippets of your work"
                   className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
@@ -190,7 +190,7 @@ export default function ProfileSettingsView() {
                       error={errors?.portfolios?.message as string}
                     />
                   </div>
-                </FormGroup>
+                </FormGroup> */}
               </div>
               <FormFooter
                 // isLoading={isLoading}
@@ -210,16 +210,10 @@ export function ProfileHeader({
   description,
   children,
 }: React.PropsWithChildren<{ title: string; description?: string }>) {
-  const { layout } = useLayout();
-  const { expandedLeft } = useBerylliumSidebars();
-
   return (
     <div
       className={cn(
-        'relative z-0 -mx-4 px-4 pt-28 before:absolute before:start-0 before:top-0 before:h-40 before:w-full before:bg-gradient-to-r before:from-[#F8E1AF] before:to-[#F6CFCF] @3xl:pt-[190px] @3xl:before:h-[calc(100%-120px)] dark:before:from-[#bca981] dark:before:to-[#cbb4b4] md:-mx-5 md:px-5 lg:-mx-8 lg:px-8 xl:-mx-6 xl:px-6 3xl:-mx-[33px] 3xl:px-[33px] 4xl:-mx-10 4xl:px-10',
-        layout === LAYOUT_OPTIONS.BERYLLIUM && expandedLeft
-          ? 'before:start-5 3xl:before:start-[25px]'
-          : 'xl:before:w-[calc(100%_+_10px)]'
+        'relative z-0 -mx-4 px-4 pt-28 before:absolute before:start-0 before:top-0 before:h-40 before:w-full before:bg-gradient-to-r before:from-[#F8E1AF] before:to-[#F6CFCF] @3xl:pt-[190px] @3xl:before:h-[calc(100%-120px)] dark:before:from-[#bca981] dark:before:to-[#cbb4b4] md:-mx-5 md:px-5 lg:-mx-8 lg:px-8 xl:-mx-6 xl:px-6 3xl:-mx-[33px] 3xl:px-[33px] 4xl:-mx-10 4xl:px-10'
       )}
     >
       <div className="relative z-10 mx-auto flex w-full max-w-screen-2xl flex-wrap items-end justify-start gap-6 border-b border-dashed border-muted pb-10">

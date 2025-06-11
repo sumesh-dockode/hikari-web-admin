@@ -3,17 +3,22 @@
 import { Title, Text, ActionIcon, Button, Popover } from "rizzui";
 import TrashIcon from "@core/components/icons/trash";
 import { PiTrashFill } from "react-icons/pi";
+import cn from "@core/utils/class-names";
 
 type DeletePopoverProps = {
   title: string;
   description: string;
   onDelete?: () => void;
+  isLoading?: boolean;
+  className?: string;
 };
 
 export default function DeletePopover({
   title,
   description,
   onDelete,
+  isLoading,
+  className = "",
 }: DeletePopoverProps) {
   return (
     <Popover placement="left">
@@ -23,11 +28,12 @@ export default function DeletePopover({
           variant="outline"
           aria-label={"Delete Item"}
           className="cursor-pointer"
+          isLoading={isLoading}
         >
           <TrashIcon className="size-4" />
         </ActionIcon>
       </Popover.Trigger>
-      <Popover.Content className="z-10">
+      <Popover.Content className={cn("z-10", className)}>
         {({ setOpen }) => (
           <div className="w-56 pb-2 pt-1 text-left rtl:text-right">
             <Title
@@ -43,6 +49,7 @@ export default function DeletePopover({
               <Button
                 size="sm"
                 className="me-1.5 h-7"
+                isLoading={isLoading}
                 onClick={() => {
                   onDelete && onDelete();
                   setOpen(false);

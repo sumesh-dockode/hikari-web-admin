@@ -1,28 +1,26 @@
 "use client";
 
 import Image from "next/image";
-import toast from "react-hot-toast";
 import isEmpty from "lodash/isEmpty";
 import prettyBytes from "pretty-bytes";
 import { useCallback, useState } from "react";
-import { useDropzone } from "@uploadthing/react";
-import { PiCheckBold, PiTrashBold, PiUploadSimpleBold } from "react-icons/pi";
-import { generateClientDropzoneAccept } from "uploadthing/client";
-import { useUploadThing } from "../../utils/uploadthing";
+import { useDropzone, Accept } from "react-dropzone";
+import { PiArrowsOutSimple, PiFilePdfLight, PiTrashBold } from "react-icons/pi";
 import { Button, Text, FieldError } from "rizzui";
 import cn from "../../utils/class-names";
 import UploadIcon from "../../components/shape/upload";
-import { endsWith } from "lodash";
-import { FileWithPath } from "react-dropzone";
-import { ClientUploadedFileData } from "uploadthing/types";
+import { convertToBase64 } from "@core/utils/image-to-base64";
+import { Modal } from "@core/modal-views/modal";
 
 interface UploadZoneProps {
   label?: string;
   name: string;
-  getValues: any;
-  setValue: any;
   className?: string;
   error?: string;
+  getValues: any;
+  setValue: any;
+  watch?: any;
+  acceptedTypes?: Accept;
 }
 
 interface FileType {
@@ -35,168 +33,75 @@ export default function UploadZone({
   label,
   name,
   className,
-  getValues,
-  setValue,
   error,
+  setValue,
+  watch,
+  acceptedTypes,
 }: UploadZoneProps) {
-  const [files, setFiles] = useState<File[]>([]);
+  const files = watch(name) || [];
 
-  const onDrop = useCallback(
-    (acceptedFiles: FileWithPath[]) => {
-      console.log("acceptedFiles", acceptedFiles);
-      setFiles([
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          })
-        ),
-      ]);
-    },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [files]
-  );
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const newFiles = await Promise.all(
+      acceptedFiles.map(async (file) => ({
+        name: file.name,
+        size: file.size,
+        url: await convertToBase64(file),
+      }))
+    );
+    const updatedFiles = [...files, ...newFiles];
+    setValue(name, updatedFiles);
+  }, []);
 
   function handleRemoveFile(index: number) {
-    // Make a copy of the files array
-    const updatedFiles = [...files];
-
-    // Remove the file at the specified index
-    updatedFiles.splice(index, 1);
-
-    // Update the state
-    setFiles(updatedFiles);
+    const updatedFiles = files.filter((_: any, i: number) => i !== index);
+    setValue(name, updatedFiles);
   }
-
-  const uploadedItems = isEmpty(getValues(name)) ? [] : getValues(name);
-
-  const notUploadedItems = files.filter(
-    (file) => !uploadedItems?.some((uploadedFile: FileType) => uploadedFile.name === file.name)
-  );
-
-  const { startUpload, routeConfig, isUploading } = useUploadThing("generalMedia", {
-    onClientUploadComplete: (res: ClientUploadedFileData<any>[] | undefined) => {
-      console.log("res", res);
-      if (setValue) {
-        // const respondedUrls = res?.map((r) => r.url);
-        setFiles([]);
-        const respondedUrls = res?.map((r) => ({
-          name: r.name,
-          size: r.size,
-          url: r.url,
-        }));
-        setValue(name, respondedUrls);
-      }
-      toast.success(
-        <Text
-          as="b"
-          className="font-semibold"
-        >
-          portfolio Images updated
-        </Text>
-      );
-    },
-    onUploadError: (error: Error) => {
-      console.error(error);
-      toast.error(error.message);
-    },
-  });
-
-  const fileTypes = routeConfig ? Object.keys(routeConfig) : [];
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
-    accept: fileTypes ? generateClientDropzoneAccept(fileTypes) : undefined,
+    accept:
+      acceptedTypes || ({ "image/*": [], "application/pdf": [] } as Accept),
   });
 
   return (
     <div className={cn("grid @container", className)}>
-      {label && <span className="mb-1.5 block font-semibold text-gray-900">{label}</span>}
-      <div
-        className={cn(
-          "rounded-md border-[1.8px]",
-          !isEmpty(files) && "flex flex-wrap items-center justify-between @xl:flex-nowrap @xl:pr-6"
-        )}
-      >
+      {label && (
+        <span className="mb-1.5 block font-semibold text-gray-900">
+          {label}
+        </span>
+      )}
+      <div className="rounded-md border-[1.8px]">
         <div
           {...getRootProps()}
-          className={cn(
-            "flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300",
-            isEmpty(files) ? "justify-center" : "flex-grow justify-center @xl:justify-start"
-          )}
+          className="flex cursor-pointer items-center gap-4 px-6 py-5 transition-all duration-300 justify-center"
         >
           <input {...getInputProps()} />
           <UploadIcon className="h-12 w-12" />
           <Text className="text-base font-medium">Drop or select file</Text>
         </div>
-
-        {!isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
-
-        {isEmpty(files) && !isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={notUploadedItems}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(notUploadedItems)}
-          />
-        )}
-
-        {!isEmpty(files) && isEmpty(notUploadedItems) && (
-          <UploadButtons
-            files={files}
-            isLoading={isUploading}
-            onClear={() => setFiles([])}
-            onUpload={() => startUpload(files)}
-          />
-        )}
       </div>
-
-      {(!isEmpty(uploadedItems) || !isEmpty(notUploadedItems)) && (
+      {!isEmpty(files) && (
         <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fit,_minmax(140px,_1fr))]">
-          {uploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.url}
-                />
-                <button
-                  type="button"
-                  className="absolute right-0 top-0 rounded-full bg-gray-700 p-1.5 transition duration-300"
-                >
-                  <PiCheckBold className="text-white" />
-                </button>
-              </figure>
-              <MediaCaption
-                name={file.name}
-                size={file.size}
-              />
-            </div>
-          ))}
-          {notUploadedItems.map((file: any, index: number) => (
-            <div
-              key={index}
-              className={cn("relative")}
-            >
-              <figure className="group relative h-40 rounded-md bg-gray-50">
-                <MediaPreview
-                  name={file.name}
-                  url={file.preview}
-                />
-                {isUploading ? (
-                  <div className="absolute inset-0 z-50 grid place-content-center rounded-md bg-gray-800/50">
-                    <LoadingSpinner />
-                  </div>
-                ) : (
+          {files.map((file: FileType, index: number) => {
+            const isPDF =
+              file?.name?.toLowerCase().endsWith(".pdf") ||
+              file?.url?.toLowerCase().endsWith(".pdf");
+            if (isPDF) {
+              return (
+                <div key={`${file.name}-${index}`} className="relative">
+                  <MediaPreview
+                    name={file.name}
+                    url={file.url}
+                    size={file.size}
+                    deleteClick={() => handleRemoveFile(index)}
+                  />
+                </div>
+              );
+            }
+            return (
+              <div key={`${file.name}-${index}`} className="relative">
+                <figure className="group relative h-40 rounded-md bg-gray-50">
+                  <MediaPreview name={file.name} url={file.url} />
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(index)}
@@ -204,73 +109,95 @@ export default function UploadZone({
                   >
                     <PiTrashBold className="text-white" />
                   </button>
-                )}
-              </figure>
-              <MediaCaption
-                name={file.path}
-                size={file.size}
-              />
-            </div>
-          ))}
+                </figure>
+                <MediaCaption name={file.name} size={file.size} />
+              </div>
+            );
+          })}
         </div>
       )}
-
       {error && <FieldError error={error} />}
     </div>
   );
 }
 
-function UploadButtons({
-  files,
-  onClear,
-  onUpload,
-  isLoading,
+function MediaPreview({
+  name,
+  url,
+  size,
+  deleteClick,
 }: {
-  files: any[];
-  isLoading: boolean;
-  onClear: () => void;
-  onUpload: () => void;
+  name: string;
+  url: string;
+  size?: number;
+  deleteClick?: () => void;
 }) {
-  return (
-    <div className="flex w-full flex-wrap items-center justify-center gap-4 px-6 pb-5 @sm:flex-nowrap @xl:w-auto @xl:justify-end @xl:px-0 @xl:pb-0">
-      <Button
-        variant="outline"
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onClear}
-      >
-        <PiTrashBold />
-        Clear {files.length} files
-      </Button>
-      <Button
-        className="w-full gap-2 @xl:w-auto"
-        isLoading={isLoading}
-        onClick={onUpload}
-      >
-        <PiUploadSimpleBold /> Upload {files.length} files
-      </Button>
-    </div>
-  );
-}
+  const [isOpen, setIsOpen] = useState(false);
 
-function MediaPreview({ name, url }: { name: string; url: string }) {
-  return endsWith(name, ".pdf") ? (
-    <object
-      data={url}
-      type="application/pdf"
-      width="100%"
-      height="100%"
-    >
-      <p>
-        Alternative text - include a link <a href={url}>to the PDF!</a>
-      </p>
-    </object>
-  ) : (
+  if (!url) return null;
+  const isPDF =
+    name?.toLowerCase().endsWith(".pdf") || url?.toLowerCase().endsWith(".pdf");
+
+  if (isPDF) {
+    return (
+      <>
+        <div className="flex items-center justify-between rounded-md border p-3 shadow-sm">
+          <div className="flex items-center gap-3">
+            <PiFilePdfLight className="text-red-500 h-6 w-6" />
+            <span className="text-sm font-medium text-gray-800 truncate">
+              {name}
+            </span>
+            <span className="text-xs text-gray-500">
+              {size && prettyBytes(size)}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsOpen(true)}
+              className="text-gray-600 hover:text-black"
+            >
+              <PiArrowsOutSimple className="h-5 w-5" />
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              color="danger"
+              onClick={deleteClick}
+            >
+              <PiTrashBold className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+
+        <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} size="lg">
+          <div className="relative h-[80vh]">
+            <object
+              data={url}
+              type="application/pdf"
+              width="100%"
+              height="100%"
+            >
+              <p>
+                PDF preview not supported.{" "}
+                <a href={url} target="_blank">
+                  Open PDF
+                </a>
+              </p>
+            </object>
+          </div>
+        </Modal>
+      </>
+    );
+  }
+
+  return (
     <Image
       fill
-      src={url}
+      src={url || ""}
       alt={name}
-      className="transform rounded-md object-contain"
+      className="rounded-md object-contain"
     />
   );
 }
@@ -279,11 +206,10 @@ function MediaCaption({ name, size }: { name: string; size: number }) {
   return (
     <div className="mt-1 text-xs">
       <p className="break-words font-medium text-gray-700">{name}</p>
-      <p className="mt-1 font-mono">{prettyBytes(size)}</p>
+      <p className="mt-1 font-mono">{size && prettyBytes(size)}</p>
     </div>
   );
 }
-
 export function LoadingSpinner() {
   return (
     <svg
@@ -356,3 +282,4 @@ export function LoadingSpinner() {
     </svg>
   );
 }
+

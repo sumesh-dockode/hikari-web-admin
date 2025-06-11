@@ -14,6 +14,8 @@ export default function TableRowActionGroup({
   deletePopoverTitle = "Delete the appointment",
   deletePopoverDescription = "Are you sure you want to delete this item?",
   className,
+  children,
+  isLoading,
 }: {
   onDelete?: () => void;
   editUrl?: string;
@@ -21,7 +23,12 @@ export default function TableRowActionGroup({
   deletePopoverTitle?: string;
   deletePopoverDescription?: string;
   className?: string;
+  children?: React.ReactNode;
+  isLoading?: boolean;
 }) {
+  const isViewUrlAvailable = viewUrl && viewUrl !== "#";
+  const isEditUrlAvailable = editUrl && editUrl !== "#";
+
   return (
     <Flex
       align="center"
@@ -29,34 +36,40 @@ export default function TableRowActionGroup({
       gap="3"
       className={cn("pe-3", className)}
     >
-      <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
-        <Link href={editUrl}>
-          <ActionIcon
-            as="span"
-            size="sm"
-            variant="outline"
-            aria-label="Edit Item"
-          >
-            <PencilIcon className="size-4" />
-          </ActionIcon>
-        </Link>
-      </Tooltip>
-      <Tooltip size="sm" content="View Item" placement="top" color="invert">
-        <Link href={viewUrl}>
-          <ActionIcon
-            as="span"
-            size="sm"
-            variant="outline"
-            aria-label="View item"
-          >
-            <EyeIcon className="size-4" />
-          </ActionIcon>
-        </Link>
-      </Tooltip>
+      {children}
+      {isEditUrlAvailable && (
+        <Tooltip size="sm" content="Edit Item" placement="top" color="invert">
+          <Link href={editUrl}>
+            <ActionIcon
+              as="span"
+              size="sm"
+              variant="outline"
+              aria-label="Edit Item"
+            >
+              <PencilIcon className="size-4" />
+            </ActionIcon>
+          </Link>
+        </Tooltip>
+      )}
+      {isViewUrlAvailable && (
+        <Tooltip size="sm" content="View Item" placement="top" color="invert">
+          <Link href={viewUrl}>
+            <ActionIcon
+              as="span"
+              size="sm"
+              variant="outline"
+              aria-label="View item"
+            >
+              <EyeIcon className="size-4" />
+            </ActionIcon>
+          </Link>
+        </Tooltip>
+      )}
       <DeletePopover
         title={deletePopoverTitle}
         description={deletePopoverDescription}
         onDelete={onDelete}
+        isLoading={isLoading}
       />
     </Flex>
   );

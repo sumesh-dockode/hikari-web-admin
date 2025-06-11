@@ -6,24 +6,13 @@ import PencilIcon from '@core/components/icons/pencil';
 import { createColumnHelper } from '@tanstack/react-table';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ActionIcon, Checkbox, Text, Title, Tooltip } from 'rizzui';
-import { CategoryDataType } from './table';
+import { ActionIcon, Checkbox, Title, Tooltip } from 'rizzui';
+import { CategoryDataType } from '@/data/product-categories';
+import noImage from '@public/no-image.jpg';
 
 const columnHelper = createColumnHelper<CategoryDataType>();
 
 export const categoriesColumns = [
-  columnHelper.display({
-    id: 'checked',
-    size: 50,
-    cell: ({ row }) => (
-      <Checkbox
-        aria-label="Select row"
-        className="ps-3.5"
-        checked={row.getIsSelected()}
-        onChange={row.getToggleSelectedHandler()}
-      />
-    ),
-  }),
   columnHelper.display({
     id: 'image',
     size: 100,
@@ -32,12 +21,28 @@ export const categoriesColumns = [
       <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
         <Image
           alt={row.original.name}
-          src={row.original.image}
+          src={row.original.image || noImage}
           fill
           sizes="(max-width: 768px) 100vw"
           className="object-cover"
         />
       </figure>
+    ),
+  }),
+  columnHelper.display({
+    id: 'icon',
+    size: 100,
+    header: 'Icon',
+    cell: ({ row }) => (
+      <div className="flex h-12 w-12 items-center justify-center rounded-full border border-gray-300 bg-gray-100">
+        <Image
+          src={row.original.icon_image || noImage}
+          alt={row.original.name}
+          width={24}
+          height={24}
+          className="h-6 w-6 object-contain"
+        />
+      </div>
     ),
   }),
   columnHelper.accessor('name', {
@@ -50,26 +55,7 @@ export const categoriesColumns = [
       </Title>
     ),
   }),
-  columnHelper.display({
-    id: 'description',
-    size: 250,
-    header: 'Description',
-    cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.description}</Text>
-    ),
-  }),
-  columnHelper.accessor('slug', {
-    id: 'slug',
-    size: 200,
-    header: 'Slug',
-    cell: ({ getValue }) => <Text>{getValue()}</Text>,
-  }),
-  columnHelper.display({
-    id: 'products',
-    size: 120,
-    header: 'Products',
-    cell: ({ row }) => <div className="ps-6">{row.original.products}</div>,
-  }),
+
   columnHelper.display({
     id: 'action',
     size: 100,
@@ -91,6 +77,7 @@ export const categoriesColumns = [
           title={`Delete the category`}
           description={`Are you sure you want to delete this #${row.original.id} category?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
+          isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />
       </div>
     ),

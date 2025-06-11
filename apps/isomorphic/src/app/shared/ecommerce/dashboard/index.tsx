@@ -11,11 +11,11 @@ import RepeatCustomerRate from '@/app/shared/ecommerce/dashboard/repeat-customer
 import UserLocation from '@/app/shared/ecommerce/dashboard/user-location';
 import PromotionalSales from '@/app/shared/ecommerce/dashboard/promotional-sales';
 import RecentOrder from '@/app/shared/ecommerce/dashboard/recent-order';
-import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
+// import StockReport from '@/app/shared/ecommerce/dashboard/stock-report';
 import { PiPlusBold } from 'react-icons/pi';
 import welcomeImg from '@public/shop-illustration.png';
 import HandWaveIcon from '@core/components/icons/hand-wave';
-
+import minglersofa from '../../../../../public/assets/minglersofa.png';
 export default function EcommerceDashboard() {
   return (
     <div className="@container">
@@ -31,10 +31,10 @@ export default function EcommerceDashboard() {
             'Here’s What happening on your store today. See the statistics at once.'
           }
           media={
-            <div className="absolute -bottom-6 end-4 hidden w-[300px] @2xl:block lg:w-[320px] 2xl:-bottom-7 2xl:w-[330px]">
+            <div className="absolute bottom-10 end-4 hidden w-[300px] @2xl:block lg:w-[320px] 2xl:bottom-9 2xl:w-[330px]">
               <div className="relative">
                 <Image
-                  src={welcomeImg}
+                  src={minglersofa}
                   alt="Welcome shop image form freepik"
                   className="dark:brightness-95 dark:drop-shadow-md"
                 />
@@ -52,21 +52,21 @@ export default function EcommerceDashboard() {
         </WelcomeBanner>
 
         <StatCards className="@2xl:grid-cols-3 @3xl:gap-6 @4xl:col-span-2 @7xl:col-span-8" />
-        <ProfitWidget className="h-[464px] @sm:h-[520px] @7xl:col-span-4 @7xl:col-start-9 @7xl:row-start-1 @7xl:row-end-3 @7xl:h-full" />
+        <ProfitWidget className="h-[464px] @sm:h-[520px] @4xl:col-span-2 @7xl:col-span-4 @7xl:col-start-9 @7xl:row-start-1 @7xl:row-end-3 @7xl:h-full" />
 
         <SalesReport className="@4xl:col-span-2 @7xl:col-span-8" />
 
-        <PromotionalSales className="@4xl:col-start-2 @4xl:row-start-3 @7xl:col-span-4 @7xl:col-start-auto @7xl:row-start-auto" />
+        <BestSellers className="@4xl:col-span-2 @7xl:col-span-4" />
 
-        <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" />
+        {/* <PromotionalSales className="@4xl:col-start-2 @4xl:row-start-3 @7xl:col-span-4 @7xl:col-start-auto @7xl:row-start-auto" /> */}
 
-        <RepeatCustomerRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" />
+        {/* <RecentOrder className="relative @4xl:col-span-2 @7xl:col-span-12" /> */}
 
-        <BestSellers className="@7xl:col-span-6 @[90rem]:col-span-4" />
+        {/* <RepeatCustomerRate className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-8" /> */}
 
-        <UserLocation className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
+        {/* <UserLocation className="@7xl:col-span-6 @[90rem]:col-span-5 @[112rem]:col-span-4" />
 
-        <StockReport className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-7 @[112rem]:col-span-8" />
+        <StockReport className="@4xl:col-span-2 @7xl:col-span-12 @[90rem]:col-span-7 @[112rem]:col-span-8" /> */}
       </div>
     </div>
   );

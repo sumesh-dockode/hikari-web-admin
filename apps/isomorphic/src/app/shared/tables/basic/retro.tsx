@@ -3,11 +3,11 @@
 import Table from '@core/components/table';
 import { orderData } from '@/data/order-data';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
-import { OrdersDataType } from '../../ecommerce/dashboard/recent-order';
 import { basicColumns } from './column';
 import { PiMagnifyingGlassBold } from 'react-icons/pi';
 import { Flex, Input, TableVariantProps, Title } from 'rizzui';
 import TablePagination from '@core/components/table/pagination';
+import { OrdersDataType } from '@/data/orders';
 
 export default function RetroTable({
   searchAble = false,

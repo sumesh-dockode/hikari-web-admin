@@ -3,7 +3,7 @@ import AuthWrapperOne from '@/app/shared/auth-layout/auth-wrapper-one';
 import Image from 'next/image';
 import UnderlineShape from '@core/components/shape/underline';
 import { metaObject } from '@/config/site.config';
-
+import minglerhome1 from '../../../public/assets/minglerhome1.png';
 export const metadata = {
   ...metaObject('Sign In'),
 };
@@ -21,23 +21,21 @@ export default function SignIn() {
           continue.
         </>
       }
-      description="By signing up, you will gain access to exclusive content, special
-      offers, and be the first to hear about exciting news and updates."
-      bannerTitle="The simplest way to manage your workspace."
-      bannerDescription="Amet minim mollit non deserunt ullamco est sit aliqua dolor do
-      amet sint velit officia consequat duis."
+      // description="By signing up, you will gain access to exclusive content, special
+      // offers, and be the first to hear about exciting news and updates."
+      // bannerTitle="The simplest way to manage your workspace."
+      // bannerDescription="Amet minim mollit non deserunt ullamco est sit aliqua dolor do
+      // amet sint velit officia consequat duis."
       isSocialLoginActive={true}
       pageImage={
-        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[820px]">
+        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[498px] 2xl:w-[498px]">
           <Image
-            src={
-              'https://isomorphic-furyroad.s3.amazonaws.com/public/auth/sign-up.webp'
-            }
+            src={minglerhome1}
             alt="Sign Up Thumbnail"
-            fill
+            // fill
             priority
             sizes="(max-width: 768px) 100vw"
-            className="object-cover"
+            // className="object-cover"
           />
         </div>
       }

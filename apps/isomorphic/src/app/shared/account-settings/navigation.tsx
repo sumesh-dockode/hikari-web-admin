@@ -8,7 +8,6 @@ import { PiCaretLeftBold, PiCaretRightBold } from 'react-icons/pi';
 import { usePathname } from 'next/navigation';
 import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
-import { useBerylliumSidebars } from '@/layouts/beryllium/beryllium-utils';
 
 const menuItems = [
   {
@@ -23,22 +22,22 @@ const menuItems = [
     label: 'Password',
     value: '/forms/profile-settings/password',
   },
-  {
-    label: 'Team',
-    value: '/forms/profile-settings/team',
-  },
-  {
-    label: 'Billing',
-    value: '/forms/profile-settings/billing',
-  },
-  {
-    label: 'Notifications',
-    value: '/forms/profile-settings/notification',
-  },
-  {
-    label: 'Integrations',
-    value: '/forms/profile-settings/integration',
-  },
+  // {
+  //   label: 'Team',
+  //   value: '/forms/profile-settings/team',
+  // },
+  // {
+  //   label: 'Billing',
+  //   value: '/forms/profile-settings/billing',
+  // },
+  // {
+  //   label: 'Notifications',
+  //   value: '/forms/profile-settings/notification',
+  // },
+  // {
+  //   label: 'Integrations',
+  //   value: '/forms/profile-settings/integration',
+  // },
 ];
 
 export default function ProfileSettingsNav() {
@@ -51,7 +50,7 @@ export default function ProfileSettingsNav() {
     scrollToTheRight,
     scrollToTheLeft,
   } = useScrollableSlider();
-  const { expandedLeft } = useBerylliumSidebars();
+
   return (
     <div
       className={cn(
@@ -60,10 +59,7 @@ export default function ProfileSettingsNav() {
           ? 'top-[66px] sm:top-[70px] md:top-[73px]'
           : layout === LAYOUT_OPTIONS.BERYLLIUM
             ? 'top-[62px] sm:top-[72px] 2xl:top-[72px]'
-            : 'top-[62px] md:top-[71px]',
-        layout === LAYOUT_OPTIONS.BERYLLIUM &&
-          expandedLeft &&
-          'xl:-ms-1 xl:px-0 3xl:-ms-2 3xl:ps-0 4xl:-ms-2'
+            : 'top-[62px] md:top-[71px]'
       )}
     >
       <div className="relative flex items-center overflow-hidden">

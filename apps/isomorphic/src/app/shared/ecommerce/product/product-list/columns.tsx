@@ -1,19 +1,18 @@
 'use client';
 
 import DeletePopover from '@core/components/delete-popover';
-import { getRatings } from '@core/components/table-utils/get-ratings';
-import { getStatusBadge } from '@core/components/table-utils/get-status-badge';
-import { getStockStatus } from '@core/components/table-utils/get-stock-status';
 import { routes } from '@/config/routes';
-import { ProductType } from '@/data/products-data';
-import EyeIcon from '@core/components/icons/eye';
+import { productsDataType } from '@/data/products-data';
 import PencilIcon from '@core/components/icons/pencil';
-import AvatarCard from '@core/ui/avatar-card';
+// import AvatarCard from '@core/ui/avatar-card';
 import { createColumnHelper } from '@tanstack/react-table';
 import Link from 'next/link';
 import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
-
-const columnHelper = createColumnHelper<ProductType>();
+import AvatarCard from '@core/ui/avatar-card';
+import { toCurrency } from '@core/utils/to-currency';
+import ConfirmationPopover from '@core/components/confirmation-popover';
+import { PiCheckBold } from 'react-icons/pi';
+const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
   columnHelper.display({
@@ -43,9 +42,10 @@ export const productsListColumns = [
     enableSorting: false,
     cell: ({ row }) => (
       <AvatarCard
-        src={row.original.image}
+        src={row.original.product_images?.[0]}
         name={row.original.name}
-        description={row.original.category}
+        description={row.original.description}
+        descriptionClassName="line-clamp-2"
         avatarProps={{
           name: row.original.name,
           size: 'lg',
@@ -58,35 +58,37 @@ export const productsListColumns = [
     id: 'sku',
     size: 150,
     header: 'SKU',
-    cell: ({ row }) => <Text className="text-sm">SKU-{row.original.sku}</Text>,
+    cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
   }),
-  columnHelper.accessor('stock', {
-    id: 'stock',
-    size: 200,
-    header: 'Stock',
-    cell: ({ row }) => getStockStatus(row.original.stock),
-  }),
+  // columnHelper.accessor('stock', {
+  //   id: 'stock',
+  //   size: 200,
+  //   header: 'Stock',
+  //   cell: ({ row }) => getStockStatus(row.original.stock),
+  // }),
   columnHelper.accessor('price', {
     id: 'price',
     size: 150,
     header: 'Price',
     cell: ({ row }) => (
-      <Text className="font-medium text-gray-700">${row.original.price}</Text>
+      <Text className="font-medium text-gray-700">
+        {toCurrency(row.original.price || 0)}
+      </Text>
     ),
   }),
+  // columnHelper.display({
+  //   id: 'rating',
+  //   size: 200,
+  //   header: 'Rating',
+  //   cell: ({ row }) => getRatings(row.original.rating),
+  // }),
   columnHelper.display({
-    id: 'rating',
+    id: 'category',
     size: 200,
-    header: 'Rating',
-    cell: ({ row }) => getRatings(row.original.rating),
+    header: 'Category',
+    cell: ({ row }) => row.original.category,
   }),
-  columnHelper.accessor('status', {
-    id: 'status',
-    size: 120,
-    header: 'Status',
-    enableSorting: false,
-    cell: ({ row }) => getStatusBadge(row.original.status),
-  }),
+
   columnHelper.display({
     id: 'action',
     size: 120,
@@ -97,6 +99,29 @@ export const productsListColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
+        {!row.original.is_published ? (
+          <ConfirmationPopover
+            title="Publish Product"
+            description="Are you sure you want to publish this product?"
+            tooltipContent="Publish Product"
+            onConfirm={() =>
+              meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
+            }
+            isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
+          />
+        ) : (
+          <Tooltip content="Published" placement="top" size="sm">
+            <ActionIcon
+              size="sm"
+              variant="solid"
+              color="primary"
+              aria-label="Published"
+              className="cursor-default"
+            >
+              <PiCheckBold className="size-4" />
+            </ActionIcon>
+          </Tooltip>
+        )}
         <Tooltip
           size="sm"
           content={'Edit Product'}
@@ -111,23 +136,6 @@ export const productsListColumns = [
               aria-label={'Edit Product'}
             >
               <PencilIcon className="h-4 w-4" />
-            </ActionIcon>
-          </Link>
-        </Tooltip>
-        <Tooltip
-          size="sm"
-          content={'View Product'}
-          placement="top"
-          color="invert"
-        >
-          <Link href={routes.eCommerce.productDetails(row.original.id)}>
-            <ActionIcon
-              as="span"
-              size="sm"
-              variant="outline"
-              aria-label={'View Product'}
-            >
-              <EyeIcon className="h-4 w-4" />
             </ActionIcon>
           </Link>
         </Tooltip>

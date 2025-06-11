@@ -274,9 +274,7 @@ export default function ServiceDetailsGallery({
           'sticky bottom-0 z-40 flex items-center justify-end gap-3 bg-gray-0/10 backdrop-blur @lg:gap-4 @xl:grid @xl:auto-cols-max @xl:grid-flow-col',
           isModalView ? '-mx-10 -mb-7 px-10 py-5' : 'py-1'
         )}
-      >
-        {/* Action buttons can go here if needed */}
-      </div>
+      ></div>
     </div>
   );
 }

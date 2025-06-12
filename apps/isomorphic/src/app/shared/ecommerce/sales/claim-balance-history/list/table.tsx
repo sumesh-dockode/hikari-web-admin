@@ -93,13 +93,18 @@ export default function ClaimBalanceHistoryTable({
   const selectedData = table
     .getSelectedRowModel()
     .rows.map((row) => row.original);
-
   function handleExportData() {
-    exportToCSV(
-      selectedData,
-      'ID,Name,Category,Sku,Price,Stock,Status,Rating',
-      `product_data_${selectedData.length}`
-    );
+    const headers = 'id,Claimed By,Date,Amount,Status';
+
+    const rows = selectedData.map((row) => ({
+      id: row.id,
+      'Claimed By': row.claimed_by,
+      Date: row.date,
+      Amount: row.amount,
+      Status: row.status,
+    }));
+
+    exportToCSV(rows, headers, `claim_balance_history_${selectedData.length}`);
   }
 
   return (

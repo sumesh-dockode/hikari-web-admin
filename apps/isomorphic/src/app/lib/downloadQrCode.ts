@@ -134,7 +134,7 @@ export async function downloadAllQRCodesFromStockAPI({
     loaderCallbacks?.onFinish?.();
   } catch (error) {
     console.error('Error generating QR codes:', error);
-    loaderCallbacks?.onFinish?.(); // Ensure loader closes on failure too
+    loaderCallbacks?.onFinish?.(); 
   }
 }
 

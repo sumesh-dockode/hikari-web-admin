@@ -35,7 +35,7 @@ export default function SignInForm() {
   };
   const errorMessages: Record<string, string> = {
     CredentialsSignin: 'Invalid username or password.',
-     ShopAccessDenied: 'You cannot access or authorize to admin portal.',
+    ShopAccessDenied: 'You cannot access or authorize to admin portal.',
     Credentials: 'Invalid username or password.',
   };
 
@@ -49,7 +49,7 @@ export default function SignInForm() {
   return (
     <>
       {displayError && (
-        <div className="mb-4 text-center text-sm text-red-600 font-semibold">
+        <div className="mb-4 text-center text-sm font-semibold text-red-600">
           {displayError}
         </div>
       )}
@@ -83,14 +83,14 @@ export default function SignInForm() {
               {...register('password')}
               error={errors.password?.message}
             />
-            <div className="flex justify-end pb-2">
+            {/* <div className="flex justify-end pb-2">
               <Link
                 href={routes.forgotPassword}
                 className="h-auto p-0 text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
               >
                 Forget Password?
               </Link>
-            </div>
+            </div> */}
             <Button
               className="w-full"
               type="submit"

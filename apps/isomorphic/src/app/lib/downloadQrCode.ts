@@ -100,24 +100,42 @@ export async function downloadAllQRCodesFromStockAPI({
     const res = await apiClient.get(`${API_ROUTES.stocks}?order=${orderId}`);
     const products: Product[] = res.data.data || [];
 
-    const zip = new JSZip();
     const total = products.length;
+
+    if (total === 0) {
+      console.warn('No products found for this order');
+      return;
+    }
 
     loaderCallbacks?.onStart?.();
 
+    if (total === 1) {
+     
+      const { id, product_name } = products[0];
+      const blob = await generateQRCodeWithNameBlob(id, product_name);
+      saveAs(blob, `${product_name}-${id}.png`);
+      loaderCallbacks?.onProgress?.(1, 1);
+      loaderCallbacks?.onFinish?.();
+      return;
+    }
+
+   
+    const zip = new JSZip();
+
     for (let i = 0; i < total; i++) {
-      const { id: productId, product_name: productName } = products[i];
-      const blob = await generateQRCodeWithNameBlob(productId, productName);
-      zip.file(`${productName}-${productId}.png`, blob);
+      const { id, product_name } = products[i];
+      const blob = await generateQRCodeWithNameBlob(id, product_name);
+      zip.file(`${product_name}-${id}.png`, blob);
       loaderCallbacks?.onProgress?.(i + 1, total);
     }
 
     const zipBlob = await zip.generateAsync({ type: 'blob' });
     saveAs(zipBlob, `qr-codes-${orderId}.zip`);
-
     loaderCallbacks?.onFinish?.();
   } catch (error) {
     console.error('Error generating QR codes:', error);
-    loaderCallbacks?.onFinish?.(); // Make sure to hide loader even on error
+    loaderCallbacks?.onFinish?.(); 
   }
 }
+
+

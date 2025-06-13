@@ -10,8 +10,9 @@ export const promotionFormSchema = z.object({
   promotion_medium: z.string().optional(),
   comments: z.string().optional(),
   aspect_ratio: z.string().optional(),
-  area_latitude: z.string().optional(),
-  area_longitude: z.string().optional(),
+  // area_latitude: z.string().optional(),
+  // area_longitude: z.string().optional(),
+  location: z.string().optional(),
   promotion_image: z.array(fileSchema).min(1, {
     message: 'Promotion image is required',
   }),

@@ -77,8 +77,9 @@ export default function CreatePromotion({
           product_name: detailData?.product_name || null,
           promotion_medium: detailData?.promotion_medium || null,
           aspect_ratio: detailData?.aspect_ratio || null,
-          area_latitude: detailData?.area_latitude || null,
-          area_longitude: detailData?.area_longitude || null,
+          // area_latitude: detailData?.area_latitude || null,
+          // area_longitude: detailData?.area_longitude || null,
+            location: detailData?.location || null,
           comments: detailData?.comments || null,
           promotion_image: imageUrl
             ? [{ url: imageUrl, name: imageName, size: imageSize }]
@@ -127,8 +128,9 @@ export default function CreatePromotion({
         product: '',
         comments: '',
         aspect_ratio: '',
-        area_latitude: '',
-        area_longitude: '',
+        // area_latitude: '',
+        // area_longitude: '',
+        location: '',
         promotion_document: [],
         promotion_image: [],
       });
@@ -199,7 +201,7 @@ export default function CreatePromotion({
                   readOnly
                   error={errors.promotion_medium?.message}
                 />
-                <Input
+                {/* <Input
                   label="Area Longitude"
                   placeholder="area longitude"
                   {...register('area_longitude')}
@@ -212,6 +214,13 @@ export default function CreatePromotion({
                   {...register('area_latitude')}
                   readOnly
                   error={errors.area_latitude?.message}
+                /> */}
+                <Input
+                  label="Location"
+                  placeholder="location"
+                  {...register('location')}
+                  readOnly
+                  error={errors.location?.message}
                 />
                 <Textarea
                   label="Comments"

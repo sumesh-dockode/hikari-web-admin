@@ -6,6 +6,7 @@ export interface PromotionDataType {
   aspect_ratio?: string;
   area_latitude?: string;
   area_longitude?: string;
+  location?: string;
   comments?: string;
   promotion_image: string | null;
   promotion_document: string | null;

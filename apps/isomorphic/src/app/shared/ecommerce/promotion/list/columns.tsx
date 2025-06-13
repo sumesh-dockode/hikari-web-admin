@@ -49,6 +49,12 @@ export const PromotionColumn = [
     cell: ({ row }) => <div className="">{row.original.comments}</div>,
   }),
   columnHelper.display({
+  id: 'location',
+  size: 120,
+  header: 'Location',
+  cell: ({ row }) => <div className="">{row.original.location}</div>,
+}),
+  columnHelper.display({
     id: 'action',
     size: 130,
     cell: ({
@@ -68,3 +74,4 @@ export const PromotionColumn = [
     ),
   }),
 ];
+

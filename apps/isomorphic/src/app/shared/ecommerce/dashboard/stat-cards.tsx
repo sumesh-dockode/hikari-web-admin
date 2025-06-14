@@ -201,11 +201,11 @@ export default function StatCards({ className }: { className?: string }) {
                 stat.increased ? 'text-green' : 'text-red'
               )}
             >
-              {stat.increased ? (
+              {/* {stat.increased ? (
                 <PiCaretDoubleUpDuotone className="me-1 h-4 w-4" />
               ) : (
                 <PiCaretDoubleDownDuotone className="me-1 h-4 w-4" />
-              )}
+              )} */}
               {stat.percentage}%
             </Text>
             <Text as="span" className="me-1 hidden @[240px]:inline-flex">

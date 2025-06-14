@@ -8,10 +8,8 @@ export default async function OrderDetailsPage({ params }: any) {
   const id = (await params).id;
 
   const formatOrderId = (uuid: string) => {
-    const base36 = BigInt(`0x${uuid.replace(/-/g, '')}`)
-      .toString(36)
-      .toUpperCase();
-    return `ORD-${base36.substring(0, 8)}`;
+    const cleanUuid = uuid.replace(/-/g, '');
+    return `ORD-${cleanUuid.slice(-4).toUpperCase()}`;
   };
 
   const formattedId = formatOrderId(id);

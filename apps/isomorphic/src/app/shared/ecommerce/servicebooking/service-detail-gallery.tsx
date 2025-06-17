@@ -255,7 +255,7 @@ export default function ServiceDetailsGallery({
         </div>
         <div className="w-full @lg:w-[45%] @xl:w-[35%]">
           <div className="sticky top-8">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+            {/* <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
               <Image
                 fill
                 priority
@@ -264,6 +264,33 @@ export default function ServiceDetailsGallery({
                 sizes="(max-width: 768px) 100vw"
                 className="h-full w-full object-cover"
               />
+            </div> */}
+            <div className="relative w-full grid grid-cols-2 gap-3">
+              {Array.isArray(currentService?.service_images) && currentService.service_images.length > 0 ? (
+                currentService.service_images.map((img: any) => (
+                  <div key={img.id} className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                    <Image
+                      fill
+                      priority
+                      src={img.image}
+                      alt={'Service Booking Image'}
+                      sizes="(max-width: 768px) 100vw"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                  <Image
+                    fill
+                    priority
+                    src={noImage}
+                    alt={'No Service Images'}
+                    sizes="(max-width: 768px) 100vw"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

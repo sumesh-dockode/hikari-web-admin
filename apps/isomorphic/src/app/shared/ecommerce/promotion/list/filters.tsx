@@ -23,7 +23,7 @@ export default function Filters<TData extends Record<string, any>>({
     <Flex align="center" justify="between" className="mb-4">
       <Input
         type="search"
-        placeholder="Search by promotion code..."
+        placeholder="Search"
         value={searchTerm || ''}
         onClear={() => {
           setSearchTerm('');

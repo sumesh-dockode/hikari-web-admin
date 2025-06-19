@@ -21,7 +21,7 @@ export default function Filters<TData extends Record<string, any>>({
 
   return (
     <Flex align="center" justify="between" className="mb-4">
-      <Input
+      {/* <Input
         type="search"
         placeholder="Search by category name..."
         value={searchTerm || ''}
@@ -36,7 +36,7 @@ export default function Filters<TData extends Record<string, any>>({
         inputClassName="h-9"
         clearable={true}
         prefix={<PiMagnifyingGlassBold className="size-4" />}
-      />
+      /> */}
 
       <ToggleColumns table={table} />
     </Flex>

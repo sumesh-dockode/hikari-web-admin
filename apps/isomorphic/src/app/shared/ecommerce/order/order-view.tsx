@@ -11,6 +11,9 @@ import { useOrderStatusChange } from '@/hooks/orders/useOrderStatusChange';
 import PageLoader from '../../page-loader';
 import OrderViewProducts from './order-products/order-view-products';
 import usePaginatedDeliveryManager from '@/hooks/DeliveryManager/usePaginatedDeliveryManager';
+import StockProductTable from './order-products/StockProductTable';
+import { useOrderStocks } from '@/hooks/orders/useOrderStocks';
+
 
 const baseStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -60,6 +63,9 @@ export default function OrderView() {
   // >();
 
   const orderData = data?.data;
+  const { data: stockProductData, isLoading: isStockLoading } = useOrderStocks(id as string);
+
+  console.log('stockProductData:', stockProductData);
   const totalItems = orderData?.items?.length || 0;
   const totalPrice = parseFloat(orderData?.total_price || 0);
   const isCancelled = orderData?.status === 'Cancelled';
@@ -156,6 +162,13 @@ export default function OrderView() {
                 </div>
               </div>
             </div>
+            {isStockLoading ? (
+  <div className="text-sm text-muted"></div>
+) : stockProductData?.length > 0 ? (
+  <StockProductTable data={stockProductData} />
+) : null}
+
+
           </div>
 
           {/* <div className="">

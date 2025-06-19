@@ -16,6 +16,7 @@ import {
 } from 'react-icons/pi';
 import { Badge, Button, Flex, Input, Text } from 'rizzui';
 
+
 const statusOptions = [
   {
     value: 'completed',
@@ -37,10 +38,14 @@ const statusOptions = [
 
 interface TableToolbarProps<T extends Record<string, any>> {
   table: ReactTableType<T>;
+  search: string;
+  setSearch: (value: string) => void;
 }
 
 export default function Filters<TData extends Record<string, any>>({
   table,
+  search,
+  setSearch,
 }: TableToolbarProps<TData>) {
   const [openDrawer, setOpenDrawer] = useState(false);
   const isMultipleSelected = table.getSelectedRowModel().rows.length > 1;
@@ -50,13 +55,24 @@ export default function Filters<TData extends Record<string, any>>({
   } = table;
 
   return (
+    // <Flex align="center" justify="between" className="mb-4">
+    //   <Input
+    //     type="search"
+    //     placeholder="Search by customer name..."
+    //     value={table.getState().globalFilter ?? ''}
+    //     onClear={() => table.setGlobalFilter('')}
+    //     onChange={(e) => table.setGlobalFilter(e.target.value)}
+    //     inputClassName="h-9"
+    //     clearable={true}
+    //     prefix={<PiMagnifyingGlassBold className="size-4" />}
+    //   />
     <Flex align="center" justify="between" className="mb-4">
       <Input
         type="search"
         placeholder="Search by customer name..."
-        value={table.getState().globalFilter ?? ''}
-        onClear={() => table.setGlobalFilter('')}
-        onChange={(e) => table.setGlobalFilter(e.target.value)}
+        value={search}
+        onClear={() => setSearch('')}
+        onChange={(e) => setSearch(e.target.value)}
         inputClassName="h-9"
         clearable={true}
         prefix={<PiMagnifyingGlassBold className="size-4" />}
@@ -68,7 +84,7 @@ export default function Filters<TData extends Record<string, any>>({
         setOpenDrawer={setOpenDrawer}
       >
         <div className="grid grid-cols-1 gap-6">
-          <FilterElements table={table} />
+         <FilterElements table={table} search={search} setSearch={setSearch} />
         </div>
       </FilterDrawerView>
 

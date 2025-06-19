@@ -15,6 +15,7 @@ import { PaginationState } from '@tanstack/react-table';
 import usePaginatedDeliveryManager from '@/hooks/DeliveryManager/usePaginatedDeliveryManager';
 
 export default function OrderTable({
+  
   className,
   variant = 'modern',
   hideFilters = false,
@@ -26,7 +27,7 @@ export default function OrderTable({
   variant?: TableVariantProps;
 }) {
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
-   const [search, setSearch] = useState('');
+  const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -34,7 +35,8 @@ export default function OrderTable({
 
   const { data: deliveryManagerData, isLoading: isLoadingDeliveryManager } =
     usePaginatedDeliveryManager({});
-  const { data, isLoading } = usePaginatedOrders(pagination);
+  // const { data, isLoading } = usePaginatedOrders(pagination);
+  const { data, isLoading } = usePaginatedOrders({ ...pagination, search });
 
   const pageCount = data?.data?.total_pages || 1;
 
@@ -82,7 +84,7 @@ export default function OrderTable({
 
   return (
     <div className={className}>
-      {!hideFilters && <Filters table={table} />}
+      {!hideFilters && <Filters table={table} search={search} setSearch={setSearch} />}
       <Table
         table={table}
         variant={variant}

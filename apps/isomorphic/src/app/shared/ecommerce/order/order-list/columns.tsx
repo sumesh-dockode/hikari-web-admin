@@ -15,9 +15,14 @@ import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
 import { ActionIcon, Box, Text, Tooltip } from 'rizzui';
 
 const columnHelper = createColumnHelper<OrdersDataType>();
+// const formatOrderId = (uuid: string) => {
+//   const base36 = BigInt(`0x${uuid.replace(/-/g, '')}`)
+//     .toString(36)
+//     .toUpperCase();
+//   return `ORD-${base36.substring(0, 8)}`;
+// };
 const formatOrderId = (uuid: string) => {
-  const cleanUuid = uuid.replace(/-/g, '');
-  return `ORD-${cleanUuid.slice(-4).toUpperCase()}`;
+  return uuid.slice(-4);
 };
 
 export const ordersColumns = (expanded: boolean = true) => {
@@ -26,8 +31,8 @@ export const ordersColumns = (expanded: boolean = true) => {
   const handleDownload = async (orderId: string) => {
     await downloadAllQRCodesFromStockAPI({
       loaderCallbacks: {
-        onStart: () => {},
-        onFinish: () => {},
+        onStart: () => { },
+        onFinish: () => { },
       },
       orderId: orderId, // replace with actual ID
     });
@@ -125,23 +130,23 @@ export const ordersColumns = (expanded: boolean = true) => {
           {['Confirmed', 'Shipped', 'Delivered'].includes(
             row.original.status
           ) && (
-            <Tooltip
-              size="sm"
-              content={'Download QR Code'}
-              placement="top"
-              color="invert"
-            >
-              <ActionIcon
-                as="span"
+              <Tooltip
                 size="sm"
-                variant="outline"
-                aria-label={'Download QR Code'}
-                onClick={() => handleDownload(row.original.id)}
+                content={'Download QR Code'}
+                placement="top"
+                color="invert"
               >
-                <BiDownload className="size-4" />
-              </ActionIcon>
-            </Tooltip>
-          )}
+                <ActionIcon
+                  as="span"
+                  size="sm"
+                  variant="outline"
+                  aria-label={'Download QR Code'}
+                  onClick={() => handleDownload(row.original.id)}
+                >
+                  <BiDownload className="size-4" />
+                </ActionIcon>
+              </Tooltip>
+            )}
         </TableRowActionGroup>
       ),
     }),

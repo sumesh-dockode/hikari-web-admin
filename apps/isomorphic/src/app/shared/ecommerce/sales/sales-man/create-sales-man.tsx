@@ -77,7 +77,7 @@ export default function CreateSalesMan({
         email: detailData?.email || '',
         phone_number: detailData?.phone_number || '',
         username: detailData?.username || '',
-        password: detailData?.password || '',
+        password: '',
         is_active: detailData?.is_active || false,
         store_manager_id: detailData?.store_manager?.id,
       };
@@ -235,6 +235,7 @@ export default function CreateSalesMan({
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <StoreManagerSelectionField
+                  key={watch('store_manager_id')}
                   value={watch('store_manager_id')}
                   onChange={(value) => setValue('store_manager_id', value)}
                   error={errors.store_manager_id?.message}

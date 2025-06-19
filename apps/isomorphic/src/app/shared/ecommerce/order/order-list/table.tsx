@@ -26,6 +26,7 @@ export default function OrderTable({
   variant?: TableVariantProps;
 }) {
   const [deleteItemId, setDeleteItemId] = useState<string | null>(null);
+   const [search, setSearch] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -97,3 +98,4 @@ export default function OrderTable({
     </div>
   );
 }
+

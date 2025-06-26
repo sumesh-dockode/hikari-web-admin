@@ -465,7 +465,7 @@ export default function ProductVariants({
           <h2 className="text-lg font-bold">Add New Variant</h2>
           {addedVariantAttributes.map((field, index) => (
             <div key={index} className="grid grid-cols-3 gap-4">
-              <Controller
+              {/* <Controller
                 control={control}
                 name={`variants.${index}.variantId`}
                 render={({ field }) => (
@@ -480,6 +480,55 @@ export default function ProductVariants({
                       ''
                     }
                     onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              /> */}
+              <Controller
+                control={control}
+                name={`variants.${index}.variantId`}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={variantOptions.filter((opt) => {
+                    
+                      const selectedIds = watch('variants')?.map((v) => v.variantId) || [];
+                      const isSelectedInOtherRow = selectedIds.includes(opt.value) &&
+                                                  opt.value !== watch(`variants.${index}.variantId`);
+                      if (isSelectedInOtherRow) {
+                        return false;
+                      }
+                      if (selectedVariantId) {
+                        const isUsedInOtherVariant = createdVariants.some(variant =>
+                          variant.id !== selectedVariantId &&
+                          variant.attributes?.some(attr =>
+                            attr.name === opt.label
+                          )
+                        );
+                        
+                        return !isUsedInOtherVariant;
+                      } else {
+                      
+                        const isUsedInExistingVariant = createdVariants.some(variant => 
+                          variant.attributes?.some(attr => 
+                            attr.name === opt.label
+                          )
+                        );
+                        
+                        return !isUsedInExistingVariant;
+                      }
+                    })}
+                    label="Variant Name"
+                    className="w-full"
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      variantOptions.find((r) => r.value === selected)?.label ??
+                      ''
+                    }
+                    onChange={(value) => {
+                      field.onChange(value);
+                    
+                      setValue(`variants.${index}.valueId`, '');
+                    }}
                   />
                 )}
               />

@@ -131,6 +131,7 @@ export default function ProductVariantsPage() {
     setIsValueModalOpen(true);
     setIsValueEditMode(false);
     setEditingValue(null);
+    resetValueForm({ value: '' }); 
   };
 
   const onSubmitValue: SubmitHandler<ProductVariantValueFormInput> = (data) => {

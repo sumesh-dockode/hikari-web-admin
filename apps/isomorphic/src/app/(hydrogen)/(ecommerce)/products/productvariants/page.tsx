@@ -131,6 +131,7 @@ export default function ProductVariantsPage() {
     setIsValueModalOpen(true);
     setIsValueEditMode(false);
     setEditingValue(null);
+    resetValueForm({ value: '' }); 
   };
 
   const onSubmitValue: SubmitHandler<ProductVariantValueFormInput> = (data) => {
@@ -285,12 +286,12 @@ export default function ProductVariantsPage() {
 
     if (!currentVariant) return null;
 
-    if (currentVariant.name.toLowerCase() === 'color') {
+    if (currentVariant.name.toLowerCase() === 'colour') {
       return (
         <div className="space-y-4">
           <div>
   <label className="mb-2 block text-sm font-medium text-gray-700">
-    Select Color
+    Select Colour
   </label>
   <div className="flex items-center gap-3">
     <input
@@ -430,7 +431,7 @@ export default function ProductVariantsPage() {
           {getModalContent()}
           {variantsAPIData
             ?.find((variant: any) => variant.id === activeVariantId)
-            ?.name.toLowerCase() !== 'color' && (
+            ?.name.toLowerCase() !== 'colour' && (
             <div>
               <Input
                 type="text"
@@ -549,7 +550,7 @@ export default function ProductVariantsPage() {
                         key={valueData.id}
                         className="relative flex items-center gap-1 rounded-full border px-3 py-1"
                       >
-                        {variant.name.toLowerCase() === 'color' ? (
+                        {variant.name.toLowerCase() === 'colour' ? (
                           <>
                             <div
                               className="h-4 w-4 rounded-full"

@@ -14,12 +14,18 @@ import { serviceDataType } from '@/data/service-data';
 
 const columnHelper = createColumnHelper<serviceDataType>();
 
+//last 4 digits
+const formatServiceId = (id: string) => {
+  return id.slice(-4);
+};
+
 export const servicebookingColumn = [
   columnHelper.display({
     id: 'id',
     size: 120,
     header: 'Id',
-    cell: ({ row }) => <>#{row.original.id}</>,
+    // cell: ({ row }) => <>#{row.original.id}</>,
+    cell: ({ row }) => <>{formatServiceId(row.original.id)}</>
   }),
   // columnHelper.display({
   //   id: 'checked',

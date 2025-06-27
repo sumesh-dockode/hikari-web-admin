@@ -12,8 +12,13 @@ export interface serviceDataType {
     name: string;
   };
   requested_by?: {
+    username: any;
     first_name: string;
     last_name: string;
+    is_active: boolean;
+    phone_number: string;
+    email: string;
+    user_role: string;
   };
    service_images: Array<{
     id: string;

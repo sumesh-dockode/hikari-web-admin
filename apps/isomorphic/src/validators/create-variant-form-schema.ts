@@ -33,7 +33,7 @@ export const variantSchema = z.object({
     .min(1, { message: messages.variantIncentiveType }),
   incentive_value: z
     .number()
-    .min(1, { message: messages.variantIncentiveValue })
+    .min(0, { message: messages.variantIncentiveValue })
     .refine((val) => !isNaN(Number(val)), 'Incentive value must be a number'),
   images: z.array(imageSchema).optional(),
 });

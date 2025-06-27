@@ -213,6 +213,7 @@ export default function ProductVariants({
         },
         {
           onSuccess: async ({ data }: any) => {
+            toast.success('Variant updated successfully');
             const result = data;
             const variantId = result?.id;
 
@@ -288,6 +289,7 @@ export default function ProductVariants({
         },
         {
           onSuccess: async ({ data }: any) => {
+            toast.success('Variant created successfully');
             const result = data;
             const variantId = result?.id;
 
@@ -371,13 +373,37 @@ export default function ProductVariants({
         description="Add your product variants here"
         className={cn(className)}
       >
-        <Button
+        {/* <Button
           onClick={() => setIsModalOpen(true)}
           variant="outline"
           className="col-span-full ml-auto w-auto"
         >
           <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
+        </Button> */}
+        {/* reset the fields */}
+        <Button
+          onClick={() => {
+            reset({
+              variants: [{ variantId: '', valueId: '' }],
+              price: 1,
+              sku: '',
+              stock: 1,
+              incentive_type: 'PERCENTAGE',
+              incentive_value: 0,
+              images: [],
+            });
+            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+            setDeletedImages([]); // <-- clears old deleted images if needed
+            setSelectedVariantId(null);
+            setVariantAction(null);
+            setIsModalOpen(true);
+          }}
+          variant="outline"
+          className="col-span-full ml-auto w-auto"
+        >
+          <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
         </Button>
+
       </FormGroup>
       {createdVariants.length > 0 && (
         <div className="mt-6">
@@ -465,7 +491,7 @@ export default function ProductVariants({
           <h2 className="text-lg font-bold">Add New Variant</h2>
           {addedVariantAttributes.map((field, index) => (
             <div key={index} className="grid grid-cols-3 gap-4">
-              <Controller
+              {/* <Controller
                 control={control}
                 name={`variants.${index}.variantId`}
                 render={({ field }) => (
@@ -480,6 +506,55 @@ export default function ProductVariants({
                       ''
                     }
                     onChange={(value) => field.onChange(value)}
+                  />
+                )}
+              /> */}
+              <Controller
+                control={control}
+                name={`variants.${index}.variantId`}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={variantOptions.filter((opt) => {
+                    
+                      const selectedIds = watch('variants')?.map((v) => v.variantId) || [];
+                      const isSelectedInOtherRow = selectedIds.includes(opt.value) &&
+                                                  opt.value !== watch(`variants.${index}.variantId`);
+                      if (isSelectedInOtherRow) {
+                        return false;
+                      }
+                      if (selectedVariantId) {
+                        const isUsedInOtherVariant = createdVariants.some(variant =>
+                          variant.id !== selectedVariantId &&
+                          variant.attributes?.some(attr =>
+                            attr.name === opt.label
+                          )
+                        );
+                        
+                        return !isUsedInOtherVariant;
+                      } else {
+                      
+                        const isUsedInExistingVariant = createdVariants.some(variant => 
+                          variant.attributes?.some(attr => 
+                            attr.name === opt.label
+                          )
+                        );
+                        
+                        return !isUsedInExistingVariant;
+                      }
+                    })}
+                    label="Variant Name"
+                    className="w-full"
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      variantOptions.find((r) => r.value === selected)?.label ??
+                      ''
+                    }
+                    onChange={(value) => {
+                      field.onChange(value);
+                    
+                      setValue(`variants.${index}.valueId`, '');
+                    }}
                   />
                 )}
               />

@@ -213,6 +213,7 @@ export default function ProductVariants({
         },
         {
           onSuccess: async ({ data }: any) => {
+            toast.success('Variant updated successfully');
             const result = data;
             const variantId = result?.id;
 
@@ -288,6 +289,7 @@ export default function ProductVariants({
         },
         {
           onSuccess: async ({ data }: any) => {
+            toast.success('Variant created successfully');
             const result = data;
             const variantId = result?.id;
 
@@ -371,13 +373,37 @@ export default function ProductVariants({
         description="Add your product variants here"
         className={cn(className)}
       >
-        <Button
+        {/* <Button
           onClick={() => setIsModalOpen(true)}
           variant="outline"
           className="col-span-full ml-auto w-auto"
         >
           <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
+        </Button> */}
+        {/* reset the fields */}
+        <Button
+          onClick={() => {
+            reset({
+              variants: [{ variantId: '', valueId: '' }],
+              price: 1,
+              sku: '',
+              stock: 1,
+              incentive_type: 'PERCENTAGE',
+              incentive_value: 0,
+              images: [],
+            });
+            setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
+            setDeletedImages([]); // <-- clears old deleted images if needed
+            setSelectedVariantId(null);
+            setVariantAction(null);
+            setIsModalOpen(true);
+          }}
+          variant="outline"
+          className="col-span-full ml-auto w-auto"
+        >
+          <PiPlusBold className="me-2 h-4 w-4" /> Add Variant
         </Button>
+
       </FormGroup>
       {createdVariants.length > 0 && (
         <div className="mt-6">

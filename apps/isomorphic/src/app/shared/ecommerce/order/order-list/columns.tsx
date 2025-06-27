@@ -44,9 +44,10 @@ export const ordersColumns = (expanded: boolean = true) => {
       size: 120,
       header: 'Order Id',
       cell: ({ row }) => (
-        <Tooltip content={row.original.id} color="invert">
-          <span>{formatOrderId(row.original.id)}</span>
-        </Tooltip>
+        // <Tooltip content={row.original.id} color="invert">
+        //   <span>{formatOrderId(row.original.id)}</span>
+        // </Tooltip>]
+         <span>{formatOrderId(row.original.id)}</span>
       ),
     }),
     columnHelper.accessor('order_info', {

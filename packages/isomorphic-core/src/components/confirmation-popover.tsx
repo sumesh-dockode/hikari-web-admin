@@ -2,6 +2,7 @@
 
 import { Title, Text, ActionIcon, Button, Popover, Tooltip } from "rizzui";
 import { PiCheckBold, PiTrashFill } from "react-icons/pi";
+import { ReactNode } from "react";
 
 type ConfirmationPopoverProps = {
   title: string;
@@ -9,6 +10,7 @@ type ConfirmationPopoverProps = {
   onConfirm?: () => void;
   tooltipContent?: string;
   isLoading?: boolean;
+  trigger?: React.ReactNode; 
 };
 
 export default function ConfirmationPopover({
@@ -17,29 +19,34 @@ export default function ConfirmationPopover({
   onConfirm,
   tooltipContent = "Approve",
   isLoading = false,
+   trigger,
+  
 }: ConfirmationPopoverProps) {
   return (
     <Popover placement="left">
-      <Popover.Trigger>
-        <div>
-          <Tooltip
-            size="sm"
-            content={tooltipContent}
-            placement="top"
-            color="invert"
-          >
-            <ActionIcon
-              size="sm"
-              variant="outline"
-              aria-label={"Confirm Action"}
-              className="cursor-pointer"
-              isLoading={isLoading}
-            >
-              <PiCheckBold className="size-4" />
-            </ActionIcon>
-          </Tooltip>
-        </div>
-      </Popover.Trigger>
+    <Popover.Trigger>
+  <div>
+    {trigger ?? (
+      <Tooltip
+        size="sm"
+        content={tooltipContent}
+        placement="top"
+        color="invert"
+      >
+        <ActionIcon
+          size="sm"
+          variant="outline"
+          aria-label={"Confirm Action"}
+          className="cursor-pointer"
+          isLoading={isLoading}
+        >
+          <PiCheckBold className="size-4" />
+        </ActionIcon>
+      </Tooltip>
+    )}
+  </div>
+</Popover.Trigger>
+
 
       <Popover.Content className="z-10">
         {({ setOpen }) => (

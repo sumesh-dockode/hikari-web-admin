@@ -17,6 +17,7 @@ import { PaginationState } from '@tanstack/react-table';
 import { useGetAllCategories } from '@/hooks/categories/useGetAllCategories';
 import { usePublishProducts } from '@/hooks/products/usePublishProducts';
 import { debounce } from 'lodash';
+import { useUnpublishProducts } from '@/hooks/products/useUnpublishProducts';
 
 interface ProductsTableProps {
   pageSize?: number;
@@ -49,7 +50,8 @@ export default function ProductsTable({
   enableRowSelection = false,
   initialSelection = [],
 }: ProductsTableProps) {
-  const [currentId, setCurrentId] = useState(null);
+  // const [currentId, setCurrentId] = useState(null);
+  const [currentId, setCurrentId] = useState<string | null>(null);
   const [pagination, setPagination] = useState<PaginationState & FiltersProps>({
     pageIndex: 0,
     pageSize: 10,
@@ -62,6 +64,7 @@ export default function ProductsTable({
   const { mutate: deleteProduct, status: deleteStatus } = useDeleteProducts();
   const { data: categoryData, isLoading: isLoadingCategory } =
     useGetAllCategories();
+  const { mutate: unpublishProduct, status: unpublishStatus } = useUnpublishProducts();
 
   const pageCount = data?.data?.total_pages || 1;
 
@@ -89,8 +92,13 @@ export default function ProductsTable({
           console.log(' row', id);
           publishProduct(id);
         },
+        handleUnpublishRow: (id: string) => {
+          setCurrentId(id);
+          unpublishProduct(id);
+        },
         deleteId: currentId,
         isLoading: publishStatus === 'pending',
+        unpublishLoading: unpublishStatus === 'pending',
       },
       enableColumnResizing: false,
       enableRowSelection: enableRowSelection,

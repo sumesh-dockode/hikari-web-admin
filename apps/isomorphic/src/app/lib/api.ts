@@ -25,4 +25,6 @@ export const API_ROUTES = {
   productImages: '/ecom/admin/product-images/',
   suggestions: '/review/',
   stocks: '/mingler/admin/stocks/',
+  redeemHistory: '/mingler/admin/redeem-history/',
+  redeemApprove: '/mingler/admin/redeem/',
 };

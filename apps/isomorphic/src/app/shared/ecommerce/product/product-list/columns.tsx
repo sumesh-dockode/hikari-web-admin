@@ -89,64 +89,81 @@ export const productsListColumns = [
     cell: ({ row }) => row.original.category,
   }),
 
-  columnHelper.display({
-    id: 'action',
-    size: 120,
-    cell: ({
-      row,
-      table: {
-        options: { meta },
-      },
-    }) => (
-      <Flex align="center" justify="end" gap="3" className="pe-4">
-        {!row.original.is_published ? (
-          <ConfirmationPopover
-            title="Publish Product"
-            description="Are you sure you want to publish this product?"
-            tooltipContent="Publish Product"
-            onConfirm={() =>
-              meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
-            }
-            isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
-          />
-        ) : (
-          <Tooltip content="Published" placement="top" size="sm">
+ columnHelper.display({
+  id: 'action',
+  size: 120,
+  cell: ({
+    row,
+    table: {
+      options: { meta },
+    },
+  }) => (
+    <Flex align="center" justify="end" gap="3" className="pe-4">
+      {!row.original.is_published ? (
+        <ConfirmationPopover
+          title="Publish Product"
+          description="Are you sure you want to publish this product?"
+          tooltipContent="Publish Product"
+          onConfirm={() =>
+            meta?.handleApproveRow && meta?.handleApproveRow(row.original.id)
+          }
+          isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
+        />
+      ) : (
+       <ConfirmationPopover
+        title="Unpublish Product"
+        description="Are you sure you want to unpublish this product?"
+        tooltipContent="Unpublish Product"
+        onConfirm={() =>
+          meta?.handleUnpublishRow && meta?.handleUnpublishRow(row.original.id)
+        }
+        isLoading={
+          meta?.unpublishLoading && meta?.deleteId === row.original.id
+        }
+        trigger={(
+          <Tooltip content="Unpublish Product" placement="top" size="sm">
             <ActionIcon
               size="sm"
               variant="solid"
               color="primary"
-              aria-label="Published"
-              className="cursor-default"
+              aria-label="Unpublish Product"
+              className="cursor-pointer"
             >
               <PiCheckBold className="size-4" />
             </ActionIcon>
           </Tooltip>
         )}
-        <Tooltip
-          size="sm"
-          content={'Edit Product'}
-          placement="top"
-          color="invert"
-        >
-          <Link href={routes.eCommerce.ediProduct(row.original.id)}>
-            <ActionIcon
-              as="span"
-              size="sm"
-              variant="outline"
-              aria-label={'Edit Product'}
-            >
-              <PencilIcon className="h-4 w-4" />
-            </ActionIcon>
-          </Link>
-        </Tooltip>
-        <DeletePopover
-          title={`Delete the product`}
-          description={`Are you sure you want to delete this #${row.original.id} product?`}
-          onDelete={() =>
-            meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
-          }
-        />
-      </Flex>
-    ),
-  }),
+      />
+
+      )}
+
+      <Tooltip
+        size="sm"
+        content={'Edit Product'}
+        placement="top"
+        color="invert"
+      >
+        <Link href={routes.eCommerce.ediProduct(row.original.id)}>
+          <ActionIcon
+            as="span"
+            size="sm"
+            variant="outline"
+            aria-label={'Edit Product'}
+          >
+            <PencilIcon className="h-4 w-4" />
+          </ActionIcon>
+        </Link>
+      </Tooltip>
+
+      <DeletePopover
+        title={`Delete the product`}
+        description={`Are you sure you want to delete this #${row.original.id} product?`}
+        onDelete={() =>
+          meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
+        }
+      />
+    </Flex>
+  ),
+}),
+
 ];

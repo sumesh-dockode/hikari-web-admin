@@ -26,6 +26,11 @@ export const variantSchema = z.object({
     .number()
     .min(1, { message: messages.variantpriceIsRequired })
     .refine((val) => !isNaN(Number(val)), 'Price must be a number'),
+    offer_price: z
+    .number()
+    .min(0, { message: 'Offer price is required' })
+    .refine((val) => !isNaN(Number(val)), 'Offer price must be a number')
+    .optional(),
   sku: z.string().min(1, { message: messages.variantSkuIsRequired }),
   stock: z.number().min(1, { message: messages.variantStockIsRequired }),
   incentive_type: z
@@ -36,6 +41,7 @@ export const variantSchema = z.object({
     .min(0, { message: messages.variantIncentiveValue })
     .refine((val) => !isNaN(Number(val)), 'Incentive value must be a number'),
   images: z.array(imageSchema).optional(),
+  is_primary: z.boolean().optional(),
 });
 
 export type VariantFormInput = z.infer<typeof variantSchema>;

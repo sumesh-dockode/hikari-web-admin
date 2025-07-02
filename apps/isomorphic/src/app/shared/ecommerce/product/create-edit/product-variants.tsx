@@ -9,6 +9,7 @@ import {
   Tooltip,
   ActionIcon,
   SelectOption,
+  Switch,
 } from 'rizzui';
 import { PiMinusBold, PiPlusBold } from 'react-icons/pi';
 import cn from '@core/utils/class-names';
@@ -57,6 +58,7 @@ interface CreatedVariant {
   value?: string;
   stock?: number;
   attributes?: { name: string; value: string }[];
+  is_primary?: boolean;
 }
 
 const incentiveTypeOptions = [
@@ -106,6 +108,30 @@ export default function ProductVariants({
   const { data: variantValuesData } = useVariantValue();
   const { data: productVariant, isFetching } = useProductsById(productId);
 
+    const {
+    control,
+    register,
+    setValue,
+    getValues,
+    reset,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<VariantFormInput>({
+    resolver: zodResolver(variantSchema),
+    defaultValues: {
+      variants: [{ variantId: '', valueId: '' }],
+      price: 1,
+      offer_price: 0,
+      sku: '',
+      stock: 1,
+      incentive_type: 'PERCENTAGE',
+      incentive_value: 0,
+      images: [],
+      is_primary: false,
+    },
+  });
+
   useEffect(() => {
     if (productVariant?.data?.variants) {
       setCreatedVariants(productVariant.data.variants);
@@ -115,6 +141,7 @@ export default function ProductVariants({
   useEffect(() => {
     if (productVariantById && selectedVariantId) {
       const productVariant = productVariantById?.data;
+      setValue('is_primary', !!productVariant?.is_primary); 
       const addedVariantAttributes =
         productVariant?.attributes?.map((a: any) => {
           const matched = variantValuesData?.data?.find((v: any) => v.id === a);
@@ -122,6 +149,7 @@ export default function ProductVariants({
             variantId: matched?.attribute,
             valueId: matched?.id,
           };
+         
         }) || [];
 
       setAddedVariantAttributes(addedVariantAttributes);
@@ -136,7 +164,7 @@ export default function ProductVariants({
 
       setIsModalOpen(true);
     }
-  }, [productVariantById, selectedVariantId]);
+  }, [productVariantById, selectedVariantId, setValue, variantValuesData]);
 
   useEffect(() => {
     if (!variantValuesData?.data) return;
@@ -173,27 +201,28 @@ export default function ProductVariants({
     ]);
   };
 
-  const {
-    control,
-    register,
-    setValue,
-    getValues,
-    reset,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<VariantFormInput>({
-    resolver: zodResolver(variantSchema),
-    defaultValues: {
-      variants: [{ variantId: '', valueId: '' }],
-      price: 1,
-      sku: '',
-      stock: 1,
-      incentive_type: 'PERCENTAGE',
-      incentive_value: 0,
-      images: [],
-    },
-  });
+  // const {
+  //   control,
+  //   register,
+  //   setValue,
+  //   getValues,
+  //   reset,
+  //   handleSubmit,
+  //   watch,
+  //   formState: { errors },
+  // } = useForm<VariantFormInput>({
+  //   resolver: zodResolver(variantSchema),
+  //   defaultValues: {
+  //     variants: [{ variantId: '', valueId: '' }],
+  //     price: 1,
+  //     sku: '',
+  //     stock: 1,
+  //     incentive_type: 'PERCENTAGE',
+  //     incentive_value: 0,
+  //     images: [],
+  //     is_primary: false,
+  //   },
+  // });
 
   const onSubmit: SubmitHandler<VariantFormInput> = (formData) => {
     if (formData?.id) {
@@ -203,6 +232,7 @@ export default function ProductVariants({
           product: productId,
           sku: formData.sku,
           price: formData.price,
+          offer_price: formData.offer_price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
           // images: formData.images?.map((i) => ({ image: i })) || [],
@@ -210,6 +240,7 @@ export default function ProductVariants({
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
+           is_primary: formData.is_primary, 
         },
         {
           onSuccess: async ({ data }: any) => {
@@ -259,6 +290,7 @@ export default function ProductVariants({
               incentive_type: result?.extras?.incentive_type,
               incentive_value: result?.extras?.incentive_value,
               images: result?.images,
+              is_primary: result?.is_primary,
             };
 
             setCreatedVariants((prev) =>
@@ -279,6 +311,7 @@ export default function ProductVariants({
           product: productId,
           sku: formData.sku,
           price: formData.price,
+          offer_price: formData.offer_price,
           stock: formData.stock,
           attributes: formData.variants.map((v) => v.valueId),
           // images: formData.images?.map((i) => ({ image: i })) || [],
@@ -286,6 +319,7 @@ export default function ProductVariants({
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
+           is_primary: formData.is_primary, 
         },
         {
           onSuccess: async ({ data }: any) => {
@@ -324,6 +358,7 @@ export default function ProductVariants({
               incentive_type: result?.extras?.incentive_type,
               incentive_value: result?.extras?.incentive_value,
               images: result?.images,
+              is_primary: result?.is_primary,
             };
             setCreatedVariants((prev) => [...prev, newVariants]);
             queryClient.invalidateQueries({
@@ -424,6 +459,9 @@ export default function ProductVariants({
                   <th className="px-4 py-2 text-left font-medium text-gray-600">
                     SKU
                   </th>
+                  <th className="px-4 py-2 text-left font-medium text-gray-600">
+                    Primary
+                  </th>
                   <th></th>
                 </tr>
               </thead>
@@ -440,6 +478,13 @@ export default function ProductVariants({
                     <td className="px-4 py-2">{toCurrency(v.price || 0)}</td>
                     <td className="px-4 py-2">{v.stock}</td>
                     <td className="px-4 py-2">{v.sku}</td>
+                    <td className="px-4 py-2">
+                      {v.is_primary ? (
+                        <span className="inline-block rounded bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">
+                          Primary
+                        </span>
+                      ) : null}
+                    </td>
                     <td className="space-x-2">
                       <Tooltip
                         size="sm"
@@ -607,6 +652,22 @@ export default function ProductVariants({
               )}
             </div>
           ))}
+          <div>
+            <label className="text-sm font-medium text-gray-700 mb-2 block">
+              Set as Primary Variant
+            </label>
+            <Controller
+              control={control}
+              name="is_primary"
+              render={({ field }) => (
+                <Switch
+                  checked={field.value}
+                  onChange={field.onChange}
+                  label={field.value ? 'Primary' : 'Not Primary'}
+                />
+              )}
+            />
+          </div>
           <Button
             type="button"
             variant="outline"
@@ -634,6 +695,20 @@ export default function ProductVariants({
               {errors.price && (
                 <p className="mt-1 text-sm text-red-500">
                   {errors.price.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-700">Offer Price</label>
+              <Input
+                type="number"
+                placeholder="Enter offer price"
+                onFocus={(e) => e.target.select()}
+                {...register('offer_price', { valueAsNumber: true })}
+              />
+              {errors.offer_price && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.offer_price.message}
                 </p>
               )}
             </div>

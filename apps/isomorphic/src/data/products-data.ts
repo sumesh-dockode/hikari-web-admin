@@ -25,10 +25,12 @@ export type ProductVariantDataType = {
   attributes?: any;
   value?: string;
   price?: number;
+  offer_price?: number;
   sku?: string;
   images?: { image: string }[];
   stock: number;
   extras?: { incentive_type: string; incentive_value?: number };
+  is_primary?: boolean; 
 };
 
 export type variantValuesDataType = {

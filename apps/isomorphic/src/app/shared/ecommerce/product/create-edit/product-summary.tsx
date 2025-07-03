@@ -94,7 +94,7 @@ export default function ProductSummary({ className, productId }: { className?: s
         }}
       />
 
-      <Controller
+      {/* <Controller
         control={control}
         name="description"
         render={({ field: { onChange, value } }) => (
@@ -109,6 +109,22 @@ export default function ProductSummary({ className, productId }: { className?: s
             label="Product Details"
             className="col-span-full [&_.ql-editor]:min-h-[100px]"
             labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
+            error={errors?.description?.message as string}
+          />
+        )}
+      /> */}
+      <Controller
+        control={control}
+        name="description"
+        render={({ field: { onChange, value } }) => (
+          <Textarea
+            value={value}
+            onChange={onChange}
+            label="Product Details"
+            className="col-span-full"
+            labelClassName="font-medium text-gray-700 dark:text-gray-600 mb-1.5"
+            placeholder="Enter product description..."
+            textareaClassName="min-h-[100px]"
             error={errors?.description?.message as string}
           />
         )}

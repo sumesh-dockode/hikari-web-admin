@@ -10,6 +10,10 @@ import { Checkbox, Flex, Text, Title } from 'rizzui';
 
 const columnHelper = createColumnHelper<SalesHistoryDataType>();
 
+const formatOrderId = (id: string) => {
+  return id.slice(-4);
+};
+
 export const SalesHistoryColumns = [
   columnHelper.accessor('created_at', {
     id: 'created_at',
@@ -41,7 +45,7 @@ export const SalesHistoryColumns = [
     header: 'Order Id',
     cell: ({ row }) => (
       <Link href={`/orders/${row.original.order}`} className="hover:underline">
-        #{row.original.order}
+       {formatOrderId(row.original.order)}
       </Link>
     ),
   }),

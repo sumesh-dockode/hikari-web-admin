@@ -25,7 +25,7 @@ export type ProductVariantDataType = {
   attributes?: any;
   value?: string;
   price?: number;
-  offer_price?: number;
+   offer_price?: number | null;
   sku?: string;
   images?: { image: string }[];
   stock: number;

@@ -68,6 +68,9 @@ export default function ServiceBookingTable() {
           ) || [];
 
       setData(serviceBookingAPIData);
+      if (serviceBookingAPIData.length > 0) {
+      console.log('First item service_types:', serviceBookingAPIData[0].service_types);
+    }
     }
   }, [data]);
 

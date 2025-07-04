@@ -187,18 +187,29 @@ export default function ServiceDetailsGallery({
                 <div>
                   <label
                     className="block text-sm font-medium text-gray-700"
-                    htmlFor="serviceType"
+                    htmlFor="serviceTypes"
                   >
-                    Service Type
+                    Service Types
                   </label>
-                  <input
-                    type="text"
-                    id="serviceType"
-                    name="serviceType"
-                    value={currentService?.service_type || 'N/A'}
-                    readOnly
-                    className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
-                  />
+                  {Array.isArray(currentService?.service_types) && currentService.service_types.length > 0 ? (
+                    <div className="mt-1 rounded-md border border-gray-300 p-2 text-sm text-gray-900">
+                      {currentService.service_types.map((serviceType: any, index: number) => (
+                        <span key={serviceType.id}>
+                          {serviceType.name}
+                          {index < currentService.service_types.length - 1 ? ', ' : ''}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      id="serviceType"
+                      name="serviceType"
+                      value={currentService?.service_type || 'N/A'}
+                      readOnly
+                      className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                    />
+                  )}
                 </div>
               </div>
 

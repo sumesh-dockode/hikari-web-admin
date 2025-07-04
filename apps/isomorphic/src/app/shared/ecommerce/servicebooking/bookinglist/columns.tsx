@@ -68,7 +68,7 @@ export const servicebookingColumn = [
     return (
       <figure className="relative aspect-square w-12 overflow-hidden rounded-lg bg-gray-100">
         <Image
-          alt={row.original.service_type}
+          alt={`Service image for ${row.original.product?.name || row.original.service_to || 'service'}`}
           src={firstImage}
           fill
           sizes="(max-width: 768px) 100vw"
@@ -114,14 +114,19 @@ export const servicebookingColumn = [
     </div>
   ),
 }),
-  columnHelper.display({
-    id: 'service_type',
-    size: 250,
-    header: 'Service Type',
-    cell: ({ row }) => (
-      <Text className="truncate !text-sm">{row.original.service_type}</Text>
-    ),
-  }),
+columnHelper.display({
+  id: 'service_types',
+  size: 250,
+  header: 'Service Types',
+  cell: ({ row }) => (
+    <div className="ps-6">
+      {Array.isArray(row.original.service_types) && row.original.service_types.length > 0
+        ? row.original.service_types.map((stype) => stype.name).join(', ')
+        : <span className="text-gray-400 text-xs">No Service Types</span>
+      }
+    </div>
+  ),
+}),
   // columnHelper.display({
   //   id: 'description',
   //   size: 300,

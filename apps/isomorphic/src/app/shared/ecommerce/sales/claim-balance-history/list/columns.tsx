@@ -13,15 +13,15 @@ const columnHelper = createColumnHelper<ClaimBalanceHistoryDataType>();
 
 function ActionCell({ row }: { row: any }) {
   const { mutate: approveClaimBalance, isPending } = useApproveClaimBalance();
-  
+
   const handleApprove = (data: ClaimBalanceHistoryDataType) => {
     approveClaimBalance(data.id.toString());
   };
-  
-  const isApproved = row.original.status === 'Approved' || 
-                     row.original.status === 'approved' || 
-                     row.original.status === 'completed';
-  
+
+  const isApproved = row.original.status === 'Approved' ||
+    row.original.status === 'approved' ||
+    row.original.status === 'completed';
+
   return (
     <Flex align="center" justify="end" gap="3" className="pe-4">
       {!isApproved && (
@@ -78,49 +78,42 @@ export const ClaimBalanceHistoryColumns = [
   header: 'Redeem Info',
   cell: ({ row }) => {
     const info = row.original.redeem_info;
-    
-   
+
     if (!info || typeof info !== 'object') {
       return <Text className="text-sm">-</Text>;
     }
-    
-   
-    if (info.upi_id) {
-      return (
-        <div className="space-y-0.5 text-sm text-gray-700">
-          <div> {info.upi_id}</div>
-        </div>
-      );
-    }
-    
-    
-    if (info.account_number || info.bank_name) {
-      return (
-        <div className="space-y-0.5 text-sm text-gray-700">
-          {info.account_holder_name && <div>{info.account_holder_name}</div>}
-          {info.bank_name && <div>{info.bank_name}</div>}
-          {info.account_number && <div> {info.account_number}</div>}
-          {info.ifsc_code && <div> {info.ifsc_code}</div>}
-          {info.branch_name && <div>{info.branch_name}</div>}
-        </div>
-      );
-    }
-    
-    
-    return <Text className="text-sm">-</Text>;
+
+    return (
+      <div className="space-y-0.5 text-sm text-gray-700">
+        {/* UPI */}
+        {info.upi_id && (
+          <div>{info.upi_id}</div>
+        )}
+        {/* Bank details */}
+        {(info.account_holder_name || info.bank_name || info.account_number || info.ifsc_code || info.branch_name) && (
+          <div>
+            {info.account_holder_name && <div>{info.account_holder_name}</div>}
+            {info.bank_name && <div>{info.bank_name}</div>}
+            {info.account_number && <div>{info.account_number}</div>}
+            {info.ifsc_code && <div>{info.ifsc_code}</div>}
+            {info.branch_name && <div>{info.branch_name}</div>}
+          </div>
+        )}
+      </div>
+    );
   },
 }),
 
-    columnHelper.accessor('balance', {
-  id: 'balance',
-  size: 150,
-  header: 'Balance',
-  cell: ({ row }) => (
-    <Text className="font-medium text-gray-700">
-      ${row.original.balance || '0.00'}
-    </Text>
-  ),
-}),
+  columnHelper.accessor('balance', {
+    id: 'balance',
+    size: 150,
+    header: 'Balance',
+    cell: ({ row }) => (
+      <Text className="font-medium text-gray-700">
+        ${row.original.balance || '0.00'}
+      </Text>
+    ),
+  }),
   columnHelper.accessor('amount', {
     id: 'amount',
     size: 150,
@@ -137,7 +130,7 @@ export const ClaimBalanceHistoryColumns = [
     enableSorting: false,
     cell: ({ row }) => getStatusBadge(row.original.status),
   }),
-    columnHelper.display({
+  columnHelper.display({
     id: 'action',
     size: 120,
     cell: ({ row }) => <ActionCell row={row} />,

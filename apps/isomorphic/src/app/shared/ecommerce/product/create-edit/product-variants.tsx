@@ -751,7 +751,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
                 </p>
               )}
             </div>
-            <div>
+            {/* <div>
               <label className="text-sm font-medium text-gray-700">Offer Price</label>
               <Input
                 type="number"
@@ -765,7 +765,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
                   {errors.offer_price.message}
                 </p>
               )}
-            </div>
+            </div> */}
             <div>
               <label className="text-sm font-medium text-gray-700">SKU</label>
               <Input
@@ -834,7 +834,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
             </div>
           
 
-          <div>
+          {/* <div>
             <label className="text-sm font-medium text-gray-700">Custom Price</label>
             <Select
               options={[
@@ -916,7 +916,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
           ))}
         </div>
       </div>
-    )}
+    )} */}
 
 
 

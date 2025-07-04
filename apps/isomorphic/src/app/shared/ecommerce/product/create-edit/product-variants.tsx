@@ -38,6 +38,7 @@ import {
 } from '@/hooks/products/useUploadProductImages';
 import { useDeleteProductImages } from '@/hooks/products/useDeleteUploadedImages';
 import toast from 'react-hot-toast';
+import { Checkbox, CheckboxGroup } from 'rizzui';
 
 interface VariantOption {
   value: string;
@@ -59,6 +60,11 @@ interface CreatedVariant {
   stock?: number;
   attributes?: { name: string; value: string }[];
   is_primary?: boolean;
+}
+
+interface ShopPrice {
+  shop: string;
+  price: number;
 }
 
 const incentiveTypeOptions = [
@@ -108,6 +114,21 @@ export default function ProductVariants({
   const { data: variantValuesData } = useVariantValue();
   const { data: productVariant, isFetching } = useProductsById(productId);
 
+  //custom price
+const [selectedShop, setSelectedShop] = useState<string>('');
+const [customShopPrice, setCustomShopPrice] = useState<number>(0);
+const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>([]);
+
+//   const handleShopSelection = (value: string) => {
+//   if (value && !selectedShops.includes(value)) {
+//     setSelectedShops([...selectedShops, value]);
+//   }
+//   };
+
+//   const handleRemoveShop = (shopToRemove: string) => {
+//   setSelectedShops(selectedShops.filter(shop => shop !== shopToRemove));
+// };
+
     const {
     control,
     register,
@@ -141,6 +162,9 @@ export default function ProductVariants({
   useEffect(() => {
     if (productVariantById && selectedVariantId) {
       const productVariant = productVariantById?.data;
+    //    if (productVariant?.shop_prices) {
+    //   setSelectedShops(productVariant.shop_prices.map((item: ShopPrice) => item.shop));
+    // }
       setValue('is_primary', !!productVariant?.is_primary); 
       const addedVariantAttributes =
         productVariant?.attributes?.map((a: any) => {
@@ -554,7 +578,7 @@ export default function ProductVariants({
                   />
                 )}
               /> */}
-              <Controller
+              {/* <Controller
                 control={control}
                 name={`variants.${index}.variantId`}
                 render={({ field }) => (
@@ -598,6 +622,35 @@ export default function ProductVariants({
                     onChange={(value) => {
                       field.onChange(value);
                     
+                      setValue(`variants.${index}.valueId`, '');
+                    }}
+                  />
+                )}
+              /> */}
+              <Controller
+                control={control}
+                name={`variants.${index}.variantId`}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={variantOptions.filter((opt) => {
+                    
+                      const selectedIds = watch('variants')?.map((v) => v.variantId) || [];
+                      const isSelectedInOtherRow = selectedIds.includes(opt.value) &&
+                                                  opt.value !== watch(`variants.${index}.variantId`);
+                      
+                    
+                      return !isSelectedInOtherRow;
+                    })}
+                    label="Variant Name"
+                    className="w-full"
+                    getOptionValue={(option) => option.value}
+                    displayValue={(selected) =>
+                      variantOptions.find((r) => r.value === selected)?.label ??
+                      ''
+                    }
+                    onChange={(value) => {
+                      field.onChange(value);
                       setValue(`variants.${index}.valueId`, '');
                     }}
                   />
@@ -704,7 +757,8 @@ export default function ProductVariants({
                 type="number"
                 placeholder="Enter offer price"
                 onFocus={(e) => e.target.select()}
-                {...register('offer_price', { valueAsNumber: true })}
+                value={watch('offer_price') ?? ''}
+                onChange={(e) => setValue('offer_price', e.target.value === '' ? undefined : Number(e.target.value))}
               />
               {errors.offer_price && (
                 <p className="mt-1 text-sm text-red-500">
@@ -778,6 +832,95 @@ export default function ProductVariants({
                 </p>
               )}
             </div>
+          
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Custom Price</label>
+            <Select
+              options={[
+                { value: 'Hilite 1', label: 'Hilite 1' },
+                { value: 'Hilite 2', label: 'Hilite 2' },
+                { value: 'Hilite 3', label: 'Hilite 3' },
+                { value: 'Hilite 4', label: 'Hilite 4' },
+                { value: 'Hilite 5', label: 'Hilite 5' },
+              ]}
+              placeholder="Select shop"
+              className="w-full"
+              value={selectedShop}
+              onChange={(value) => setSelectedShop(value as string)}
+              getOptionValue={(option) => option.value}
+              displayValue={(selected) => selected ? String(selected) : ''}
+            />
+          </div>
+
+
+          <div>
+            <label className="text-sm font-medium text-gray-700">Price</label>
+            <Input
+              type="number"
+              placeholder="Enter your price"
+              value={customShopPrice}
+              onChange={(e) => setCustomShopPrice(Number(e.target.value))}
+              onFocus={(e) => e.target.select()}
+              className="w-full"
+            />
+          </div>
+
+
+          <div className="col-span-2 flex justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              className="w-auto"
+              onClick={() => {
+                if (
+                  selectedShop &&
+                  !shopPrices.some((sp) => sp.shop === selectedShop) &&
+                  customShopPrice > 0
+                ) {
+                  setShopPrices([...shopPrices, { shop: selectedShop, price: customShopPrice }]);
+                  setSelectedShop('');
+                  setCustomShopPrice(0);
+                }
+              }}
+            >
+              + Add
+            </Button>
+          </div>
+
+
+       {shopPrices.length > 0 && (
+      <div className="col-span-2 mt-2">
+        <p className="text-sm font-medium text-gray-700 mb-1">Added Shops</p>
+        <div className="flex flex-col gap-2">
+          {shopPrices.map((shop, index) => (
+            <div
+              key={index}
+              className="flex items-center justify-between gap-2 rounded border border-gray-300 px-3 py-1 w-fit text-sm"
+            >
+              <span className="text-gray-800">
+                {shop.shop} ₹{shop.price}
+              </span>
+              <button
+                type="button"
+                className="text-red-500 ml-2"
+                onClick={() => {
+                  const updated = [...shopPrices];
+                  updated.splice(index, 1);
+                  setShopPrices(updated);
+                }}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+
+
+
           </div>
           <div className="flex justify-end gap-2 pt-4">
             <Button

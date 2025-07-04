@@ -26,11 +26,9 @@ export const variantSchema = z.object({
     .number()
     .min(1, { message: messages.variantpriceIsRequired })
     .refine((val) => !isNaN(Number(val)), 'Price must be a number'),
-    offer_price: z
-    .number()
-    .min(0, { message: 'Offer price is required' })
-    .refine((val) => !isNaN(Number(val)), 'Offer price must be a number')
-    .optional(),
+   offer_price: z
+  .union([z.number(), z.nan().transform(() => undefined)])
+  .optional(),
   sku: z.string().min(1, { message: messages.variantSkuIsRequired }),
   stock: z.number().min(1, { message: messages.variantStockIsRequired }),
   incentive_type: z

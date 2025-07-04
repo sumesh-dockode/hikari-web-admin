@@ -1,7 +1,15 @@
 export interface serviceDataType {
   id: string;
   service_to: string;
-  service_type: string;
+  service_types: Array<{
+    id: string;
+    name: string;
+    description: string;
+    price: string;
+    duration: number;
+    created_at: string;
+    updated_at: string;
+  }>;
   user_id: number;
   description: string;
   image: string;

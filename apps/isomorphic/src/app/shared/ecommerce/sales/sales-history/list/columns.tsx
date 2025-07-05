@@ -22,13 +22,19 @@ export const SalesHistoryColumns = [
     cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
   }),
   columnHelper.display({
-    id: 'name',
-    size: 300,
-    header: 'Product',
-    enableSorting: false,
-    cell: ({ row }) => (
+  id: 'name',
+  size: 300,
+  header: 'Product',
+  enableSorting: false,
+  cell: ({ row }) => {
+    const images = row.original.product_variant.images;
+    const imageUrl = Array.isArray(images) && images.length > 0 
+      ? (images[0] as { image: string }).image 
+      : '';
+      
+    return (
       <AvatarCard
-        src={row.original.product_variant.images?.[0]}
+        src={imageUrl}
         name={row.original.product_name}
         description={row.original.product_variant.sku}
         avatarProps={{
@@ -37,8 +43,9 @@ export const SalesHistoryColumns = [
           className: 'rounded-lg',
         }}
       />
-    ),
-  }),
+    );
+  },
+}),
   columnHelper.display({
     id: 'order',
     size: 150,

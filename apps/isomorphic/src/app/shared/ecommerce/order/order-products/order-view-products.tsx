@@ -30,11 +30,25 @@ const columns = [
             className="object-cover"
           />
         </div>
-        <div className="ms-4">
+         <div className="ms-4">
           <Title as="h6" className="!text-sm font-medium">
             {row.product_variant.product.name}
           </Title>
+          {/* <Text className="text-xs text-gray-500">
+            SKU: {row.product_variant.sku}
+          </Text> */}
+          {row.product_variant.attributes && row.product_variant.attributes.length > 0 && (
+            <div className="mt-1">
+              <Text className="text-xs font-medium">Variant Details:</Text>
+              {row.product_variant.attributes.map((attr: any, index: number) => (
+                <Text key={index} className="text-xs text-gray-500">
+                  {attr.name}: {attr.value}
+                </Text>
+              ))}
+            </div>
+          )}
         </div>
+        
       </div>
     ),
   },

@@ -62,9 +62,10 @@ interface CreatedVariant {
   is_primary?: boolean;
 }
 
-interface ShopPrice {
+interface ShopCustomPrice {
   shop: string;
   price: number;
+  offer_price?: number;
 }
 
 const incentiveTypeOptions = [
@@ -114,10 +115,11 @@ export default function ProductVariants({
   const { data: variantValuesData } = useVariantValue();
   const { data: productVariant, isFetching } = useProductsById(productId);
 
-  //custom price
+//custom P
 const [selectedShop, setSelectedShop] = useState<string>('');
-const [customShopPrice, setCustomShopPrice] = useState<number>(0);
-const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>([]);
+const [customShopPrice, setCustomShopPrice] = useState<number | ''>('');
+const [customShopOfferPrice, setCustomShopOfferPrice] = useState<number | ''>('');
+const [shopCustomPrices, setShopCustomPrices] = useState<ShopCustomPrice[]>([]);
 
 //   const handleShopSelection = (value: string) => {
 //   if (value && !selectedShops.includes(value)) {
@@ -751,7 +753,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
                 </p>
               )}
             </div>
-            {/* <div>
+            <div>
               <label className="text-sm font-medium text-gray-700">Offer Price</label>
               <Input
                 type="number"
@@ -765,7 +767,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
                   {errors.offer_price.message}
                 </p>
               )}
-            </div> */}
+            </div>
             <div>
               <label className="text-sm font-medium text-gray-700">SKU</label>
               <Input
@@ -834,7 +836,7 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
             </div>
           
 
-          {/* <div>
+           {/* <div>
             <label className="text-sm font-medium text-gray-700">Custom Price</label>
             <Select
               options={[
@@ -916,12 +918,13 @@ const [shopPrices, setShopPrices] = useState<{ shop: string; price: number }[]>(
           ))}
         </div>
       </div>
-    )} */}
+    )}  */}
 
 
 
 
           </div>
+          
           <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"

@@ -33,7 +33,7 @@ const StoreManagerSelectionField = ({
   const storeManagerOptions =
     storeManagerData?.data.map((storeManager: StoreManagerDataType) => ({
       key: storeManager.id,
-      label: `${storeManager.first_name || ''} ${storeManager.last_name || ''}`,
+      label: `${storeManager.store_info?.name ?? storeManager.first_name}`,
       value: storeManager.id,
       // Store the full manager data for later use
       managerData: storeManager,

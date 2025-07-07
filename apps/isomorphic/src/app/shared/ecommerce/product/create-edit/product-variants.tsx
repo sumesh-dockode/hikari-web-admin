@@ -135,6 +135,11 @@ const [selectedShop, setSelectedShop] = useState<{
 const [customShopPrice, setCustomShopPrice] = useState<number | ''>('');
 const [customShopOfferPrice, setCustomShopOfferPrice] = useState<number | ''>('');
 const [shopCustomPrices, setShopCustomPrices] = useState<ShopCustomPrice[]>([]);
+const [tempShopPrices, setTempShopPrices] = useState<{
+  storeId: string;
+  storeName: string;
+  price: number;
+}[]>([]);
 
 //cus api
 const { data: storePrices = [], isLoading: isStorePricesLoading } = useStorePricesByVariant(selectedVariantId || createdVariants[0]?.id);
@@ -149,6 +154,7 @@ useEffect(() => {
   
   setSelectedShop(undefined);
   setCustomShopPrice('');
+  setTempShopPrices([]); // Clear temporary shop prices
 }, [isModalOpen, selectedVariantId]);
 //   const handleShopSelection = (value: string) => {
 //   if (value && !selectedShops.includes(value)) {
@@ -181,7 +187,7 @@ useEffect(() => {
       incentive_type: 'PERCENTAGE',
       incentive_value: 0,
       images: [],
-      is_primary: false,
+      is_primary: false, 
     },
   });
 
@@ -396,6 +402,31 @@ useEffect(() => {
                   })
               );
               await Promise.all(imageUploadPromises);
+            }
+
+            // Create shop prices from temporary state
+            if (tempShopPrices.length > 0) {
+              const shopPricePromises = tempShopPrices.map(sp => 
+                createStorePrice({
+                  variantId,
+                  storeId: sp.storeId,
+                  price: sp.price
+                })
+              );
+              
+              try {
+                await Promise.all(shopPricePromises);
+                toast.success('All shop prices added successfully');
+                
+                // Make sure to invalidate the store prices query to refresh the data
+                queryClient.invalidateQueries({ queryKey: ['storePrices', variantId] });
+              } catch (error) {
+                console.error('Error creating some shop prices:', error);
+                toast.error('Some shop prices could not be added');
+              }
+              
+              // Clear temporary shop prices
+              setTempShopPrices([]);
             }
 
             setAddedVariantAttributes([{ variantId: '', valueId: '' }]);
@@ -759,7 +790,7 @@ useEffect(() => {
               name="is_primary"
               render={({ field }) => (
                 <Switch
-                  checked={field.value}
+                  checked={!!field.value} // Convert to boolean with !!
                   onChange={field.onChange}
                   label={field.value ? 'Primary' : 'Not Primary'}
                 />
@@ -887,25 +918,25 @@ useEffect(() => {
   <h3 className="mb-2 text-base font-semibold">Custom Price</h3>
   <div className="grid grid-cols-2 gap-4 items-end">
     <div>
-      <label className="text-sm font-medium text-gray-700">Shop</label>
-   <StoreManagerSelectionField
-  value={selectedShop ? selectedShop.managerId : 0}
-  onChange={(managerId, managerName, storeInfo) => {
-    console.log('Store manager selected:', { managerId, managerName, storeInfo });
-    
-    if (storeInfo && storeInfo.id) {
-      setSelectedShop({
-        managerId,
-        label: managerName ?? '',
-        storeId: storeInfo.id,
-        storeName: storeInfo.name,
-      });
-    } else {
-      toast.error('This store manager does not have an associated store');
-      setSelectedShop(undefined);
-    }
-  }}
-/>
+      <label className="text-sm font-medium text-gray-700">Select Shop</label>
+      <StoreManagerSelectionField
+        value={selectedShop ? selectedShop.managerId : 0}
+        onChange={(managerId, managerName, storeInfo) => {
+          console.log('Store manager selected:', { managerId, managerName, storeInfo });
+          
+          if (storeInfo && storeInfo.id) {
+            setSelectedShop({
+              managerId,
+              label: managerName ?? '',
+              storeId: storeInfo.id,
+              storeName: storeInfo.name,
+            });
+          } else {
+            toast.error('This store manager does not have an associated store');
+            setSelectedShop(undefined);
+          }
+        }}
+      />
     </div>
     <div>
       <label className="text-sm font-medium text-gray-700">Price</label>
@@ -920,78 +951,113 @@ useEffect(() => {
     </div>
   </div>
   <div className="flex justify-end mt-2">
-<Button
-  type="button"
-  variant="outline"
-  className="w-auto"
-  isLoading={isCreatingStorePrice}
-  onClick={() => {
-    const variantId = selectedVariantId || createdVariants[0]?.id;
-    console.log('DEBUG createStorePrice', {
-      variantId,
-      selectedShop,
-      customShopPrice,
-    });
-    
-    // Validate all required fields
-    if (!selectedShop) {
-      toast.error('Please select a store manager');
-      return;
-    }
-    
-    if (!selectedShop.storeId) {
-      toast.error('The selected store manager does not have a valid store. Please select another store manager.');
-      return;
-    }
-    
-    if (customShopPrice === '' || Number(customShopPrice) <= 0) {
-      toast.error('Please enter a valid price');
-      return;
-    }
-    
-    if (!variantId) {
-      toast.error('No variant selected');
-      return;
-    }
-    
-    // All validations passed, proceed with API call
-    createStorePrice(
-      {
-        variantId,
-        storeId: selectedShop.storeId,
-        price: Number(customShopPrice),
-      },
-      {
-        onSuccess: (data) => {
-          console.log('Store price created successfully:', data);
+    <Button
+      type="button"
+      variant="outline"
+      className="w-auto"
+      isLoading={isCreatingStorePrice}
+      onClick={() => {
+        
+        const variantId = selectedVariantId || null;
+        
+        // Validate inputs
+        if (!selectedShop) {
+          toast.error('Please select a store manager');
+          return;
+        }
+        
+        if (!selectedShop.storeId) {
+          toast.error('The selected store manager does not have a valid store. Please select another store manager.');
+          return;
+        }
+        
+        if (customShopPrice === '' || Number(customShopPrice) <= 0) {
+          toast.error('Please enter a valid price');
+          return;
+        }
+        
+        
+        
+        if (variantId) {
+          createStorePrice(
+            {
+              variantId,
+              storeId: selectedShop.storeId,
+              price: Number(customShopPrice),
+            },
+            {
+              onSuccess: (data) => {
+                setSelectedShop(undefined);
+                setCustomShopPrice('');
+                toast.success('Store price added successfully');
+              },
+              onError: (error: any) => {
+                const errorMessage = error?.response?.data?.message || 'Failed to add store price';
+                toast.error(errorMessage);
+              }
+            }
+          );
+        } else {
+         
+          setTempShopPrices([
+            ...tempShopPrices,
+            {
+              storeId: selectedShop.storeId,
+              storeName: selectedShop.storeName,
+              price: Number(customShopPrice)
+            }
+          ]);
           setSelectedShop(undefined);
           setCustomShopPrice('');
-          toast.success('Store price added successfully');
-        },
-        onError: (error: any) => {
-          console.error('Error creating store price:', error);
-          const errorMessage = error?.response?.data?.message || 'Failed to add store price';
-          toast.error(errorMessage);
-          
-          // Log detailed error information
-          console.error('API Error Details:', {
-            status: error?.response?.status,
-            data: error?.response?.data,
-            config: error?.config,
-          });
+          toast.success('Store price added to queue');
         }
-      }
-    );
-  }}
->
-  + Add
-</Button>
+      }}
+    >
+      + Add
+    </Button>
   </div>
 
-{isStorePricesLoading ? (
-  <div>Loading...</div>
-) : (
-   selectedVariantId && storePrices.length > 0 && (
+  {isStorePricesLoading ? (
+    <div>Loading...</div>
+  ) : (
+    selectedVariantId && storePrices.length > 0 && (
+      <div className="mt-4">
+        <h4 className="text-sm font-medium mb-2">Added Shops</h4>
+        <div className="overflow-x-auto rounded border">
+          <table className="min-w-full divide-y divide-gray-200 text-sm">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
+                <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
+                <th className="px-4 py-2 w-16"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {storePrices.map((sp: any) => (
+                <tr key={sp.id} className="border-b even:bg-gray-50">
+                  <td className="px-4 py-2">{sp.store?.name}</td>
+                  <td className="px-4 py-2">{sp.price}</td>
+                  <td className="px-4 py-2 text-right">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="text"
+                      className="text-red-500 p-0"
+                      onClick={() => handleDeleteStorePrice(sp.id)}
+                    >
+                      <PiTrashBold className="w-5 h-5" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  )}
+
+  {!selectedVariantId && tempShopPrices.length > 0 && (
     <div className="mt-4">
       <h4 className="text-sm font-medium mb-2">Added Shops</h4>
       <div className="overflow-x-auto rounded border">
@@ -1000,22 +1066,25 @@ useEffect(() => {
             <tr>
               <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
               <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
-              <th className="px-4 py-2"></th>
+              <th className="px-4 py-2 w-16"></th>
             </tr>
           </thead>
           <tbody>
-            {storePrices.map((sp: any) => (
-              <tr key={sp.id} className="border-b even:bg-gray-50">
-                <td className="px-4 py-2">{sp.store?.name}</td>
+            {tempShopPrices.map((sp, index) => (
+              <tr key={index} className="border-b even:bg-gray-50">
+                <td className="px-4 py-2">{sp.storeName}</td>
                 <td className="px-4 py-2">{sp.price}</td>
-                <td className="px-4 py-2">
-                 
+                <td className="px-4 py-2 text-right">
                   <Button
                     type="button"
                     size="sm"
                     variant="text"
                     className="text-red-500 p-0"
-                    onClick={() => handleDeleteStorePrice(sp.id)}
+                    onClick={() => {
+                      const updatedPrices = [...tempShopPrices];
+                      updatedPrices.splice(index, 1);
+                      setTempShopPrices(updatedPrices);
+                    }}
                   >
                     <PiTrashBold className="w-5 h-5" />
                   </Button>
@@ -1026,98 +1095,8 @@ useEffect(() => {
         </table>
       </div>
     </div>
-  )
-)}
+  )}
 </div>
-          
-
-           {/* <div>
-            <label className="text-sm font-medium text-gray-700">Custom Price</label>
-            <Select
-              options={[
-                { value: 'Hilite 1', label: 'Hilite 1' },
-                { value: 'Hilite 2', label: 'Hilite 2' },
-                { value: 'Hilite 3', label: 'Hilite 3' },
-                { value: 'Hilite 4', label: 'Hilite 4' },
-                { value: 'Hilite 5', label: 'Hilite 5' },
-              ]}
-              placeholder="Select shop"
-              className="w-full"
-              value={selectedShop}
-              onChange={(value) => setSelectedShop(value as string)}
-              getOptionValue={(option) => option.value}
-              displayValue={(selected) => selected ? String(selected) : ''}
-            />
-          </div>
-
-
-          <div>
-            <label className="text-sm font-medium text-gray-700">Price</label>
-            <Input
-              type="number"
-              placeholder="Enter your price"
-              value={customShopPrice}
-              onChange={(e) => setCustomShopPrice(Number(e.target.value))}
-              onFocus={(e) => e.target.select()}
-              className="w-full"
-            />
-          </div>
-
-
-          <div className="col-span-2 flex justify-end">
-            <Button
-              type="button"
-              variant="outline"
-              className="w-auto"
-              onClick={() => {
-                if (
-                  selectedShop &&
-                  !shopPrices.some((sp) => sp.shop === selectedShop) &&
-                  customShopPrice > 0
-                ) {
-                  setShopPrices([...shopPrices, { shop: selectedShop, price: customShopPrice }]);
-                  setSelectedShop('');
-                  setCustomShopPrice(0);
-                }
-              }}
-            >
-              + Add
-            </Button>
-          </div>
-
-
-       {shopPrices.length > 0 && (
-      <div className="col-span-2 mt-2">
-        <p className="text-sm font-medium text-gray-700 mb-1">Added Shops</p>
-        <div className="flex flex-col gap-2">
-          {shopPrices.map((shop, index) => (
-            <div
-              key={index}
-              className="flex items-center justify-between gap-2 rounded border border-gray-300 px-3 py-1 w-fit text-sm"
-            >
-              <span className="text-gray-800">
-                {shop.shop} ₹{shop.price}
-              </span>
-              <button
-                type="button"
-                className="text-red-500 ml-2"
-                onClick={() => {
-                  const updated = [...shopPrices];
-                  updated.splice(index, 1);
-                  setShopPrices(updated);
-                }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}  */}
-
-
-
-
           </div>
           
           <div className="flex justify-end gap-2 pt-4">

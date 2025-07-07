@@ -21,7 +21,7 @@ export const SalesHistoryColumns = [
     header: 'Date',
     cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
   }),
-  columnHelper.display({
+ columnHelper.display({
   id: 'name',
   size: 300,
   header: 'Product',

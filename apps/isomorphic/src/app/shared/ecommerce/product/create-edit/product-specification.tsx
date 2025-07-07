@@ -114,30 +114,30 @@ export default function ProductSpecifications({
   //     });
   //   }
   // }, [specificationValueById, selectedSpecification, productId, reset]);
-  
+
   useEffect(() => {
-  if (specificationValueById?.data && selectedSpecification) {
-    const specificationValue = specificationValueById.data;
-    setValue('id', specificationValue?.id);
-    setValue('specification', specificationValue?.specification);
-    setValue('value', specificationValue?.value);
-    setValue('product', productId);
-    
-    // Open modal when data is loaded
-    if (specificationAction === 'edit') {
-      setIsModalOpen(true);
+    if (specificationValueById?.data && selectedSpecification) {
+      const specificationValue = specificationValueById.data;
+      setValue('id', specificationValue?.id);
+      setValue('specification', specificationValue?.specification);
+      setValue('value', specificationValue?.value);
+      setValue('product', productId);
+
+      // Open modal when data is loaded
+      if (specificationAction === 'edit') {
+        setIsModalOpen(true);
+      }
     }
-  }
-}, [specificationValueById, selectedSpecification, productId, setValue, specificationAction]);
+  }, [specificationValueById, selectedSpecification, productId, setValue, specificationAction]);
 
 
 
   //edit
   const handleEditSpecification = (id: string) => {
-  setSpecificationAction('edit');
-  setSelectedSpecification(id);
-  // Modal will be opened by the useEffect when data is loaded
-};
+    setSpecificationAction('edit');
+    setSelectedSpecification(id);
+    // Modal will be opened by the useEffect when data is loaded
+  };
 
   useEffect(() => {
     if (!specificationsData?.data) return;
@@ -195,7 +195,7 @@ export default function ProductSpecifications({
             setSpecifications((prev) =>
               prev.map((v) => (v.id === data.id ? newSpecification : v))
             );
-             toast.success('Specification updated successfully');
+            toast.success('Specification updated successfully');
             closeModal();
           },
         }
@@ -210,7 +210,7 @@ export default function ProductSpecifications({
             value: data.value,
           };
           setSpecifications((prev) => [...prev, newSpecification]);
-           toast.success('Specification added successfully');
+          toast.success('Specification added successfully');
           closeModal();
         },
       });
@@ -270,7 +270,7 @@ export default function ProductSpecifications({
                   <td className="space-x-2">
                     <Tooltip
                       size="sm"
-                      content="Edit Variant"
+                      content="Edit Specifications"
                       placement="top"
                       color="invert"
                     >
@@ -416,8 +416,8 @@ export default function ProductSpecifications({
               Cancel
             </Button>
             <Button
-              type="button" 
-              onClick={handleSubmit(onSubmit)} 
+              type="button"
+              onClick={handleSubmit(onSubmit)}
               isLoading={createStatus === 'pending' || updateStatus === 'pending'}
             >
               {specificationAction === 'edit' ? 'Update' : 'Save'} Specification

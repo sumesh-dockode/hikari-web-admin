@@ -7,41 +7,83 @@ import { Select, SelectOption } from 'rizzui/select';
 
 interface StoreManagerSelectionFieldProps {
   value: number;
-  onChange: (value: number) => void;
+  onChange: (
+    value: number, 
+    managerName?: string, 
+    storeInfo?: { id: string; name: string }
+  ) => void;
   error?: string;
+  placeholder?: string;
 }
 
 const StoreManagerSelectionField = ({
   value,
   onChange,
   error,
+  placeholder = "Select Store Manager",
 }: StoreManagerSelectionFieldProps) => {
   const [searchText, setSearchText] = useState('');
   const { data: storeManagerData } = usePaginatedStoreManager({
     search: searchText,
   });
+  
+  // Log the API response to debug
+  console.log('Store Manager API Response:', storeManagerData);
+  
   const storeManagerOptions =
     storeManagerData?.data.map((storeManager: StoreManagerDataType) => ({
       key: storeManager.id,
       label: `${storeManager.first_name || ''} ${storeManager.last_name || ''}`,
       value: storeManager.id,
+      // Store the full manager data for later use
+      managerData: storeManager,
     })) || [];
-
-  //   const onSearchChange = debounce((value: string) => {
-  //     setSearchText(value);
-  //   }, 500);
 
   return (
     <Select
       className="w-full sm:max-w-[280px]"
-      placeholder="Select Store Manager"
+      placeholder={placeholder}
       value={value ?? ''}
-      onChange={onChange}
-      //   onSearchChange={onSearchChange}
+      onChange={(selectedValue) => {
+       
+        const selectedOption = storeManagerOptions.find(
+          (option: SelectOption) => option.value === selectedValue
+        );
+        
+        if (selectedOption) {
+          const managerData = selectedOption.managerData;
+          
+        
+          console.log('Selected manager full data:', JSON.stringify(managerData, null, 2));
+          
+          const managerName = selectedOption.label;
+          
+         
+          const storeInfo = managerData?.store_info 
+            ? { 
+                id: managerData.store_info.id, 
+                name: managerData.store_info.name 
+              } 
+            : undefined;
+          
+       
+          console.log('Passing to parent:', { 
+            managerId: Number(selectedValue), 
+            managerName, 
+            storeInfo 
+          });
+          
+         
+          onChange(Number(selectedValue), managerName, storeInfo);
+        } else {
+        
+          onChange(Number(selectedValue));
+        }
+      }}
       options={storeManagerOptions}
       searchable={true}
       stickySearch={true}
-      getOptionValue={(option) => option.value}
+      getOptionValue={(option: SelectOption) => option.value}
       displayValue={(selected) =>
         storeManagerOptions?.find((o: SelectOption) => o.value === selected)
           ?.label || ''

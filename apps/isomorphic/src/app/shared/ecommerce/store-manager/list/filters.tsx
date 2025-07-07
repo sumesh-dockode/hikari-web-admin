@@ -43,3 +43,4 @@ export default function Filters<TData extends Record<string, any>>({
     </Flex>
   );
 }
+

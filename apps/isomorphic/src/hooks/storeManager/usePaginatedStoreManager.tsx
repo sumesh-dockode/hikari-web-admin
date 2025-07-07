@@ -31,6 +31,9 @@ export default function usePaginatedStoreManager(options: {
     
     const { data } = await apiClient.get(url);
 
+    // Log the full API response with detailed structure
+    console.log('Store Manager API Full Response:', JSON.stringify(data, null, 2));
+
     return data;
   };
   return useQuery({

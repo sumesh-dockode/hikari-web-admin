@@ -27,4 +27,6 @@ export const API_ROUTES = {
   stocks: '/mingler/admin/stocks/',
   redeemHistory: '/mingler/admin/redeem-history/',
   redeemApprove: '/mingler/admin/redeem/',
+  storePricesByVariant: '/mingler/admin/store-prices/variants/', 
+  storePrices: '/mingler/admin/store-prices/'
 };

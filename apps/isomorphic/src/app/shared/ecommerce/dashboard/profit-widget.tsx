@@ -51,13 +51,13 @@ export default function ProfitWidget({ className }: { className?: string }) {
                   bottom: 30,
                 }}
               >
-                {/* <defs>
+                <defs>
                   <linearGradient id="serviceCount" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.125} />
                     <stop offset="95%" stopColor="#ffdadf" stopOpacity={0.05} />
                   </linearGradient>
-                </defs> */}
-                <XAxis dataKey="month" axisLine={false} tickLine={false} />
+                </defs>
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={false} />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false}

@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/react-query';
 import { API_ROUTES } from '@/app/lib/api';
 import apiClient from '@/app/lib/apiClient';
 
-// Define the dashboard data interface
+
 export interface DashboardData {
   services_count: number;
   total_products_count: number;

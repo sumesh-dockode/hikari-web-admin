@@ -36,7 +36,7 @@ export default function ProfitWidget({ className }: { className?: string }) {
       className={cn('flex flex-col', className)}
     >
       <div className="grid flex-grow grid-cols-1 gap-3">
-        {/* Filter section commented out as API doesn't support filtering */}
+        
         <div className="mt-auto h-64 w-full pb-5 @sm:h-72 @sm:pt-3 @7xl:h-[240px] lg:pb-7">
           {isLoading ? (
             <div className="flex h-full items-center justify-center">

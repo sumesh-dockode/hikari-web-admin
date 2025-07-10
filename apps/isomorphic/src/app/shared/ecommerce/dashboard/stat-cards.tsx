@@ -14,24 +14,24 @@ import useDashboard from '@/hooks/dashboard/useDashboard';
 export default function StatCards({ className }: { className?: string }) {
   const { data: dashboardData, isLoading } = useDashboard();
 
-  // Create chart data from monthly sales
+ 
   const salesData = dashboardData?.monthly_sales?.map(item => ({
     day: item.month,
     sale: item.sales,
-    cost: item.sales * 0.6, // Example calculation
+    cost: item.sales * 0.6, 
   })) || [];
 
-  // Create chart data from monthly services
+ 
   const servicesData = dashboardData?.monthly_services?.map(item => ({
     day: item.month,
-    sale: item.count * 100, // Scale for visualization
-    cost: item.count * 50,  // Example calculation
+    sale: item.count * 100,
+    cost: item.count * 50,  
   })) || [];
 
-  // Create chart data from orders (using monthly sales as proxy)
+ 
   const orderData = dashboardData?.monthly_sales?.map(item => ({
     day: item.month,
-    sale: item.sales / 1000, // Scale for visualization
+    sale: item.sales / 1000,
     cost: item.sales / 2000,
   })) || [];
 

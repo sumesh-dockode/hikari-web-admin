@@ -20,13 +20,13 @@ export default function SalesReport({ className }: { className?: string }) {
   const isTablet = useMedia('(max-width: 820px)', false);
   const { data: dashboardData, isLoading } = useDashboard();
   
-  // Transform API data for the chart
+ 
   const chartData = dashboardData?.monthly_sales?.map(item => ({
     month: item.month,
     sales: item.sales,
   })) || [];
 
-  // Format Y-axis values with dollar sign and compact format
+
   const formatYAxis = (value: number) => {
     if (value >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;

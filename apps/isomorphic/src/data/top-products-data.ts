@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '@/app/lib/apiClient';
 
-// Keep the static data as fallback
+
 export const topProducts = [
   {
     id: 1,
@@ -143,7 +143,7 @@ export const topProductList = [
   },
 ];
 
-// New function to fetch top products from API
+
 export function useTopProducts() {
   const [products, setProducts] = useState<typeof topProducts>([]);
   const [loading, setLoading] = useState(true);
@@ -159,13 +159,13 @@ export function useTopProducts() {
           title: product.product_name,
           description: 'Product',
           price: `$${product.product_price.toFixed(2)}`,
-          rating: [4, 4.5, 5], // Default rating
+          rating: [4, 4.5, 5], 
         }));
         setProducts(apiProducts);
       } catch (err) {
         console.error('Error fetching top products:', err);
         setError(err instanceof Error ? err : new Error('Unknown error'));
-        // Fallback to static data
+        
         setProducts(topProducts);
       } finally {
         setLoading(false);

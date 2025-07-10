@@ -1,174 +1,82 @@
 'use client';
 
 import MetricCard from '@core/components/cards/metric-card';
-import { Text } from 'rizzui';
 import cn from '@core/utils/class-names';
 import {
-  PiCaretDoubleUpDuotone,
-  PiCaretDoubleDownDuotone,
   PiGiftDuotone,
   PiBankDuotone,
-  PiChartPieSliceDuotone,
+  PiShoppingCartDuotone,
+  PiToolboxDuotone,
 } from 'react-icons/pi';
 import { BarChart, Bar, ResponsiveContainer } from 'recharts';
-
-const orderData = [
-  {
-    day: 'Sunday',
-    sale: 4000,
-    cost: 2400,
-  },
-  {
-    day: 'Monday',
-    sale: 3000,
-    cost: 1398,
-  },
-  {
-    day: 'Tuesday',
-    sale: 2000,
-    cost: 9800,
-  },
-  {
-    day: 'Wednesday',
-    sale: 2780,
-    cost: 3908,
-  },
-  {
-    day: 'Thursday',
-    sale: 1890,
-    cost: 4800,
-  },
-  {
-    day: 'Friday',
-    sale: 2390,
-    cost: 3800,
-  },
-  {
-    day: 'Saturday',
-    sale: 3490,
-    cost: 4300,
-  },
-];
-
-const salesData = [
-  {
-    day: 'Sunday',
-    sale: 2000,
-    cost: 2400,
-  },
-  {
-    day: 'Monday',
-    sale: 3000,
-    cost: 1398,
-  },
-  {
-    day: 'Tuesday',
-    sale: 2000,
-    cost: 9800,
-  },
-  {
-    day: 'Wednesday',
-    sale: 2780,
-    cost: 3908,
-  },
-  {
-    day: 'Thursday',
-    sale: 1890,
-    cost: 4800,
-  },
-  {
-    day: 'Friday',
-    sale: 2390,
-    cost: 3800,
-  },
-  {
-    day: 'Saturday',
-    sale: 3490,
-    cost: 4300,
-  },
-];
-
-const revenueData = [
-  {
-    day: 'Sunday',
-    sale: 2000,
-    cost: 2400,
-  },
-  {
-    day: 'Monday',
-    sale: 2800,
-    cost: 1398,
-  },
-  {
-    day: 'Tuesday',
-    sale: 3500,
-    cost: 9800,
-  },
-  {
-    day: 'Wednesday',
-    sale: 2780,
-    cost: 3908,
-  },
-  {
-    day: 'Thursday',
-    sale: 1890,
-    cost: 4800,
-  },
-  {
-    day: 'Friday',
-    sale: 2390,
-    cost: 3800,
-  },
-  {
-    day: 'Saturday',
-    sale: 3490,
-    cost: 4300,
-  },
-];
-
-const eComDashboardStatData = [
-  {
-    id: '1',
-    icon: <PiGiftDuotone className="h-6 w-6" />,
-    title: 'New Orders',
-    metric: '1,390',
-    increased: true,
-    decreased: false,
-    percentage: '+32.40',
-    style: 'text-[#3872FA]',
-    fill: '#3872FA',
-    chart: orderData,
-  },
-  {
-    id: '2',
-    icon: <PiChartPieSliceDuotone className="h-6 w-6" />,
-    title: 'Sales',
-    metric: '$57,890',
-    increased: false,
-    decreased: true,
-    percentage: '-4.40',
-    style: 'text-[#10b981]',
-    fill: '#10b981',
-    chart: salesData,
-  },
-  {
-    id: '3',
-    icon: <PiBankDuotone className="h-6 w-6" />,
-    title: 'Revenue',
-    metric: '$12,390',
-    increased: true,
-    decreased: false,
-    percentage: '+32.40',
-    style: 'text-[#7928ca]',
-    fill: '#7928ca',
-    chart: revenueData,
-  },
-];
+import useDashboard from '@/hooks/dashboard/useDashboard';
 
 export default function StatCards({ className }: { className?: string }) {
+  const { data: dashboardData, isLoading } = useDashboard();
+
+  // Create chart data from monthly sales
+  const salesData = dashboardData?.monthly_sales?.map(item => ({
+    day: item.month,
+    sale: item.sales,
+    cost: item.sales * 0.6, // Example calculation
+  })) || [];
+
+  // Create chart data from monthly services
+  const servicesData = dashboardData?.monthly_services?.map(item => ({
+    day: item.month,
+    sale: item.count * 100, // Scale for visualization
+    cost: item.count * 50,  // Example calculation
+  })) || [];
+
+  // Create chart data from orders (using monthly sales as proxy)
+  const orderData = dashboardData?.monthly_sales?.map(item => ({
+    day: item.month,
+    sale: item.sales / 1000, // Scale for visualization
+    cost: item.sales / 2000,
+  })) || [];
+
+  const eComDashboardStatData = [
+    {
+      id: '1',
+      icon: <PiShoppingCartDuotone className="h-6 w-6" />,
+      title: 'Total Orders',
+      metric: dashboardData ? dashboardData.total_orders_count.toString() : '...',
+      style: 'text-[#3872FA]',
+      fill: '#3872FA',
+      chart: orderData,
+    },
+    {
+      id: '2',
+      icon: <PiGiftDuotone className="h-6 w-6" />,
+      title: 'Total Products',
+      metric: dashboardData ? dashboardData.total_products_count.toString() : '...',
+      style: 'text-[#10b981]',
+      fill: '#10b981',
+      chart: servicesData,
+    },
+    {
+      id: '3',
+      icon: <PiBankDuotone className="h-6 w-6" />,
+      title: 'Total Revenue',
+      metric: dashboardData ? `$${dashboardData.total_sales_revenue.toLocaleString()}` : '...',
+      style: 'text-[#7928ca]',
+      fill: '#7928ca',
+      chart: salesData,
+    },
+    {
+      id: '4',
+      icon: <PiToolboxDuotone className="h-6 w-6" />,
+      title: 'Services Count',
+      metric: dashboardData ? dashboardData.services_count.toString() : '...',
+      style: 'text-[#f59e0b]',
+      fill: '#f59e0b',
+      chart: servicesData,
+    },
+  ];
+
   return (
     <div
-      className={cn('grid grid-cols-1 gap-5 3xl:gap-8 4xl:gap-9', className)}
+      className={cn('grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 3xl:gap-8 4xl:gap-9', className)}
     >
       {eComDashboardStatData.map((stat) => (
         <MetricCard
@@ -192,28 +100,7 @@ export default function StatCards({ className }: { className?: string }) {
           }
           chartClassName="hidden @[200px]:flex @[200px]:items-center h-14 w-24"
           className="@container [&>div]:items-center"
-        >
-          <Text className="mt-5 flex items-center border-t border-dashed border-muted pt-4 leading-none text-gray-500">
-            <Text
-              as="span"
-              className={cn(
-                'me-2 inline-flex items-center font-medium',
-                stat.increased ? 'text-green' : 'text-red'
-              )}
-            >
-              {/* {stat.increased ? (
-                <PiCaretDoubleUpDuotone className="me-1 h-4 w-4" />
-              ) : (
-                <PiCaretDoubleDownDuotone className="me-1 h-4 w-4" />
-              )} */}
-              {stat.percentage}%
-            </Text>
-            <Text as="span" className="me-1 hidden @[240px]:inline-flex">
-              {stat.increased ? 'Increased' : 'Decreased'}
-            </Text>{' '}
-            last month
-          </Text>
-        </MetricCard>
+        />
       ))}
     </div>
   );

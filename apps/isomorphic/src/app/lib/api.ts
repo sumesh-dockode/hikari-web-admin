@@ -28,5 +28,6 @@ export const API_ROUTES = {
   redeemHistory: '/mingler/admin/redeem-history/',
   redeemApprove: '/mingler/admin/redeem/',
   storePricesByVariant: '/mingler/admin/store-prices/variants/', 
-  storePrices: '/mingler/admin/store-prices/'
+  storePrices: '/mingler/admin/store-prices/',
+  dashboard: '/mingler/admin/dashboard/'
 };

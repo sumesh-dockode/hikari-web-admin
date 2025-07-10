@@ -1,3 +1,7 @@
+import { useEffect, useState } from 'react';
+import apiClient from '@/app/lib/apiClient';
+
+// Keep the static data as fallback
 export const topProducts = [
   {
     id: 1,
@@ -138,3 +142,38 @@ export const topProductList = [
     rating: [4, 4.5, 5],
   },
 ];
+
+// New function to fetch top products from API
+export function useTopProducts() {
+  const [products, setProducts] = useState<typeof topProducts>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchTopProducts = async () => {
+      try {
+        const response = await apiClient.get('/mingler/admin/dashboard/');
+        const apiProducts = response.data.data.top_products.map((product: any, index: number) => ({
+          id: index + 1,
+          thumbnail: product.product_image || 'https://isomorphic-furyroad.s3.amazonaws.com/public/products/modern/1.webp',
+          title: product.product_name,
+          description: 'Product',
+          price: `$${product.product_price.toFixed(2)}`,
+          rating: [4, 4.5, 5], // Default rating
+        }));
+        setProducts(apiProducts);
+      } catch (err) {
+        console.error('Error fetching top products:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error'));
+        // Fallback to static data
+        setProducts(topProducts);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopProducts();
+  }, []);
+
+  return { products, loading, error };
+}

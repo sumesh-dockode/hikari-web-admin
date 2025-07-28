@@ -179,7 +179,7 @@ useEffect(() => {
     resolver: zodResolver(variantSchema),
     defaultValues: {
       variants: [{ variantId: '', valueId: '' }],
-      price: 1,
+      price: undefined,
       actual_price: 0,
       // offer_price: 0,
       sku: '',
@@ -218,7 +218,11 @@ useEffect(() => {
       setValue('variants', addedVariantAttributes);
       setValue('id', productVariant?.id);
       setValue('sku', productVariant?.sku);
-      setValue('price', productVariant?.price || 0);
+      setValue('price', 
+  productVariant?.price === null || productVariant?.price === undefined || productVariant?.price === ''
+    ? undefined
+    : Number(productVariant?.price)
+);
      setValue('actual_price', productVariant?.actual_price || 0);
       setValue('stock', productVariant?.stock);
       setValue('incentive_type', productVariant?.extras?.incentive_type);
@@ -512,7 +516,7 @@ useEffect(() => {
           onClick={() => {
             reset({
               variants: [{ variantId: '', valueId: '' }],
-              price: 1,
+              price: undefined,
               sku: '',
               stock: 1,
               incentive_type: 'PERCENTAGE',
@@ -838,7 +842,7 @@ useEffect(() => {
                 onFocus={(e) => e.target.select()}
                 {...register('price', { 
                   valueAsNumber: true,
-                  setValueAs: (v) => v === '' ? 0 : Number(v) 
+                 setValueAs: (v) => v === '' ? undefined : Number(v)
                 })}
               />
               {errors.price && (

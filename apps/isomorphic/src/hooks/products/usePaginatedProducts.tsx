@@ -24,7 +24,7 @@ export default function usePaginatedProducts(options: {
       params.push(`page_size=${options.pageSize}`);
     }
     if (options?.search) {
-      params.push(`name=${options.search}`);
+      params.push(`search=${options.search}`);
     }
     if (options?.category) {
       params.push(`category=${options.category}`);

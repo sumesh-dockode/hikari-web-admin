@@ -22,16 +22,18 @@ export const variantSchema = z.object({
       })
     )
     .min(1, { message: messages.variantNameIsRequired }),
-  price: z
-    .number()
-    .min(1, { message: messages.variantpriceIsRequired })
-    .refine((val) => !isNaN(Number(val)), 'Price must be a number'),
-  actual_price: z
-    .union([z.number(), z.null()])
-    .optional(),
-  offer_price: z
-    .union([z.number(), z.nan().transform(() => undefined)])
-    .optional(),
+ actual_price: z.number({ invalid_type_error: "Default price is required" })
+  .min(0, "Default price must be at least 0"),
+
+price: z
+  .number({ invalid_type_error: "Offer price must be a number" })
+  .min(0, "Offer price must be at least 0")
+  .optional(),
+
+ offer_price: z
+  .number({ invalid_type_error: 'Offer Price must be a number' })
+  .min(0, { message: 'Offer Price must be 0 or greater' })
+  .optional(),
   sku: z.string().min(1, { message: messages.variantSkuIsRequired }),
   stock: z.number().min(1, { message: messages.variantStockIsRequired }),
   incentive_type: z

@@ -29,5 +29,6 @@ export const API_ROUTES = {
   redeemApprove: '/mingler/admin/redeem/',
   storePricesByVariant: '/mingler/admin/store-prices/variants/', 
   storePrices: '/mingler/admin/store-prices/',
-  dashboard: '/mingler/admin/dashboard/'
+  dashboard: '/mingler/admin/dashboard/',
+  assignDeliveryManager: '/ecom/admin/orders/{id}/assign/',
 };

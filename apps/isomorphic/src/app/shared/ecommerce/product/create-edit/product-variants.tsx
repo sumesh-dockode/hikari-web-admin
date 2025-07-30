@@ -124,49 +124,49 @@ export default function ProductVariants({
   const { data: variantValuesData } = useVariantValue();
   const { data: productVariant, isFetching } = useProductsById(productId);
 
-//custom P
+  //custom P
 
-const [selectedShop, setSelectedShop] = useState<{ 
-  managerId: number; 
-  label: string; 
-  storeId: string;
-  storeName: string;
-} | undefined>(undefined);
-const [customShopPrice, setCustomShopPrice] = useState<number | ''>('');
-const [customShopOfferPrice, setCustomShopOfferPrice] = useState<number | ''>('');
-const [shopCustomPrices, setShopCustomPrices] = useState<ShopCustomPrice[]>([]);
-const [tempShopPrices, setTempShopPrices] = useState<{
-  storeId: string;
-  storeName: string;
-  price: number;
-}[]>([]);
+  const [selectedShop, setSelectedShop] = useState<{
+    managerId: number;
+    label: string;
+    storeId: string;
+    storeName: string;
+  } | undefined>(undefined);
+  const [customShopPrice, setCustomShopPrice] = useState<number | ''>('');
+  const [customShopOfferPrice, setCustomShopOfferPrice] = useState<number | ''>('');
+  const [shopCustomPrices, setShopCustomPrices] = useState<ShopCustomPrice[]>([]);
+  const [tempShopPrices, setTempShopPrices] = useState<{
+    storeId: string;
+    storeName: string;
+    price: number;
+  }[]>([]);
 
-//cus api
-const { data: storePrices = [], isLoading: isStorePricesLoading } = useStorePricesByVariant(selectedVariantId || createdVariants[0]?.id);
-const { mutate: deleteStorePrice, isPending: isDeletingStorePrice } = useDeleteStorePrice();
-const { mutate: createStorePrice, isPending: isCreatingStorePrice } = useCreateStorePrice();
+  //cus api
+  const { data: storePrices = [], isLoading: isStorePricesLoading } = useStorePricesByVariant(selectedVariantId || createdVariants[0]?.id);
+  const { mutate: deleteStorePrice, isPending: isDeletingStorePrice } = useDeleteStorePrice();
+  const { mutate: createStorePrice, isPending: isCreatingStorePrice } = useCreateStorePrice();
 
-function handleDeleteStorePrice(storePriceId: string) {
-  deleteStorePrice(storePriceId);
-}
+  function handleDeleteStorePrice(storePriceId: string) {
+    deleteStorePrice(storePriceId);
+  }
 
-useEffect(() => {
-  
-  setSelectedShop(undefined);
-  setCustomShopPrice('');
-  setTempShopPrices([]); // Clear temporary shop prices
-}, [isModalOpen, selectedVariantId]);
-//   const handleShopSelection = (value: string) => {
-//   if (value && !selectedShops.includes(value)) {
-//     setSelectedShops([...selectedShops, value]);
-//   }
-//   };
+  useEffect(() => {
 
-//   const handleRemoveShop = (shopToRemove: string) => {
-//   setSelectedShops(selectedShops.filter(shop => shop !== shopToRemove));
-// };
+    setSelectedShop(undefined);
+    setCustomShopPrice('');
+    setTempShopPrices([]); // Clear temporary shop prices
+  }, [isModalOpen, selectedVariantId]);
+  //   const handleShopSelection = (value: string) => {
+  //   if (value && !selectedShops.includes(value)) {
+  //     setSelectedShops([...selectedShops, value]);
+  //   }
+  //   };
 
-    const {
+  //   const handleRemoveShop = (shopToRemove: string) => {
+  //   setSelectedShops(selectedShops.filter(shop => shop !== shopToRemove));
+  // };
+
+  const {
     control,
     register,
     setValue,
@@ -187,7 +187,7 @@ useEffect(() => {
       incentive_type: 'PERCENTAGE',
       incentive_value: 0,
       images: [],
-      is_primary: false, 
+      is_primary: false,
     },
   });
 
@@ -200,10 +200,7 @@ useEffect(() => {
   useEffect(() => {
     if (productVariantById && selectedVariantId) {
       const productVariant = productVariantById?.data;
-    //    if (productVariant?.shop_prices) {
-    //   setSelectedShops(productVariant.shop_prices.map((item: ShopPrice) => item.shop));
-    // }
-      setValue('is_primary', !!productVariant?.is_primary); 
+      setValue('is_primary', !!productVariant?.is_primary);
       const addedVariantAttributes =
         productVariant?.attributes?.map((a: any) => {
           const matched = variantValuesData?.data?.find((v: any) => v.id === a);
@@ -211,19 +208,15 @@ useEffect(() => {
             variantId: matched?.attribute,
             valueId: matched?.id,
           };
-         
+
         }) || [];
 
       setAddedVariantAttributes(addedVariantAttributes);
       setValue('variants', addedVariantAttributes);
       setValue('id', productVariant?.id);
       setValue('sku', productVariant?.sku);
-      setValue('price', 
-  productVariant?.price === null || productVariant?.price === undefined || productVariant?.price === ''
-    ? undefined
-    : Number(productVariant?.price)
-);
-     setValue('actual_price', productVariant?.actual_price || 0);
+      setValue('price', productVariant?.actual_price || undefined);
+      setValue('actual_price', productVariant?.actual_price || undefined);
       setValue('stock', productVariant?.stock);
       setValue('incentive_type', productVariant?.extras?.incentive_type);
       setValue('incentive_value', productVariant?.extras?.incentive_value);
@@ -298,7 +291,7 @@ useEffect(() => {
           id: formData.id,
           product: productId,
           sku: formData.sku,
-          price: formData.price,
+          price: formData.price || 0, // Don't fallback to actual_price
           actual_price: formData.actual_price,
           // offer_price: formData.offer_price,
           stock: formData.stock,
@@ -308,7 +301,7 @@ useEffect(() => {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
-           is_primary: formData.is_primary, 
+          is_primary: formData.is_primary,
         },
         {
           onSuccess: async ({ data }: any) => {
@@ -379,7 +372,7 @@ useEffect(() => {
           id: formData.id,
           product: productId,
           sku: formData.sku,
-          price: formData.price,
+          price: formData.price || 0, // Don't fallback to actual_price
           actual_price: formData.actual_price,
           offer_price: formData.offer_price,
           stock: formData.stock,
@@ -389,7 +382,7 @@ useEffect(() => {
             incentive_type: formData.incentive_type,
             incentive_value: formData.incentive_value,
           },
-           is_primary: formData.is_primary, 
+          is_primary: formData.is_primary,
         },
         {
           onSuccess: async ({ data }: any) => {
@@ -410,25 +403,25 @@ useEffect(() => {
 
             // Create shop prices from temporary state
             if (tempShopPrices.length > 0) {
-              const shopPricePromises = tempShopPrices.map(sp => 
+              const shopPricePromises = tempShopPrices.map(sp =>
                 createStorePrice({
                   variantId,
                   storeId: sp.storeId,
                   price: sp.price
                 })
               );
-              
+
               try {
                 await Promise.all(shopPricePromises);
                 toast.success('All shop prices added successfully');
-                
+
                 // Make sure to invalidate the store prices query to refresh the data
                 queryClient.invalidateQueries({ queryKey: ['storePrices', variantId] });
               } catch (error) {
                 console.error('Error creating some shop prices:', error);
                 toast.error('Some shop prices could not be added');
               }
-              
+
               // Clear temporary shop prices
               setTempShopPrices([]);
             }
@@ -714,12 +707,12 @@ useEffect(() => {
                   <Select
                     {...field}
                     options={variantOptions.filter((opt) => {
-                    
+
                       const selectedIds = watch('variants')?.map((v) => v.variantId) || [];
                       const isSelectedInOtherRow = selectedIds.includes(opt.value) &&
-                                                  opt.value !== watch(`variants.${index}.variantId`);
-                      
-                    
+                        opt.value !== watch(`variants.${index}.variantId`);
+
+
                       return !isSelectedInOtherRow;
                     })}
                     label="Variant Name"
@@ -819,15 +812,15 @@ useEffect(() => {
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-700">Default Price</label>
-               <Input
-                  type="number"
-                  placeholder="Enter default price"
-                  onFocus={(e) => e.target.select()}
-                  {...register('actual_price', { 
-                    valueAsNumber: true,
-                    setValueAs: (v) => v === '' ? 0 : Number(v) 
-                  })}
-                />
+              <Input
+                type="number"
+                placeholder="Enter default price"
+                onFocus={(e) => e.target.select()}
+                {...register('actual_price', {
+                  valueAsNumber: true,
+                  setValueAs: (v) => v === '' ? undefined : Number(v)
+                })}
+              />
               {errors.actual_price && (
                 <p className="mt-1 text-sm text-red-500">
                   {errors.actual_price.message}
@@ -840,9 +833,8 @@ useEffect(() => {
                 type="number"
                 placeholder="Enter offer price"
                 onFocus={(e) => e.target.select()}
-                {...register('price', { 
-                  valueAsNumber: true,
-                 setValueAs: (v) => v === '' ? undefined : Number(v)
+                {...register('price', {
+                  setValueAs: (v) => v === '' || v === null || v === undefined ? undefined : Number(v)
                 })}
               />
               {errors.price && (
@@ -918,191 +910,191 @@ useEffect(() => {
               )}
             </div>
 
-<div className="col-span-2 mt-4">
-  <h3 className="mb-2 text-base font-semibold">Custom Price</h3>
-  <div className="grid grid-cols-2 gap-4 items-end">
-    <div>
-      <label className="text-sm font-medium text-gray-700">Select Shop</label>
-      <StoreManagerSelectionField
-        value={selectedShop ? selectedShop.managerId : 0}
-        onChange={(managerId, managerName, storeInfo) => {
-          console.log('Store manager selected:', { managerId, managerName, storeInfo });
-          
-          if (storeInfo && storeInfo.id) {
-            setSelectedShop({
-              managerId,
-              label: managerName ?? '',
-              storeId: storeInfo.id,
-              storeName: storeInfo.name,
-            });
-          } else {
-            toast.error('This store manager does not have an associated store');
-            setSelectedShop(undefined);
-          }
-        }}
-      />
-    </div>
-    <div>
-      <label className="text-sm font-medium text-gray-700">Price</label>
-      <Input
-        type="number"
-        placeholder="Enter price"
-        value={customShopPrice}
-        onChange={(e) => setCustomShopPrice(e.target.value === '' ? '' : Number(e.target.value))}
-        onFocus={(e) => e.target.select()}
-        className="w-full"
-      />
-    </div>
-  </div>
-  <div className="flex justify-end mt-2">
-    <Button
-      type="button"
-      variant="outline"
-      className="w-auto"
-      isLoading={isCreatingStorePrice}
-      onClick={() => {
-        
-        const variantId = selectedVariantId || null;
-        
-        // Validate inputs
-        if (!selectedShop) {
-          toast.error('Please select a store manager');
-          return;
-        }
-        
-        if (!selectedShop.storeId) {
-          toast.error('The selected store manager does not have a valid store. Please select another store manager.');
-          return;
-        }
-        
-        if (customShopPrice === '' || Number(customShopPrice) <= 0) {
-          toast.error('Please enter a valid price');
-          return;
-        }
-        
-        
-        
-        if (variantId) {
-          createStorePrice(
-            {
-              variantId,
-              storeId: selectedShop.storeId,
-              price: Number(customShopPrice),
-            },
-            {
-              onSuccess: (data) => {
-                setSelectedShop(undefined);
-                setCustomShopPrice('');
-                toast.success('Store price added successfully');
-              },
-              onError: (error: any) => {
-                const errorMessage = error?.response?.data?.message || 'Failed to add store price';
-                toast.error(errorMessage);
-              }
-            }
-          );
-        } else {
-         
-          setTempShopPrices([
-            ...tempShopPrices,
-            {
-              storeId: selectedShop.storeId,
-              storeName: selectedShop.storeName,
-              price: Number(customShopPrice)
-            }
-          ]);
-          setSelectedShop(undefined);
-          setCustomShopPrice('');
-          toast.success('Store price added to queue');
-        }
-      }}
-    >
-      + Add
-    </Button>
-  </div>
+            <div className="col-span-2 mt-4">
+              <h3 className="mb-2 text-base font-semibold">Custom Price</h3>
+              <div className="grid grid-cols-2 gap-4 items-end">
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Select Shop</label>
+                  <StoreManagerSelectionField
+                    value={selectedShop ? selectedShop.managerId : 0}
+                    onChange={(managerId, managerName, storeInfo) => {
+                      console.log('Store manager selected:', { managerId, managerName, storeInfo });
 
-  {isStorePricesLoading ? (
-    <div>Loading...</div>
-  ) : (
-    selectedVariantId && storePrices.length > 0 && (
-      <div className="mt-4">
-        <h4 className="text-sm font-medium mb-2">Added Shops</h4>
-        <div className="overflow-x-auto rounded border">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
-                <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
-                <th className="px-4 py-2 w-16"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {storePrices.map((sp: any) => (
-                <tr key={sp.id} className="border-b even:bg-gray-50">
-                  <td className="px-4 py-2">{sp.store?.name}</td>
-                  <td className="px-4 py-2">{sp.price}</td>
-                  <td className="px-4 py-2 text-right">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="text"
-                      className="text-red-500 p-0"
-                      onClick={() => handleDeleteStorePrice(sp.id)}
-                    >
-                      <PiTrashBold className="w-5 h-5" />
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    )
-  )}
-
-  {!selectedVariantId && tempShopPrices.length > 0 && (
-    <div className="mt-4">
-      <h4 className="text-sm font-medium mb-2">Added Shops</h4>
-      <div className="overflow-x-auto rounded border">
-        <table className="min-w-full divide-y divide-gray-200 text-sm">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
-              <th className="px-4 py-2 w-16"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {tempShopPrices.map((sp, index) => (
-              <tr key={index} className="border-b even:bg-gray-50">
-                <td className="px-4 py-2">{sp.storeName}</td>
-                <td className="px-4 py-2">{sp.price}</td>
-                <td className="px-4 py-2 text-right">
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="text"
-                    className="text-red-500 p-0"
-                    onClick={() => {
-                      const updatedPrices = [...tempShopPrices];
-                      updatedPrices.splice(index, 1);
-                      setTempShopPrices(updatedPrices);
+                      if (storeInfo && storeInfo.id) {
+                        setSelectedShop({
+                          managerId,
+                          label: managerName ?? '',
+                          storeId: storeInfo.id,
+                          storeName: storeInfo.name,
+                        });
+                      } else {
+                        toast.error('This store manager does not have an associated store');
+                        setSelectedShop(undefined);
+                      }
                     }}
-                  >
-                    <PiTrashBold className="w-5 h-5" />
-                  </Button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )}
-</div>
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium text-gray-700">Price</label>
+                  <Input
+                    type="number"
+                    placeholder="Enter price"
+                    value={customShopPrice}
+                    onChange={(e) => setCustomShopPrice(e.target.value === '' ? '' : Number(e.target.value))}
+                    onFocus={(e) => e.target.select()}
+                    className="w-full"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-auto"
+                  isLoading={isCreatingStorePrice}
+                  onClick={() => {
+
+                    const variantId = selectedVariantId || null;
+
+                    // Validate inputs
+                    if (!selectedShop) {
+                      toast.error('Please select a store manager');
+                      return;
+                    }
+
+                    if (!selectedShop.storeId) {
+                      toast.error('The selected store manager does not have a valid store. Please select another store manager.');
+                      return;
+                    }
+
+                    if (customShopPrice === '' || Number(customShopPrice) <= 0) {
+                      toast.error('Please enter a valid price');
+                      return;
+                    }
+
+
+
+                    if (variantId) {
+                      createStorePrice(
+                        {
+                          variantId,
+                          storeId: selectedShop.storeId,
+                          price: Number(customShopPrice),
+                        },
+                        {
+                          onSuccess: (data) => {
+                            setSelectedShop(undefined);
+                            setCustomShopPrice('');
+                            toast.success('Store price added successfully');
+                          },
+                          onError: (error: any) => {
+                            const errorMessage = error?.response?.data?.message || 'Failed to add store price';
+                            toast.error(errorMessage);
+                          }
+                        }
+                      );
+                    } else {
+
+                      setTempShopPrices([
+                        ...tempShopPrices,
+                        {
+                          storeId: selectedShop.storeId,
+                          storeName: selectedShop.storeName,
+                          price: Number(customShopPrice)
+                        }
+                      ]);
+                      setSelectedShop(undefined);
+                      setCustomShopPrice('');
+                      toast.success('Store price added to queue');
+                    }
+                  }}
+                >
+                  + Add
+                </Button>
+              </div>
+
+              {isStorePricesLoading ? (
+                <div>Loading...</div>
+              ) : (
+                selectedVariantId && storePrices.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="text-sm font-medium mb-2">Added Shops</h4>
+                    <div className="overflow-x-auto rounded border">
+                      <table className="min-w-full divide-y divide-gray-200 text-sm">
+                        <thead className="bg-gray-50">
+                          <tr>
+                            <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
+                            <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
+                            <th className="px-4 py-2 w-16"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {storePrices.map((sp: any) => (
+                            <tr key={sp.id} className="border-b even:bg-gray-50">
+                              <td className="px-4 py-2">{sp.store?.name}</td>
+                              <td className="px-4 py-2">{sp.price}</td>
+                              <td className="px-4 py-2 text-right">
+                                <Button
+                                  type="button"
+                                  size="sm"
+                                  variant="text"
+                                  className="text-red-500 p-0"
+                                  onClick={() => handleDeleteStorePrice(sp.id)}
+                                >
+                                  <PiTrashBold className="w-5 h-5" />
+                                </Button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )
+              )}
+
+              {!selectedVariantId && tempShopPrices.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-2">Added Shops</h4>
+                  <div className="overflow-x-auto rounded border">
+                    <table className="min-w-full divide-y divide-gray-200 text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-4 py-2 text-left font-medium text-gray-600">Shop</th>
+                          <th className="px-4 py-2 text-left font-medium text-gray-600">Price</th>
+                          <th className="px-4 py-2 w-16"></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tempShopPrices.map((sp, index) => (
+                          <tr key={index} className="border-b even:bg-gray-50">
+                            <td className="px-4 py-2">{sp.storeName}</td>
+                            <td className="px-4 py-2">{sp.price}</td>
+                            <td className="px-4 py-2 text-right">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="text"
+                                className="text-red-500 p-0"
+                                onClick={() => {
+                                  const updatedPrices = [...tempShopPrices];
+                                  updatedPrices.splice(index, 1);
+                                  setTempShopPrices(updatedPrices);
+                                }}
+                              >
+                                <PiTrashBold className="w-5 h-5" />
+                              </Button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-          
+
           <div className="flex justify-end gap-2 pt-4">
             <Button
               variant="outline"

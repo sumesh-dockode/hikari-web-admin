@@ -22,18 +22,22 @@ export const variantSchema = z.object({
       })
     )
     .min(1, { message: messages.variantNameIsRequired }),
- actual_price: z.number({ invalid_type_error: "Default price is required" })
-  .min(0, "Default price must be at least 0"),
+  actual_price: z.number({ invalid_type_error: "Default price is required" })
+    .min(0, "Default price must be at least 0")
+    .optional(),
 
-price: z
-  .number({ invalid_type_error: "Offer price must be a number" })
-  .min(0, "Offer price must be at least 0")
-  .optional(),
+  price: z
+    .number()
+    .min(0, "Offer price must be at least 0")
+    .optional()
+    .nullable()
+    .or(z.literal(''))
+    .transform((val) => val === '' || val === null ? undefined : val),
 
- offer_price: z
-  .number({ invalid_type_error: 'Offer Price must be a number' })
-  .min(0, { message: 'Offer Price must be 0 or greater' })
-  .optional(),
+  offer_price: z
+    .number({ invalid_type_error: 'Offer Price must be a number' })
+    .min(0, { message: 'Offer Price must be 0 or greater' })
+    .optional(),
   sku: z.string().min(1, { message: messages.variantSkuIsRequired }),
   stock: z.number().min(1, { message: messages.variantStockIsRequired }),
   incentive_type: z

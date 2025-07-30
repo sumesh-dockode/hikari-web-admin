@@ -33,12 +33,12 @@ export const suggestionColumns = [
     header: 'Created At',
     cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
   }),
-  // columnHelper.accessor('updated_at', {
-  //   id: 'updated_at',
-  //   size: 200,
-  //   header: 'Updated At',
-  //   cell: ({ row }) => <DateCell date={new Date(row.original.updated_at)} />,
-  // }),
+  columnHelper.accessor('updated_at', {
+    id: 'updated_at',
+    size: 200,
+    header: 'Updated At',
+    cell: ({ row }) => <DateCell date={new Date(row.original.updated_at)} />,
+  }),
   columnHelper.display({
     id: 'review',
     size: 300,

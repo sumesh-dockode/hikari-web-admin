@@ -2,10 +2,32 @@ import Image from 'next/image';
 import WidgetCard from '@core/components/cards/widget-card';
 import { Button } from 'rizzui/button';
 import { Text } from 'rizzui/typography';
-import { topProductList } from '@/data/top-products-data';
 import Rating from '@core/components/rating';
+import { useTopProducts } from '@/hooks/dashboard/top-product-list';
 
 export default function TopProductList() {
+  const { products, loading, error } = useTopProducts();
+
+  if (loading) {
+    return (
+      <WidgetCard title={'Top Products'}>
+        <div className="flex h-32 items-center justify-center">
+          <Text>Loading...</Text>
+        </div>
+      </WidgetCard>
+    );
+  }
+
+  if (error) {
+    return (
+      <WidgetCard title={'Top Products'}>
+        <div className="flex h-32 items-center justify-center">
+          <Text className="text-red-500">Failed to load products</Text>
+        </div>
+      </WidgetCard>
+    );
+  }
+
   return (
     <WidgetCard
       title={'Top Products'}
@@ -18,7 +40,7 @@ export default function TopProductList() {
       }
     >
       <div className="grid grid-cols-1 gap-5">
-        {topProductList.map((product) => (
+        {products.map((product) => (
           <div
             key={product.title + product.id}
             className="flex items-start pe-2"

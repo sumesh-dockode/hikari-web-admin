@@ -84,6 +84,7 @@ export default function ServiceDetailsGallery({
   isModalView?: boolean;
 }) {
   const { id } = useParams();
+  const shortId = (id as string)?.slice(-4); 
   const { data: serviceData, isLoading } = useServiceById(id as string);
   const { data: serviceBookingAPIData } = usePaginatedServices({
     pageIndex: 0,
@@ -110,6 +111,10 @@ export default function ServiceDetailsGallery({
   // const {data,}
   const handleChangeStatus = (statusId: string) => {
     const status = statusActions.find((s) => s.id === statusId)?.name;
+
+
+    //id
+    
 
     if (status && id) {
       const payload = {
@@ -141,6 +146,7 @@ export default function ServiceDetailsGallery({
               // description={'You cannot update this information'}
               isModalView={isModalView}
             >
+              
               <div className="grid grid-cols-1 gap-4">
                     <div>
                       <label

@@ -2,12 +2,13 @@
 
 import { useState, useRef } from 'react';
 import { useFormContext } from 'react-hook-form';
-import { Button } from 'rizzui';
+import { Button, } from 'rizzui';
 import { PiPlusBold, PiTrashBold, PiXBold } from 'react-icons/pi';
 import FormGroup from '@/app/shared/form-group';
 import cn from '@core/utils/class-names';
 import { convertToBase64 } from '@core/utils/image-to-base64';
 import { UploadProductImagesProps } from '@/hooks/products/useUploadProductImages';
+import toast from 'react-hot-toast';
 
 interface ProductMultipleMediaProps {
   className?: string;
@@ -32,17 +33,44 @@ export default function ProductMultipleMedia({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files?.[0];
-    if (!files) return;
-    const imageUrl = await convertToBase64(files);
-    const imgObj = {
-      image: imageUrl,
-    };
-    const newImages = [...images, imgObj];
-    setImages(newImages);
-    setValue(name, newImages);
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+  
+    const validImageTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
+  
+   
+    const validFiles = Array.from(fileList).filter(file => {
+      if (!validImageTypes.includes(file.type)) {
+        toast.error(`Invalid file type. Please upload JPEG, PNG, or WebP.`);
+        return false;
+      }
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(`File too large. Must be less than 2MB.`);
+        return false;
+      }
+      return true;
+    });
+  
+    if (validFiles.length === 0) return;
+  
+    try {
+      
+      const newImagePromises = validFiles.map(async (file) => {
+        const imageUrl = await convertToBase64(file);
+        return { image: imageUrl };
+      });
+  
+      const newImages = await Promise.all(newImagePromises);
+      const updatedImages = [...images, ...newImages];
+      
+      setImages(updatedImages);
+      setValue(name, updatedImages);
+    } catch (error) {
+      console.error('Error processing images:', error);
+      toast.error('Failed to process some images. Please try again.');
+    }
   };
-
   const handleRemoveImage = (index: number) => {
     const updatedImages = images.filter((_, i) => i !== index);
     const deleted = images.filter((_, i) => i === index);

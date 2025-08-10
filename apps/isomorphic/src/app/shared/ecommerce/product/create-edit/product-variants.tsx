@@ -215,7 +215,7 @@ export default function ProductVariants({
       setValue('variants', addedVariantAttributes);
       setValue('id', productVariant?.id);
       setValue('sku', productVariant?.sku);
-      setValue('price', productVariant?.actual_price || undefined);
+      setValue('price', productVariant?.price || undefined);
       setValue('actual_price', productVariant?.actual_price || undefined);
       setValue('stock', productVariant?.stock);
       setValue('incentive_type', productVariant?.extras?.incentive_type);

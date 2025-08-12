@@ -166,7 +166,8 @@ export default function CreateEditProduct({
     }
   };
 
-  if (isFetching) return <PageLoader />;
+  // if (isFetching) return <PageLoader />;
+  if (productId && (isFetching || !data)) return <PageLoader />;
 
   return (
     <div className="@container">

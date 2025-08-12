@@ -291,7 +291,7 @@ export default function ProductVariants({
           id: formData.id,
           product: productId,
           sku: formData.sku,
-          price: formData.price || 0, // Don't fallback to actual_price
+          price: formData.price || 0, 
           actual_price: formData.actual_price,
           // offer_price: formData.offer_price,
           stock: formData.stock,

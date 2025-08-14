@@ -25,6 +25,7 @@ import { useCreateProducts } from '@/hooks/products/useCreateProducts';
 import { useUpdateProducts } from '@/hooks/products/useUpdateProducts';
 import { useProductsById } from '@/hooks/products/useProductsById';
 import { productsDataType } from '@/data/products-data';
+import { useQueryClient } from '@tanstack/react-query';
 
 import ProductSpecification from './product-specification';
 import { useRouter } from 'next/navigation';
@@ -70,6 +71,15 @@ export default function CreateEditProduct({
     data: updateResponseData,
     status: updateStatus,
   } = useUpdateProducts();
+  const queryClient = useQueryClient();
+
+  //  effect to handle form reset after update
+  useEffect(() => {
+    if (updateStatus === 'success' && updateResponseData?.id) {
+      // Force a refetch of the product data after successful update
+      queryClient.invalidateQueries({ queryKey: ['products', productId] });
+    }
+  }, [updateStatus, updateResponseData, productId]);
 
   const form = useForm<CreateProductInput>({
     resolver: zodResolver(productFormSchema),
@@ -89,6 +99,11 @@ export default function CreateEditProduct({
   const router = useRouter();
   // Populate form if editing an existing product
   useEffect(() => {
+    // console.log(' useEffect triggered');
+    // console.log('data:', data);
+    // console.log('productId:', productId);
+    // console.log('form.getValues():', form.getValues());
+
     if (data?.status === 'success') {
       form.reset({
         id: data.data.id || '',
@@ -155,6 +170,7 @@ export default function CreateEditProduct({
             setLoading(false);
             setProductId(response.id);
             toast.success('Product created successfully');
+
             // router.push(`/products/${response.id}/edit`);
           }
         },

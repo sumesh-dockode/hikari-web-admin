@@ -9,7 +9,13 @@ export interface StoreManagerDataType {
   is_active: boolean;
   store_name: string;
   store_address: string;
+  store_info?: {
+    id: string;
+    name: string;
+    address: string;
+  };
 }
+
 
 export interface StoreManagerTableDataType {
   id: string | null;

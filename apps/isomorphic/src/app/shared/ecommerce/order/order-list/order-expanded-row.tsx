@@ -23,6 +23,11 @@ export interface OrderItem {
       alt_text: string;
       product_variant: string;
     }[];
+     attributes?: {
+      id: string;
+      name: string;
+      value: string;
+    }[];
   };
   quantity: number;
   price: string;

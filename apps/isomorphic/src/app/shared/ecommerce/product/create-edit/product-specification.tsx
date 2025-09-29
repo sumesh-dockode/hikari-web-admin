@@ -16,6 +16,8 @@ import { useUpdateSpecificationValue } from '@/hooks/products/specificationValue
 import DeletePopover from '@core/components/delete-popover';
 import PencilIcon from '@core/components/icons/pencil';
 import { z } from 'zod';
+import toast from 'react-hot-toast';
+
 
 interface Specification {
   id?: string;
@@ -101,17 +103,41 @@ export default function ProductSpecifications({
     }
   }, [productSpecification]);
 
+  // useEffect(() => {
+  //   if (specificationValueById?.data && selectedSpecification) {
+  //     const specificationValue = specificationValueById.data;
+  //     reset({
+  //       id: specificationValue?.id,
+  //       specification: specificationValue?.specification,
+  //       value: specificationValue?.value,
+  //       product: productId,
+  //     });
+  //   }
+  // }, [specificationValueById, selectedSpecification, productId, reset]);
+
   useEffect(() => {
     if (specificationValueById?.data && selectedSpecification) {
       const specificationValue = specificationValueById.data;
-      reset({
-        id: specificationValue?.id,
-        specification: specificationValue?.specification,
-        value: specificationValue?.value,
-        product: productId,
-      });
+      setValue('id', specificationValue?.id);
+      setValue('specification', specificationValue?.specification);
+      setValue('value', specificationValue?.value);
+      setValue('product', productId);
+
+      // Open modal when data is loaded
+      if (specificationAction === 'edit') {
+        setIsModalOpen(true);
+      }
     }
-  }, [specificationValueById, selectedSpecification, productId, reset]);
+  }, [specificationValueById, selectedSpecification, productId, setValue, specificationAction]);
+
+
+
+  //edit
+  const handleEditSpecification = (id: string) => {
+    setSpecificationAction('edit');
+    setSelectedSpecification(id);
+    // Modal will be opened by the useEffect when data is loaded
+  };
 
   useEffect(() => {
     if (!specificationsData?.data) return;
@@ -169,6 +195,7 @@ export default function ProductSpecifications({
             setSpecifications((prev) =>
               prev.map((v) => (v.id === data.id ? newSpecification : v))
             );
+            toast.success('Specification updated successfully');
             closeModal();
           },
         }
@@ -183,6 +210,7 @@ export default function ProductSpecifications({
             value: data.value,
           };
           setSpecifications((prev) => [...prev, newSpecification]);
+          toast.success('Specification added successfully');
           closeModal();
         },
       });
@@ -242,11 +270,11 @@ export default function ProductSpecifications({
                   <td className="space-x-2">
                     <Tooltip
                       size="sm"
-                      content="Edit Variant"
+                      content="Edit Specifications"
                       placement="top"
                       color="invert"
                     >
-                      <ActionIcon
+                      {/* <ActionIcon
                         as="span"
                         size="sm"
                         variant="outline"
@@ -258,6 +286,16 @@ export default function ProductSpecifications({
                           setSpecificationAction('edit');
                           setSelectedSpecification(spec.id as string);
                         }}
+                      >
+                        <PencilIcon className="size-4" />
+                      </ActionIcon> */}
+                      <ActionIcon
+                        as="span"
+                        size="sm"
+                        variant="outline"
+                        aria-label="Edit Variant"
+                        isLoading={isFetching && selectedSpecification === spec.id}
+                        onClick={() => handleEditSpecification(spec.id as string)}
                       >
                         <PencilIcon className="size-4" />
                       </ActionIcon>
@@ -283,7 +321,7 @@ export default function ProductSpecifications({
         </div>
       )}
 
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
+      {/* <Modal isOpen={isModalOpen} onClose={closeModal}>
         <div className="space-y-5 p-4">
           <h2 className="text-lg font-bold">
             {specificationAction === 'edit' ? 'Edit' : 'Add New'} Specification
@@ -336,7 +374,58 @@ export default function ProductSpecifications({
             </div>
           </form>
         </div>
+      </Modal> */}
+      <Modal isOpen={isModalOpen} onClose={closeModal}>
+        <div className="space-y-5 p-4">
+          <h2 className="text-lg font-bold">
+            {specificationAction === 'edit' ? 'Edit' : 'Add New'} Specification
+          </h2>
+
+          {/* Rplc form with  div */}
+          <div className="grid gap-4">
+            <Controller
+              name="specification"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  options={specificationOptions}
+                  label="Specification Name"
+                  className="w-full"
+                  error={errors.specification?.message}
+                  getOptionValue={(option) => option.value}
+                  displayValue={(selected) =>
+                    specificationOptions.find((r) => r.value === selected)?.label ?? ''
+                  }
+                  onChange={(selectedValue) => field.onChange(selectedValue)}
+                  value={field.value}
+                />
+              )}
+            />
+
+            <Input
+              label="Value"
+              placeholder="Enter specification value"
+              {...register('value')}
+              error={errors.value?.message}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2 pt-4">
+            <Button variant="outline" onClick={closeModal} type="button">
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={handleSubmit(onSubmit)}
+              isLoading={createStatus === 'pending' || updateStatus === 'pending'}
+            >
+              {specificationAction === 'edit' ? 'Update' : 'Save'} Specification
+            </Button>
+          </div>
+        </div>
       </Modal>
+
     </>
   );
 }

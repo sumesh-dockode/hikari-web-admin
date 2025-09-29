@@ -68,22 +68,27 @@ export const salesManColumns = [
     id: 'bank_account_info',
     size: 200,
     header: 'Bank Account Info',
-    cell: ({ row }) => (
-      <>
-        {row.original.bank_account_info ? (
-          <div>
-            {row.original.bank_account_info?.account_holder_name} |{' '}
-            {row.original.bank_account_info?.bank_name} |{' '}
-            {row.original.bank_account_info?.account_number} |{' '}
-            {row.original.bank_account_info?.ifsc_code} |{' '}
-            {row.original.bank_account_info?.branch_name} |{' '}
-            {row.original.bank_account_info?.upi_id}
-          </div>
-        ) : (
-          <>-</>
-        )}
-      </>
-    ),
+    cell: ({ row }) => {
+      const info = row.original.bank_account_info;
+
+      if (!info) return <>-</>;
+
+      const infoFields = [
+        info.account_holder_name,
+        info.bank_name,
+        info.account_number,
+        info.ifsc_code,
+        info.branch_name,
+        info.upi_id,
+      ].filter((field) => !!field);
+      return (
+        <div className="space-y-0.5 text-sm text-gray-700">
+          {infoFields.map((field, idx) => (
+            <div key={idx}>{field}</div>
+          ))}
+        </div>
+      );
+    },
   }),
   columnHelper.display({
     id: 'store_manager',

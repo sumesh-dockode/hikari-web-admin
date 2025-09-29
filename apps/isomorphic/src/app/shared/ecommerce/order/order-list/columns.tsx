@@ -15,20 +15,24 @@ import { PiCaretDownBold, PiCaretUpBold } from 'react-icons/pi';
 import { ActionIcon, Box, Text, Tooltip } from 'rizzui';
 
 const columnHelper = createColumnHelper<OrdersDataType>();
+// const formatOrderId = (uuid: string) => {
+//   const base36 = BigInt(`0x${uuid.replace(/-/g, '')}`)
+//     .toString(36)
+//     .toUpperCase();
+//   return `ORD-${base36.substring(0, 8)}`;
+// };
 const formatOrderId = (uuid: string) => {
-  const base36 = BigInt(`0x${uuid.replace(/-/g, '')}`)
-    .toString(36)
-    .toUpperCase();
-  return `ORD-${base36.substring(0, 8)}`;
+  return uuid.slice(-4);
 };
+
 export const ordersColumns = (expanded: boolean = true) => {
   // const [isLoading, setIsLoading] = useState(false);
 
   const handleDownload = async (orderId: string) => {
     await downloadAllQRCodesFromStockAPI({
       loaderCallbacks: {
-        onStart: () => {},
-        onFinish: () => {},
+        onStart: () => { },
+        onFinish: () => { },
       },
       orderId: orderId, // replace with actual ID
     });
@@ -40,9 +44,10 @@ export const ordersColumns = (expanded: boolean = true) => {
       size: 120,
       header: 'Order Id',
       cell: ({ row }) => (
-        <Tooltip content={row.original.id} color="invert">
-          <span>{formatOrderId(row.original.id)}</span>
-        </Tooltip>
+        // <Tooltip content={row.original.id} color="invert">
+        //   <span>{formatOrderId(row.original.id)}</span>
+        // </Tooltip>]
+         <span>{formatOrderId(row.original.id)}</span>
       ),
     }),
     columnHelper.accessor('order_info', {
@@ -126,23 +131,23 @@ export const ordersColumns = (expanded: boolean = true) => {
           {['Confirmed', 'Shipped', 'Delivered'].includes(
             row.original.status
           ) && (
-            <Tooltip
-              size="sm"
-              content={'Download QR Code'}
-              placement="top"
-              color="invert"
-            >
-              <ActionIcon
-                as="span"
+              <Tooltip
                 size="sm"
-                variant="outline"
-                aria-label={'Download QR Code'}
-                onClick={() => handleDownload(row.original.id)}
+                content={'Download QR Code'}
+                placement="top"
+                color="invert"
               >
-                <BiDownload className="size-4" />
-              </ActionIcon>
-            </Tooltip>
-          )}
+                <ActionIcon
+                  as="span"
+                  size="sm"
+                  variant="outline"
+                  aria-label={'Download QR Code'}
+                  onClick={() => handleDownload(row.original.id)}
+                >
+                  <BiDownload className="size-4" />
+                </ActionIcon>
+              </Tooltip>
+            )}
         </TableRowActionGroup>
       ),
     }),

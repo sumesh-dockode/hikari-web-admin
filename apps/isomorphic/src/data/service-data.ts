@@ -1,12 +1,39 @@
 export interface serviceDataType {
   id: string;
   service_to: string;
-  service_type: string;
+  service_types: Array<{
+    id: string;
+    name: string;
+    description: string;
+    price: string;
+    duration: number;
+    created_at: string;
+    updated_at: string;
+  }>;
   user_id: number;
   description: string;
   image: string;
   price: string;
   status: string;
+  product?: {
+    id: string;
+    name: string;
+  };
+  requested_by?: {
+    username: any;
+    first_name: string;
+    last_name: string;
+    is_active: boolean;
+    phone_number: string;
+    email: string;
+    user_role: string;
+  };
+   service_images: Array<{
+    id: string;
+    image: string;
+    created_at: string;
+    updated_at: string;
+  }>;
 }
 
 export interface serviceStatusChangeDataType {

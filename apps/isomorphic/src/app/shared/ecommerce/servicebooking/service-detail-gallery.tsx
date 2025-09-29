@@ -84,6 +84,7 @@ export default function ServiceDetailsGallery({
   isModalView?: boolean;
 }) {
   const { id } = useParams();
+  const shortId = (id as string)?.slice(-4); 
   const { data: serviceData, isLoading } = useServiceById(id as string);
   const { data: serviceBookingAPIData } = usePaginatedServices({
     pageIndex: 0,
@@ -110,6 +111,10 @@ export default function ServiceDetailsGallery({
   // const {data,}
   const handleChangeStatus = (statusId: string) => {
     const status = statusActions.find((s) => s.id === statusId)?.name;
+
+
+    //id
+    
 
     if (status && id) {
       const payload = {
@@ -141,39 +146,76 @@ export default function ServiceDetailsGallery({
               // description={'You cannot update this information'}
               isModalView={isModalView}
             >
+              
               <div className="grid grid-cols-1 gap-4">
+                    <div>
+                      <label
+                        className="block text-sm font-medium text-gray-700"
+                        htmlFor="username"
+                      >
+                        Requested By
+                      </label>
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={currentService?.requested_by?.username || 'N/A'}
+                        readOnly
+                        className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                      />
+
+                    </div>
                 <div>
                   <label
                     className="block text-sm font-medium text-gray-700"
                     htmlFor="serviceTo"
                   >
-                    Service To
+                    Product Name
                   </label>
-                  <input
+                  {/* <input
                     type="text"
                     id="serviceTo"
                     name="serviceTo"
                     value={currentService?.service_to || 'N/A'}
                     readOnly
                     className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
-                  />
+                  /> */}
+                  <input
+                      type="text"
+                      id="serviceTo"
+                      name="serviceTo"
+                      value={currentService?.product?.name || currentService?.service_to || 'N/A'}
+                      readOnly
+                      className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                    />
                 </div>
 
                 <div>
                   <label
                     className="block text-sm font-medium text-gray-700"
-                    htmlFor="serviceType"
+                    htmlFor="serviceTypes"
                   >
-                    Service Type
+                    Service Types
                   </label>
-                  <input
-                    type="text"
-                    id="serviceType"
-                    name="serviceType"
-                    value={currentService?.service_type || 'N/A'}
-                    readOnly
-                    className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
-                  />
+                  {Array.isArray(currentService?.service_types) && currentService.service_types.length > 0 ? (
+                    <div className="mt-1 rounded-md border border-gray-300 p-2 text-sm text-gray-900">
+                      {currentService.service_types.map((serviceType: any, index: number) => (
+                        <span key={serviceType.id}>
+                          {serviceType.name}
+                          {index < currentService.service_types.length - 1 ? ', ' : ''}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <input
+                      type="text"
+                      id="serviceType"
+                      name="serviceType"
+                      value={currentService?.service_type || 'N/A'}
+                      readOnly
+                      className="mt-1 block w-full rounded-md border border-gray-300 text-gray-900 shadow-sm focus:outline-none sm:text-sm"
+                    />
+                  )}
                 </div>
               </div>
 
@@ -255,7 +297,7 @@ export default function ServiceDetailsGallery({
         </div>
         <div className="w-full @lg:w-[45%] @xl:w-[35%]">
           <div className="sticky top-8">
-            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+            {/* <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
               <Image
                 fill
                 priority
@@ -264,6 +306,33 @@ export default function ServiceDetailsGallery({
                 sizes="(max-width: 768px) 100vw"
                 className="h-full w-full object-cover"
               />
+            </div> */}
+            <div className="relative w-full grid grid-cols-2 gap-3">
+              {Array.isArray(currentService?.service_images) && currentService.service_images.length > 0 ? (
+                currentService.service_images.map((img: any) => (
+                  <div key={img.id} className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                    <Image
+                      fill
+                      priority
+                      src={img.image}
+                      alt={'Service Booking Image'}
+                      sizes="(max-width: 768px) 100vw"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ))
+              ) : (
+                <div className="relative aspect-[4/3] w-full overflow-hidden rounded-lg">
+                  <Image
+                    fill
+                    priority
+                    src={noImage}
+                    alt={'No Service Images'}
+                    sizes="(max-width: 768px) 100vw"
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>

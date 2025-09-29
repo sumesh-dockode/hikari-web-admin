@@ -17,7 +17,7 @@ export default async function ServiceDetailPage({ params }: any) {
         name: 'Service Details',
       },
       {
-        name: id,
+        name: id.slice(-4),
       },
     ],
   };

@@ -110,18 +110,33 @@ export const productsListColumns = [
             isLoading={meta?.isLoading && meta?.deleteId === row.original.id}
           />
         ) : (
-          <Tooltip content="Published" placement="top" size="sm">
-            <ActionIcon
-              size="sm"
-              variant="solid"
-              color="primary"
-              aria-label="Published"
-              className="cursor-default"
-            >
-              <PiCheckBold className="size-4" />
-            </ActionIcon>
-          </Tooltip>
+          <ConfirmationPopover
+            title="Unpublish Product"
+            description="Are you sure you want to unpublish this product?"
+            tooltipContent="Unpublish Product"
+            onConfirm={() =>
+              meta?.handleUnpublishRow && meta?.handleUnpublishRow(row.original.id)
+            }
+            isLoading={
+              meta?.unpublishLoading && meta?.deleteId === row.original.id
+            }
+            trigger={(
+              <Tooltip content="Unpublish Product" placement="top" size="sm">
+                <ActionIcon
+                  size="sm"
+                  variant="solid"
+                  color="primary"
+                  aria-label="Unpublish Product"
+                  className="cursor-pointer"
+                >
+                  <PiCheckBold className="size-4" />
+                </ActionIcon>
+              </Tooltip>
+            )}
+          />
+
         )}
+
         <Tooltip
           size="sm"
           content={'Edit Product'}
@@ -139,9 +154,10 @@ export const productsListColumns = [
             </ActionIcon>
           </Link>
         </Tooltip>
+
         <DeletePopover
           title={`Delete the product`}
-          description={`Are you sure you want to delete this #${row.original.id} product?`}
+          description={`Are you sure you want to delete '${row.original.name}'?`}
           onDelete={() =>
             meta?.handleDeleteRow && meta?.handleDeleteRow(row.original)
           }
@@ -149,4 +165,5 @@ export const productsListColumns = [
       </Flex>
     ),
   }),
+
 ];

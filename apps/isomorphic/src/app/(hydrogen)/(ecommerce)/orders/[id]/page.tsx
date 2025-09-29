@@ -6,8 +6,16 @@ import OrderView from '@/app/shared/ecommerce/order/order-view';
 
 export default async function OrderDetailsPage({ params }: any) {
   const id = (await params).id;
+
+  const formatOrderId = (uuid: string) => {
+    const cleanUuid = uuid.replace(/-/g, '');
+    return `ORD-${cleanUuid.slice(-4).toUpperCase()}`;
+  };
+
+  const formattedId = formatOrderId(id);
+
   const pageHeader = {
-    title: `Order #${id}`,
+    title: `Order ${formattedId}`,
     breadcrumb: [
       {
         href: routes.eCommerce.dashboard,
@@ -18,10 +26,11 @@ export default async function OrderDetailsPage({ params }: any) {
         name: 'Orders',
       },
       {
-        name: id,
+        name: formattedId,
       },
     ],
   };
+
   return (
     <>
       <PageHeader title={pageHeader.title} breadcrumb={pageHeader.breadcrumb}>
@@ -34,6 +43,7 @@ export default async function OrderDetailsPage({ params }: any) {
           </Button>
         </Link>
       </PageHeader>
+
       <OrderView />
     </>
   );

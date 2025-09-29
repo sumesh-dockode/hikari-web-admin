@@ -10,6 +10,10 @@ import { Checkbox, Flex, Text, Title } from 'rizzui';
 
 const columnHelper = createColumnHelper<SalesHistoryDataType>();
 
+const formatOrderId = (id: string) => {
+  return id.slice(-4);
+};
+
 export const SalesHistoryColumns = [
   columnHelper.accessor('created_at', {
     id: 'created_at',
@@ -17,14 +21,20 @@ export const SalesHistoryColumns = [
     header: 'Date',
     cell: ({ row }) => <DateCell date={new Date(row.original.created_at)} />,
   }),
-  columnHelper.display({
-    id: 'name',
-    size: 300,
-    header: 'Product',
-    enableSorting: false,
-    cell: ({ row }) => (
+ columnHelper.display({
+  id: 'name',
+  size: 300,
+  header: 'Product',
+  enableSorting: false,
+  cell: ({ row }) => {
+    const images = row.original.product_variant.images;
+    const imageUrl = Array.isArray(images) && images.length > 0 
+      ? (images[0] as { image: string }).image 
+      : '';
+      
+    return (
       <AvatarCard
-        src={row.original.product_variant.images?.[0]}
+        src={imageUrl}
         name={row.original.product_name}
         description={row.original.product_variant.sku}
         avatarProps={{
@@ -33,15 +43,16 @@ export const SalesHistoryColumns = [
           className: 'rounded-lg',
         }}
       />
-    ),
-  }),
+    );
+  },
+}),
   columnHelper.display({
     id: 'order',
     size: 150,
     header: 'Order Id',
     cell: ({ row }) => (
       <Link href={`/orders/${row.original.order}`} className="hover:underline">
-        #{row.original.order}
+       {formatOrderId(row.original.order)}
       </Link>
     ),
   }),

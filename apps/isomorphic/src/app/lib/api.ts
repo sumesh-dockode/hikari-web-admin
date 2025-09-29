@@ -31,4 +31,5 @@ export const API_ROUTES = {
   storePrices: '/mingler/admin/store-prices/',
   dashboard: '/mingler/admin/dashboard/',
   assignDeliveryManager: '/ecom/admin/orders/{id}/assign/',
+  stockStatusUpdate: '/mingler/stocks/{id}/delivery/status',
 };

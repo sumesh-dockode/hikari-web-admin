@@ -10,6 +10,10 @@ export function useOrderStocks(orderId: string) {
       const res = await apiClient.get(API_ROUTES.stocks, {
         params: { order: orderId },
       });
+
+   
+      console.log('RAW API RESPONSE for stocks:', res.data);
+
       return res.data.data;
     },
     enabled: !!orderId,

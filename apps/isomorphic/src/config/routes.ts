@@ -160,6 +160,8 @@ export const routes = {
   comingSoon: '/coming-soon',
   accessDenied: '/access-denied',
   notFound: '/not-found',
+  privacyPolicy: '/privacy-policy',
+  termsAndConditions: '/terms-and-conditions',
   maintenance: '/maintenance',
   blank: '/blank',
   auth: {

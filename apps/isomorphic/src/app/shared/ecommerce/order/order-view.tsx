@@ -14,7 +14,11 @@ import usePaginatedDeliveryManager from '@/hooks/DeliveryManager/usePaginatedDel
 import StockProductTable from './order-products/StockProductTable';
 import { useOrderStocks } from '@/hooks/orders/useOrderStocks';
 import { useUpdateOrder } from '@/hooks/orders/useUpdateOrder';
+import { useState } from 'react';
+import toast from 'react-hot-toast';
+import { useQueryClient } from '@tanstack/react-query'; 
 
+import { useUpdateOrderStockStatus } from '@/hooks/orders/useUpdateOrderStockStatus';
 
 const baseStatusActions = [
   { id: 1, label: 'Ordered', actionLabel: '' },
@@ -56,6 +60,7 @@ function WidgetCard({
 
 export default function OrderView() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const { data, isLoading: isLoading } = useOrderById(id as string);
   const { mutate: updateOrderStatus, status } = useOrderStatusChange();
   const { data: deliveryManagerData, isLoading: isManagersLoading } = usePaginatedDeliveryManager({});
@@ -64,8 +69,11 @@ export default function OrderView() {
   // >();
 
   const orderData = data?.data;
-  const { data: stockProductData, isLoading: isStockLoading } = useOrderStocks(id as string);
+  const { data: stockProductData, isLoading: isStockLoading, refetch: refetchStocks } = useOrderStocks(id as string);
   const { mutate: updateOrder, error, isError } = useUpdateOrder();
+  const { mutate: updateStockStatus, isPending: isUpdatingStock } =
+    useUpdateOrderStockStatus();
+  const [updatingStockId, setUpdatingStockId] = useState<string | null>(null);
 
   console.log('stockProductData:', stockProductData);
   const totalItems = orderData?.items?.length || 0;
@@ -75,9 +83,9 @@ export default function OrderView() {
   const orderStatusActions = !isCancelled
     ? baseStatusActions
     : [
-        { id: 1, label: 'Ordered', actionLabel: '' },
-        { id: 5, label: 'Cancelled', actionLabel: '' },
-      ];
+      { id: 1, label: 'Ordered', actionLabel: '' },
+      { id: 5, label: 'Cancelled', actionLabel: '' },
+    ];
 
   const currentOrderStatus =
     orderStatusActions.find((status) => status.label === orderData?.status)
@@ -107,15 +115,36 @@ export default function OrderView() {
     updateOrderStatus(payload);
   };
 
-  
+  const handleUpdateStockStatus = (stockId: string, newStatus: string) => {
+    setUpdatingStockId(stockId);
+    updateStockStatus(
+      { stockId, status: newStatus },
+      {
+        onSuccess: () => {
+          toast.success('Stock status updated successfully!');
+      
+          queryClient.invalidateQueries({
+            queryKey: ['order-stock-products', id],
+          });
+       
+          queryClient.invalidateQueries({ queryKey: ['orders', id] });
+        },
+       
+        onSettled: () => {
+          setUpdatingStockId(null);
+        },
+      }
+    );
+  };
+
   const handleAssignDeliveryManager = (managerId: number) => {
     console.log('Assigning manager:', managerId);
     console.log('Order data:', orderData);
-    
+
     const payload = {
-      assignee_id: managerId.toString(), 
+      assignee_id: managerId.toString(),
     };
-    
+
     console.log('Payload being sent:', payload);
     updateOrder({
       id: orderData.id.toString(),
@@ -181,10 +210,15 @@ export default function OrderView() {
               </div>
             </div>
             {isStockLoading ? (
-  <div className="text-sm text-muted"></div>
-) : stockProductData?.length > 0 ? (
-  <StockProductTable data={stockProductData} />
-) : null}
+              <div className="text-sm text-muted"></div>
+            ) : stockProductData?.length > 0 ? (
+              <StockProductTable
+                data={stockProductData}
+                onUpdateStockStatus={handleUpdateStockStatus}
+                isUpdating={isUpdatingStock}
+                updatingStockId={updatingStockId}
+              />
+            ) : null}
 
 
           </div>
@@ -239,9 +273,8 @@ export default function OrderView() {
                     </span>
                   ) : null}
 
-                  {currentOrderStatus + 1 !== item.id ? (
-                    item.label
-                  ) : (
+                  {/* Only show button for 'Confirmed' status, otherwise just show label */}
+                  {item.id === 2 && currentOrderStatus === 1 ? (
                     <Button
                       size="sm"
                       variant="outline"
@@ -250,6 +283,8 @@ export default function OrderView() {
                     >
                       {item.actionLabel}
                     </Button>
+                  ) : (
+                    item.label
                   )}
                   {item.id === 2 && currentOrderStatus === 1 && (
                     <Button
@@ -269,41 +304,41 @@ export default function OrderView() {
           </WidgetCard>
 
           {/* Delivery mng */}
-        {(orderData?.assigned_to || orderData?.status === 'Confirmed') && (
-          <div className="mb-6">
-            <label className="block mb-2 font-medium text-sm">
-              Delivery Manager
-            </label>
-            {orderData?.assigned_to ? (
-              <div>
-                Assigned to:{' '}
-                <b>
-                  {(() => {
-                    const assigned = deliveryManagerData?.data.find(
-                      (item: any) => item.id === orderData.assigned_to
-                    );
-                    return assigned
-                      ? `${assigned.first_name} ${assigned.last_name}`
-                      : 'Unknown';
-                  })()}
-                </b>
-              </div>
-            ) : (
-              <Select
-                options={deliveryManagerData?.data?.map((manager: any) => ({
-                  label: `${manager.first_name} ${manager.last_name}`,
-                  value: manager.id,
-                }))}
-                onChange={(selected) => {
-                  console.log('Selected manager:', selected);
-                  handleAssignDeliveryManager((selected as { value: number }).value);
-                }}
-                placeholder="Select Delivery Manager"
-                searchable
-              />
-            )}
-          </div>
-        )}
+          {(orderData?.assigned_to || orderData?.status === 'Confirmed') && (
+            <div className="mb-6">
+              <label className="block mb-2 font-medium text-sm">
+                Delivery Manager
+              </label>
+              {orderData?.assigned_to ? (
+                <div>
+                  Assigned to:{' '}
+                  <b>
+                    {(() => {
+                      const assigned = deliveryManagerData?.data.find(
+                        (item: any) => item.id === orderData.assigned_to
+                      );
+                      return assigned
+                        ? `${assigned.first_name} ${assigned.last_name}`
+                        : 'Unknown';
+                    })()}
+                  </b>
+                </div>
+              ) : (
+                <Select
+                  options={deliveryManagerData?.data?.map((manager: any) => ({
+                    label: `${manager.first_name} ${manager.last_name}`,
+                    value: manager.id,
+                  }))}
+                  onChange={(selected) => {
+                    console.log('Selected manager:', selected);
+                    handleAssignDeliveryManager((selected as { value: number }).value);
+                  }}
+                  placeholder="Select Delivery Manager"
+                  searchable
+                />
+              )}
+            </div>
+          )}
 
           <WidgetCard
             title="Customer Details"
@@ -314,7 +349,7 @@ export default function OrderView() {
                 size="lg"
                 color="primary"
                 name={orderData?.order_info?.name || ''}
-                // src={row.original.customer.avatar}
+              // src={row.original.customer.avatar}
               />
             </div>
             <div className="ps-4 @5xl:ps-6">

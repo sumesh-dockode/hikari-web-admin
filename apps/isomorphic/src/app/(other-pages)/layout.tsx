@@ -4,12 +4,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from 'rizzui';
 import cn from '@core/utils/class-names';
-import SocialItems from '@core/ui/social-shares';
 import { usePathname, useRouter } from 'next/navigation';
 import { siteConfig } from '@/config/site.config';
 import { routes } from '@/config/routes';
 
-const ignoreBackButtonRoutes = [routes.accessDenied, routes.notFound];
+const ignoreBackButtonRoutes = [routes.accessDenied, routes.notFound, routes.privacyPolicy, routes.termsAndConditions];
 
 export default function OtherPagesLayout({
   children,
@@ -50,7 +49,9 @@ export default function OtherPagesLayout({
         </div>
       </div>
       {children}
-      <SocialItems />
+      <div className="text-center text-sm mt-4">
+        <p>© 2025 Mingler. All rights reserved.</p>
+      </div>
     </div>
   );
 }

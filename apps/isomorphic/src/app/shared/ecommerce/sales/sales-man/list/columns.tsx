@@ -93,7 +93,7 @@ export const salesManColumns = [
   columnHelper.display({
     id: 'store_manager',
     size: 150,
-    header: 'Store Manager',
+    header: 'Store OMS',
     cell: ({ row }) => (
       <>
         <Text className="font-medium text-gray-700">

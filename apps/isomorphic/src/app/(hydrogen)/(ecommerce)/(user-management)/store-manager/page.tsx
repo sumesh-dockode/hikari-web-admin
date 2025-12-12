@@ -7,11 +7,11 @@ import { Button } from 'rizzui/button';
 import { PiPlusBold } from 'react-icons/pi';
 
 export const metadata = {
-  ...metaObject('Store Manager'),
+  ...metaObject('Store OMS'),
 };
 
 const pageHeader = {
-  title: 'Store Manager',
+  title: 'Store OMS',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -19,7 +19,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.storeManager,
-      name: 'Store Manager',
+      name: 'Store OMS',
     },
     {
       name: 'List',
@@ -37,7 +37,7 @@ export default function CategoriesPage() {
         >
           <Button as="span" className="w-full @lg:w-auto">
             <PiPlusBold className="me-1.5 h-[17px] w-[17px]" />
-            Add Store Manager
+            Add Store OMS
           </Button>
         </Link>
       </PageHeader>

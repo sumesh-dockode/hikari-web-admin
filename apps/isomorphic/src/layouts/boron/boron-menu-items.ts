@@ -145,7 +145,7 @@ export const menuItems = [
     icon: PiUserListDuotone,
     dropdownItems: [
       {
-        name: 'Store Manager',
+        name: 'Store OMS',
         href: routes.eCommerce.storeManager,
       },
       {

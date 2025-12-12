@@ -102,7 +102,7 @@ export const storeManagerColumns = [
       },
     }) => (
       <div className="flex items-center justify-end gap-3 pe-4">
-        <Tooltip content={'Edit Store Manager'} placement="top" color="invert">
+        <Tooltip content={'Edit Store OMS'} placement="top" color="invert">
           <Link
             href={routes.eCommerce.editStoreManager(row.original.id as string)}
           >
@@ -112,8 +112,8 @@ export const storeManagerColumns = [
           </Link>
         </Tooltip>
         <DeletePopover
-          title={`Delete the Store Manager`}
-          description={`Are you sure you want to delete this #${row.original.username} store manager?`}
+          title={`Delete the Store OMS`}
+          description={`Are you sure you want to delete this #${row.original.username} store oms?`}
           onDelete={() => meta?.handleDeleteRow?.(row.original)}
           isLoading={meta?.deleteId === row.original.id && meta?.isDeleting}
         />

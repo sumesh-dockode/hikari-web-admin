@@ -57,7 +57,7 @@ export const productsListColumns = [
   columnHelper.display({
     id: 'sku',
     size: 150,
-    header: 'SKU',
+    header: 'titile',
     cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
   }),
   // columnHelper.accessor('stock', {

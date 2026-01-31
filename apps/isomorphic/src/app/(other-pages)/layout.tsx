@@ -42,7 +42,7 @@ export default function OtherPagesLayout({
               size="sm"
               className="md:h-10 md:px-4 md:text-base"
               onClick={() => back()}
-            >
+           >
               Go to home
             </Button>
           )}

@@ -35,6 +35,11 @@ export default function TablePagination<TData extends Record<string, any>>({
   showSelectedCount?: boolean;
   className?: string;
 }) {
+  const paginationState = table.getState().pagination;
+
+  const pageSize = paginationState?.pageSize ?? 10;
+  const pageIndex = paginationState?.pageIndex ?? 0;
+
   return (
     <Flex
       gap="6"
@@ -46,12 +51,13 @@ export default function TablePagination<TData extends Record<string, any>>({
         <Text className="hidden font-normal text-gray-600 @md:block">
           Rows per page
         </Text>
+
         <Select
           size="sm"
           variant="flat"
           options={options}
           className="w-12"
-          value={table.getState().pagination.pageSize}
+          value={pageSize}
           onChange={(v: SelectOption) => {
             table.setPageSize(Number(v.value));
           }}
@@ -60,6 +66,7 @@ export default function TablePagination<TData extends Record<string, any>>({
           optionClassName="font-medium text-xs px-2 justify-center"
         />
       </Flex>
+
       {showSelectedCount && (
         <Box className="hidden @2xl:block w-full">
           <Text>
@@ -68,11 +75,12 @@ export default function TablePagination<TData extends Record<string, any>>({
           </Text>
         </Box>
       )}
+
       <Flex justify="end" align="center">
         <Text className="hidden font-normal text-gray-600 @3xl:block">
-          Page {table.getState().pagination.pageIndex + 1} of{" "}
-          {table.getPageCount().toLocaleString()}
+          Page {pageIndex + 1} of {table.getPageCount().toLocaleString()}
         </Text>
+
         <Grid gap="2" columns="4">
           <ActionIcon
             size="sm"
@@ -85,6 +93,7 @@ export default function TablePagination<TData extends Record<string, any>>({
           >
             <PiCaretDoubleLeftBold className="size-3.5" />
           </ActionIcon>
+
           <ActionIcon
             size="sm"
             rounded="lg"
@@ -96,6 +105,7 @@ export default function TablePagination<TData extends Record<string, any>>({
           >
             <PiCaretLeftBold className="size-3.5" />
           </ActionIcon>
+
           <ActionIcon
             size="sm"
             rounded="lg"
@@ -107,12 +117,13 @@ export default function TablePagination<TData extends Record<string, any>>({
           >
             <PiCaretRightBold className="size-3.5" />
           </ActionIcon>
+
           <ActionIcon
             size="sm"
             rounded="lg"
             variant="outline"
             aria-label="Go to last page"
-            onClick={() => () => table.setPageIndex(table.getPageCount() - 1)}
+            onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
             className="text-gray-900 shadow-sm disabled:text-gray-400 disabled:shadow-none"
           >

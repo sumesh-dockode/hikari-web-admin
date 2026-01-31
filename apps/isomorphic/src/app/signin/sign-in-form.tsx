@@ -1,108 +1,114 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { SubmitHandler } from 'react-hook-form';
-import { PiArrowRightBold } from 'react-icons/pi';
-import { Checkbox, Password, Button, Input, Text } from 'rizzui';
+import { Input, Text, Button, Password } from 'rizzui';
+import { useMedia } from '@core/hooks/use-media';
 import { Form } from '@core/ui/form';
 import { routes } from '@/config/routes';
 import { loginSchema, LoginSchema } from '@/validators/login.schema';
-import { useSearchParams } from 'next/navigation';
-
-const initialValues: LoginSchema = {
-  username: '',
-  password: '',
-};
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { signIn, getSession } from 'next-auth/react';
 
 export default function SignInForm() {
-  //TODO: why we need to reset it here
-  const [reset, setReset] = useState({});
+  const isMedium = useMedia('(max-width: 1200px)', false);
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
-  const searchParams = useSearchParams();
-  const error = searchParams.get('error');
+  const [apiError, setApiError] = useState('');
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
       setLoading(true);
-      await signIn('credentials', {
-        ...data,
+      setApiError('');
+
+      const res = await signIn('credentials', {
+        username: data.username,
+        password: data.password,
+        redirect: false,
       });
+
+      if (res?.ok) {
+        const session = await getSession();
+
+        const accessToken = (session as any)?.accessToken;
+        const refreshToken = (session as any)?.refreshToken;
+        const user = (session as any)?.user;
+
+        if (accessToken) localStorage.setItem('access', accessToken);
+        if (refreshToken) localStorage.setItem('refresh', refreshToken);
+        if (user) localStorage.setItem('user', JSON.stringify(user));
+
+        console.log(' Stored tokens:', { accessToken, refreshToken });
+
+        router.push('/');
+        router.refresh();
+        return;
+      }
+
+      setApiError('Invalid username or password');
+    } catch (error) {
+      setApiError('Something went wrong. Try again.');
     } finally {
       setLoading(false);
     }
   };
-  const errorMessages: Record<string, string> = {
-    CredentialsSignin: 'Invalid username or password.',
-    ShopAccessDenied: 'You cannot access or authorize to admin portal.',
-    Credentials: 'Invalid username or password.',
-  };
-
-  const displayError =
-    error && errorMessages[error]
-      ? errorMessages[error]
-      : error
-        ? decodeURIComponent(error)
-        : '';
 
   return (
-    <>
-      {displayError && (
-        <div className="mb-4 text-center text-sm font-semibold text-red-600">
-          {displayError}
+    <Form<LoginSchema>
+      validationSchema={loginSchema}
+      onSubmit={onSubmit}
+      useFormProps={{ mode: 'onChange' }}
+    >
+      {({ register, formState: { errors } }) => (
+        <div className="space-y-5 lg:space-y-6">
+          <Input
+            type="text"
+            size={isMedium ? 'lg' : 'xl'}
+            label="username"
+            placeholder="Enter your username"
+            className="[&>label>span]:font-medium"
+            {...register('username')}
+            error={errors.username?.message}
+          />
+
+          <Password
+            label="Password"
+            placeholder="Enter your password"
+            size={isMedium ? 'lg' : 'xl'}
+            className="[&>label>span]:font-medium"
+            {...register('password')}
+            error={errors.password?.message}
+          />
+
+          <div className="flex items-center justify-between">
+            {/* <Link
+              href={routes.auth.forgotPassword3}
+              className="h-auto p-0 text-sm font-semibold text-gray-600 underline transition-colors hover:text-primary hover:no-underline"
+            >
+              Forget Password?
+            </Link> */}
+            
+
+            {apiError && (
+              <Text className="text-sm font-medium text-red-600">
+                {apiError}
+              </Text>
+            )}
+          </div>
+
+          <Button
+            className="w-full bg-secondary1 hover:bg-secondary2"
+            type="submit"
+            size={isMedium ? 'lg' : 'xl'}
+            isLoading={loading}
+            disabled={loading}
+          >
+            Login
+          </Button>
         </div>
       )}
-      <Form<LoginSchema>
-        validationSchema={loginSchema}
-        resetValues={reset}
-        onSubmit={onSubmit}
-        useFormProps={{
-          defaultValues: initialValues,
-        }}
-      >
-        {({ register, formState: { errors } }) => (
-          <div className="space-y-5">
-            <Input
-              type="text"
-              size="lg"
-              label="Username"
-              placeholder="Enter your username"
-              className="[&>label>span]:font-medium"
-              inputClassName="text-sm"
-              {...register('username')}
-              error={errors.username?.message}
-            />
-
-            <Password
-              label="Password"
-              placeholder="Enter your password"
-              size="lg"
-              className="[&>label>span]:font-medium"
-              inputClassName="text-sm"
-              {...register('password')}
-              error={errors.password?.message}
-            />
-            {/* <div className="flex justify-end pb-2">
-              <Link
-                href={routes.forgotPassword}
-                className="h-auto p-0 text-sm font-semibold text-blue underline transition-colors hover:text-gray-900 hover:no-underline"
-              >
-                Forget Password?
-              </Link>
-            </div> */}
-            <Button
-              className="w-full"
-              type="submit"
-              size="lg"
-              isLoading={loading}
-            >
-              <span>Sign in</span>{' '}
-              <PiArrowRightBold className="ms-2 mt-0.5 h-5 w-5" />
-            </Button>
-          </div>
-        )}
-      </Form>
-    </>
+    </Form>
   );
 }

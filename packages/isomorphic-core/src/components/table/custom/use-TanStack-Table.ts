@@ -19,7 +19,6 @@ import {
   RowPinningState,
   SortingState,
   TableOptions,
-  TableState,
   getCoreRowModel,
   getExpandedRowModel,
   getFacetedRowModel,
@@ -62,26 +61,42 @@ export function useTanStackTable<T extends Record<string, any>>({
   columnConfig: ColumnDef<T, any>[];
   pagination?: PaginationState;
 }) {
-  const [data, setData] = React.useState<T[]>([...tableData]);
+  const [data, setData] = React.useState<T[]>([...(tableData ?? [])]);
   const [columns] = React.useState(() => [...columnConfig]);
+
   const [globalFilter, setGlobalFilter] = React.useState("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [expanded, setExpanded] = React.useState<ExpandedState>({});
+
   const [columnOrder, setColumnOrder] = React.useState<string[]>(() =>
     columns.map((c) => c.id!)
   );
-  const dataIds = React.useMemo<UniqueIdentifier[]>(
-    () => data?.map((item) => item?.id).filter(Boolean),
-    [data]
-  );
-  
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  );
+
+  const [columnFilters, setColumnFilters] =
+    React.useState<ColumnFiltersState>([]);
+
   const [rowPinning, setRowPinning] = React.useState<RowPinningState>({
     top: [],
     bottom: [],
   });
+
+  // ✅ FIX: Always keep pagination defined
+  const [localPagination, setLocalPagination] = React.useState<PaginationState>(
+    pagination ?? { pageIndex: 0, pageSize: 10 }
+  );
+
+  // ✅ Keep in sync when parent changes pagination
+  React.useEffect(() => {
+    if (pagination) {
+      setLocalPagination(pagination);
+    }
+  }, [pagination?.pageIndex, pagination?.pageSize]);
+
+  const dataIds = React.useMemo<UniqueIdentifier[]>(
+    () => data?.map((item) => item?.id).filter(Boolean),
+    [data]
+  );
+
   const handleDragEndColumn = React.useCallback((event: DragEndEvent) => {
     const { active, over } = event;
     if (active && over && active.id !== over.id) {
@@ -113,16 +128,31 @@ export function useTanStackTable<T extends Record<string, any>>({
   const table = useReactTable({
     data,
     columns,
+
     state: {
       sorting,
-      pagination,
+      pagination: localPagination, // ✅ ALWAYS defined now
       expanded,
       rowPinning,
       columnOrder,
       globalFilter,
       columnFilters,
+      ...(options?.state ?? {}),
     },
+
+    // ✅ IMPORTANT: keep pagination working
+    onPaginationChange: (updater) => {
+      const next =
+        typeof updater === "function" ? updater(localPagination) : updater;
+
+      setLocalPagination(next);
+
+      // forward to parent if they use server pagination
+      options?.onPaginationChange?.(updater);
+    },
+
     ...options,
+
     getRowCanExpand: () => true,
     onSortingChange: setSorting,
     onExpandedChange: setExpanded,
@@ -130,6 +160,7 @@ export function useTanStackTable<T extends Record<string, any>>({
     onColumnOrderChange: setColumnOrder,
     onGlobalFilterChange: setGlobalFilter,
     onColumnFiltersChange: setColumnFilters,
+
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFacetedRowModel: getFacetedRowModel(),

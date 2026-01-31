@@ -1,9 +1,12 @@
 export type productsDataType = {
   id: string;
+  count?:number |string;
   name: string;
+  time?:string | number;
   category: any;
   images?: string | any;
   sku?: string;
+  
   description?: string;
   stock?: number;
   price?: string;
@@ -11,7 +14,8 @@ export type productsDataType = {
   product_images?: any;
   is_published?: string;
   similar_products?: string[];
-  // status: string;
+  status?: string;
+  image?: string | null;
   // rating: any;
 };
 export type variantDataType = {

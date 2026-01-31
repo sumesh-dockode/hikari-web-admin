@@ -2,6 +2,8 @@ import '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
+    handleEditRow?: (row: TData) => void;
+
     handleDeleteRow?: (row: Row<TData>) => void;
     handleMultipleDelete?: (row: Row<TData>) => void;
     handleApproveRow?: (row: Row<TData>) => void;

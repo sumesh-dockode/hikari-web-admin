@@ -3,7 +3,8 @@ import { productVariants } from "@/app/shared/ecommerce/product/create-edit/form
 export const routes = {
   eCommerce: {
     dashboard: '/',
-    products: '/products',
+    products: '/',
+    product2:'/product2',
     createProduct: '/products/create',
     productDetails: (slug: string) => `/products/${slug}`,
     ediProduct: (slug: string) => `/products/${slug}/edit`,

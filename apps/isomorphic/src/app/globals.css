@@ -8,7 +8,13 @@
 @layer base {
   /* default theme */
   :root {
+
+
+--secondary1:245 31 108;
+--secondary2:245 31 128;
     /*
+
+    
       - gray/natural colors for texts, borders and disabled elements.
       - If required we can use as background too.
     */

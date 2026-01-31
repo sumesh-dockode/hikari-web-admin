@@ -1,17 +1,26 @@
 'use client';
 
-import { useState } from 'react';
-import { SubmitHandler, Controller } from 'react-hook-form';
-import { PiDesktop } from 'react-icons/pi';
+import { useEffect, useState } from 'react';
+import { Controller } from 'react-hook-form';
 import { Form } from '@core/ui/form';
-import { Button, Password, Title, Text } from 'rizzui';
-import cn from '@core/utils/class-names';
+import { Button, Password } from 'rizzui';
 import { ProfileHeader } from '@/app/shared/account-settings/profile-settings';
 import HorizontalFormBlockWrapper from '@/app/shared/account-settings/horiozontal-block';
 import {
   passwordFormSchema,
   PasswordFormTypes,
 } from '@/validators/password-settings.schema';
+import toast from 'react-hot-toast';
+
+/* ---------------- TYPES ---------------- */
+
+type BackendUserType = {
+  id: string;
+  username: string;
+  companies: string[];
+};
+
+/* ---------------- COMPONENT ---------------- */
 
 export default function PasswordSettingsView({
   settings,
@@ -20,169 +29,187 @@ export default function PasswordSettingsView({
 }) {
   const [isLoading, setLoading] = useState(false);
   const [reset, setReset] = useState({});
+  const [user, setUser] = useState<BackendUserType | null>(null);
 
-  const onSubmit: SubmitHandler<PasswordFormTypes> = (data) => {
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      console.log('Password settings data ->', data);
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL?.replace(/\/$/, '');
+
+
+  const getUserIdFromStorage = (): string | null => {
+    try {
+      const storedUser = localStorage.getItem('user');
+      if (!storedUser) return null;
+      const parsedUser = JSON.parse(storedUser) as { id?: string };
+      return parsedUser?.id ?? null;
+    } catch {
+      return null;
+    }
+  };
+
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const accessToken = localStorage.getItem('access');
+      const userId = getUserIdFromStorage();
+
+      if (!accessToken || !userId || !baseUrl) return;
+
+      try {
+        const res = await fetch(
+          `${baseUrl}/authentication/users/${userId}/`,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: `Bearer ${accessToken}`,
+            },
+          }
+        );
+
+        if (!res.ok) return;
+
+        const json = (await res.json()) as any;
+        setUser(json?.data ?? null);
+      } catch (err) {
+        console.log('Fetch user error:', err);
+      }
+    };
+
+    fetchUser();
+  }, [baseUrl]);
+
+
+  const changePassword = async (newPassword: string) => {
+    const accessToken = localStorage.getItem('access');
+
+    if (!accessToken) {
+      toast.error('Token missing');
+      return;
+    }
+
+    if (!baseUrl) {
+      toast.error('API URL missing');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${baseUrl}/api/v1/change-password/`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ new_password: newPassword }),
+      });
+
+      const result = (await res.json().catch(() => ({}))) as any;
+
+      if (!res.ok) {
+        toast.error(result?.message || 'Password update failed');
+        return;
+      }
+
+      toast.success(result?.message || 'Password updated successfully');
+
       setReset({
-        currentPassword: '',
         newPassword: '',
         confirmedPassword: '',
       });
-    }, 600);
+    } catch (err) {
+      console.log('Password change API error:', err);
+      toast.error('Something went wrong');
+    }
   };
 
+
   return (
-    <>
-      <Form<PasswordFormTypes>
-        validationSchema={passwordFormSchema}
-        resetValues={reset}
-        onSubmit={onSubmit}
-        className="@container"
-        useFormProps={{
-          mode: 'onChange',
-          defaultValues: {
-            ...settings,
-          },
-        }}
-      >
-        {({ register, control, formState: { errors }, getValues }) => {
-          return (
-            <>
-              <ProfileHeader
-                title="Olivia Rhye"
-                description="olivia@example.com"
-              />
+    <Form
+      validationSchema={passwordFormSchema}
+      resetValues={reset}
+      onSubmit={() => {}}
+      useFormProps={{
+        mode: 'onChange',
+        defaultValues: {
+          newPassword: '',
+          confirmedPassword: '',
+          ...settings,
+        },
+      }}
+    >
+      {({ control, formState: { errors }, getValues, trigger }) => {
+        const handleClick = async () => {
+          const isValid = await trigger([
+            'newPassword',
+            'confirmedPassword',
+          ]);
+          if (!isValid) return;
 
-              <div className="mx-auto w-full max-w-screen-2xl">
-                <HorizontalFormBlockWrapper
-                  title="Current Password"
-                  titleClassName="text-base font-medium"
+          try {
+            setLoading(true);
+            await changePassword(getValues().newPassword);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        return (
+          <>
+            {/* <ProfileHeader
+              title={user?.username || 'USER NAME'}
+              description="---"
+            /> */}
+
+            <div className="mx-auto w-full max-w-screen-2xl">
+              {/* NEW PASSWORD */}
+              <HorizontalFormBlockWrapper
+                title="New Password"
+                titleClassName="text-base font-medium"
+              >
+                <Controller
+                  control={control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <Password
+                      placeholder="Enter new password"
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      error={errors.newPassword?.message}
+                    />
+                  )}
+                />
+              </HorizontalFormBlockWrapper>
+
+              {/* CONFIRM PASSWORD */}
+              <HorizontalFormBlockWrapper
+                title="Confirm New Password"
+                titleClassName="text-base font-medium"
+              >
+                <Controller
+                  control={control}
+                  name="confirmedPassword"
+                  render={({ field }) => (
+                    <Password
+                      placeholder="Confirm password"
+                      value={field.value ?? ''}
+                      onChange={field.onChange}
+                      error={errors.confirmedPassword?.message}
+                    />
+                  )}
+                />
+              </HorizontalFormBlockWrapper>
+
+              <div className="mt-6 flex justify-end">
+                <Button
+                  // className="bg-swa hover:bg-swa1"
+                  onClick={handleClick}
+                  // isLoading={isLoading}
+                  // disabled={!user}
                 >
-                  <Password
-                    {...register('currentPassword')}
-                    placeholder="Enter your password"
-                    error={errors.currentPassword?.message}
-                  />
-                </HorizontalFormBlockWrapper>
-
-                <HorizontalFormBlockWrapper
-                  title="New Password"
-                  titleClassName="text-base font-medium"
-                >
-                  <Controller
-                    control={control}
-                    name="newPassword"
-                    render={({ field: { onChange, value } }) => (
-                      <Password
-                        placeholder="Enter your password"
-                        helperText={
-                          getValues().newPassword.length < 8 &&
-                          'Your current password must be more than 8 characters'
-                        }
-                        onChange={onChange}
-                        error={errors.newPassword?.message}
-                      />
-                    )}
-                  />
-                </HorizontalFormBlockWrapper>
-
-                <HorizontalFormBlockWrapper
-                  title="Confirm New Password"
-                  titleClassName="text-base font-medium"
-                >
-                  <Controller
-                    control={control}
-                    name="confirmedPassword"
-                    render={({ field: { onChange, value } }) => (
-                      <Password
-                        placeholder="Enter your password"
-                        onChange={onChange}
-                        error={errors.confirmedPassword?.message}
-                      />
-                    )}
-                  />
-                </HorizontalFormBlockWrapper>
-
-                <div className="mt-6 flex w-auto items-center justify-end gap-3">
-                  <Button type="button" variant="outline">
-                    Cancel
-                  </Button>
-                  <Button type="submit" variant="solid" isLoading={isLoading}>
-                    Update Password
-                  </Button>
-                </div>
+                  Update Password
+                </Button>
               </div>
-            </>
-          );
-        }}
-      </Form>
-      {/* <LoggedDevices className="mt-10" /> */}
-    </>
+            </div>
+          </>
+        );
+      }}
+    </Form>
   );
 }
-
-// Logged devices
-// function LoggedDevices({ className }: { className?: string }) {
-//   return (
-//     <div className={cn('mx-auto w-full max-w-screen-2xl', className)}>
-//       <div className="border-b border-dashed border-muted">
-//         <Title as="h2" className="mb-3 text-xl font-bold text-gray-900">
-//           Where you’re logged in
-//         </Title>
-//         <Text className="mb-6 text-sm text-gray-500">
-//           We’ll alert you via olivia@untitledui.com if there is any unusual
-//           activity on your account.
-//         </Text>
-//       </div>
-//       <div className="flex items-center gap-6 border-b border-dashed border-muted py-6">
-//         <PiDesktop className="h-7 w-7 text-gray-500" />
-//         <div>
-//           <div className="mb-2 flex items-center gap-2">
-//             <Title
-//               as="h3"
-//               className="text-base font-medium text-gray-900 dark:text-gray-700"
-//             >
-//               2018 Macbook Pro 15-inch
-//             </Title>
-//             <Text
-//               as="span"
-//               className="relative hidden rounded-md border border-muted py-1.5 pe-2.5 ps-5 text-xs font-semibold text-gray-900 before:absolute before:start-2.5 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full before:bg-green sm:block"
-//             >
-//               Active Now
-//             </Text>
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <Text className="text-sm text-gray-500">Melbourne, Australia</Text>
-//             <span className="h-1 w-1 rounded-full bg-gray-600" />
-//             <Text className="text-sm text-gray-500">22 Jan at 4:20pm</Text>
-//           </div>
-//           <Text
-//             as="span"
-//             className="relative mt-2 inline-block rounded-md border border-muted py-1.5 pe-2.5 ps-5 text-xs font-semibold text-gray-900 before:absolute before:start-2.5 before:top-1/2 before:h-1.5 before:w-1.5 before:-translate-y-1/2 before:rounded-full before:bg-green sm:hidden"
-//           >
-//             Active Now
-//           </Text>
-//         </div>
-//       </div>
-//       <div className="flex items-center gap-6 py-6">
-//         <PiDesktop className="h-7 w-7 text-gray-500" />
-//         <div>
-//           <Title
-//             as="h3"
-//             className="mb-2 text-base font-medium text-gray-900 dark:text-gray-700"
-//           >
-//             2020 Macbook Air M1
-//           </Title>
-//           <div className="flex items-center gap-2">
-//             <Text className="text-sm text-gray-500">Melbourne, Australia</Text>
-//             <span className="h-1 w-1 rounded-full bg-gray-600" />
-//             <Text className="text-sm text-gray-500">22 Jan at 4:20pm</Text>
-//           </div>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }

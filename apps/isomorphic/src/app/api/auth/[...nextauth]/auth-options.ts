@@ -1,142 +1,109 @@
-import { type NextAuthOptions } from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import GoogleProvider from 'next-auth/providers/google';
-import { env } from '@/env.mjs';
-import isEqual from 'lodash/isEqual';
-import { pagesOptions } from './pages-options';
-
-export interface User {
-  id: string;
-  name: string;
-  role: string;
-  access_token: string;
-  refresh_token: string;
-}
-
-interface AuthUser {
-  id: string;
-  username: string;
-  role: string;
-}
-
-interface AuthResponse {
-  status: 'success' | 'error';
-  data: { access: string; refresh: string; user: AuthUser };
-}
+import { type NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import GoogleProvider from "next-auth/providers/google";
+import { env } from "@/env.mjs";
+import { pagesOptions } from "./pages-options";
 
 export const authOptions: NextAuthOptions = {
-  // debug: true,
   pages: {
     ...pagesOptions,
   },
+
   session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    strategy: "jwt",
+    maxAge: 30 * 24 * 60 * 60,
   },
+
   callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = (user as any).id;
+        token.username = (user as any).username;
+        token.accessToken = (user as any).accessToken;
+        token.refreshToken = (user as any).refreshToken;
+      }
+      return token;
+    },
+
     async session({ session, token }) {
       return {
         ...session,
         user: {
-          ...session.user,
+          ...(session.user ?? {}),
           id: token.id as string,
-          role: token.role as string,
-          accessToken: token.accessToken as string, // Expose access token
-          refreshToken: token.refreshToken as string, // Expose refresh token
+          name: token.username as string,
         },
-      };
+        accessToken: token.accessToken as string,
+        refreshToken: token.refreshToken as string,
+      } as any;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.id = (user as User).id;
-        token.role = (user as User).role;
-        token.accessToken = (user as User).access_token; // Store access token
-        token.refreshToken = (user as User).refresh_token; // Store refresh token
-      }
-      return token;
-    },
-    async redirect({ url, baseUrl }) {
-      // const parsedUrl = new URL(url, baseUrl);
-      // if (parsedUrl.searchParams.has('callbackUrl')) {
-      //   return `${baseUrl}${parsedUrl.searchParams.get('callbackUrl')}`;
-      // }
-      // if (parsedUrl.origin === baseUrl) {
-      //   return url;
-      // }
+
+    async redirect({ baseUrl }) {
       return baseUrl;
     },
   },
+
   providers: [
     CredentialsProvider({
-      id: 'credentials',
-      name: 'Credentials',
+      id: "credentials",
+      name: "Credentials",
+
       credentials: {
-        username: {
-          label: 'Username',
-          type: 'text',
-          placeholder: 'Enter your username',
-        },
-        password: { label: 'Password', type: 'password' },
+        username: { label: "username", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      async authorize(credentials): Promise<User | null> {
+
+      async authorize(credentials) {
         try {
-          let url = `${process.env.NEXT_PUBLIC_API_URL}/authentication/login/`;
+          if (!credentials?.username || !credentials?.password) return null;
 
-          const requestBody = JSON.stringify({
-            username: credentials?.username,
-            password: credentials?.password,
-          });
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/v1/login/`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                username: credentials.username,
+                password: credentials.password,
+              }),
+            }
+          );
 
-          const res = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: requestBody,
-          });
+          const text = await res.text();
+          console.log("backend status:", res.status);
+          console.log("backend response:", text);
 
-          // if (!res.ok) {
-          //   throw new Error('Invalid credentials');
-          // }
+          if (!res.ok) return null;
 
-          const responseData = (await res.json()) as AuthResponse;
-          if (responseData.status === 'success') {
-            console.log('Login API response:', responseData);
-            const authResponse = responseData.data;
+          const json = JSON.parse(text) as any;
 
-          if (!res.ok) {
-          throw new Error('Credentials');
-          }
+          const accessToken = json?.data?.access;
+          const refreshToken = json?.data?.refresh;
 
+          const userId = json?.data?.user?.id;
+          const username = json?.data?.user?.username ?? credentials.username;
 
-          if (authResponse.user.role === 'SHOP') {
-            throw new Error('ShopAccessDenied');
-          }
-            
-            return {
-              id: authResponse.user.id,
-              name: authResponse.user.username,
-              role: authResponse.user.role,
-              access_token: authResponse.access,
-              refresh_token: authResponse.refresh,
-            };
-          } else {
-            console.error('Authentication failed:', responseData);
-            return null;
-          }
-        // } catch (error) {
-        //   console.error('Login error:', error);
-        //   return null;
-        // }
-        } catch (error: any) {
-          console.error('Login error:', error);
-          throw new Error(error?.message || 'Credentials');
+          if (!accessToken || !userId) return null;
+
+          return {
+            id: String(userId),
+            username: String(username),
+            accessToken,
+            refreshToken,
+          } as any;
+        } catch (err) {
+          console.log("authorize error:", err);
+          return null;
         }
-
       },
     }),
-    // GoogleProvider({
-    //   clientId: env.GOOGLE_CLIENT_ID || '',
-    //   clientSecret: env.GOOGLE_CLIENT_SECRET || '',
-    //   allowDangerousEmailAccountLinking: true,
-    // }),
+
+    GoogleProvider({
+      clientId: env.GOOGLE_CLIENT_ID || "",
+      clientSecret: env.GOOGLE_CLIENT_SECRET || "",
+      allowDangerousEmailAccountLinking: true,
+    }),
   ],
 };

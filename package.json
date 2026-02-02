@@ -31,8 +31,7 @@
     "intl:build": "turbo build --filter=intl",
     "intl:start": "turbo start --filter=intl",
     "intl:clean": "turbo clean --filter=intl",
-    "gen-icons": "turbo gen-icons --filter=core",
-    "prepare": "husky"
+    "gen-icons": "turbo gen-icons --filter=core"
   },
   "devDependencies": {
     "eslint": "9.17.0",

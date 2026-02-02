@@ -330,6 +330,7 @@ export default function AddStockPopup() {
                   <label className={labelClass}>Quantity</label>
                   <input
                     type="number"
+                    min="0"
                     {...register('quantity')}
                     className={`${inputClass} ${errors.quantity ? errorInputClass : ''}`}
                     placeholder="Enter Quantity (example : 1 )"

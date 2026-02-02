@@ -78,33 +78,6 @@ export default function Filters<TData extends Record<string, any>>({
       </FilterDrawerView>
 
       <Flex align="center" gap="3" className="w-auto">
-        {/* {isMultipleSelected ? (
-          <Button
-            color="danger"
-            variant="outline"
-            className="h-[34px] gap-2 text-sm"
-            onClick={() =>
-              meta?.handleMultipleDelete &&
-              meta.handleMultipleDelete(
-                table.getSelectedRowModel().rows.map((r) => r.original.id)
-              )
-            }
-          >
-            <PiTrash size={18} />
-            Delete
-          </Button>
-        ) : null} */}
-
-        <Button
-          variant={'outline'}
-          onClick={() => setOpenDrawer(!openDrawer)}
-          className="h-9 pe-3 ps-2.5"
-        >
-          <PiFunnel className="me-1.5 size-[18px]" strokeWidth={1.7} />
-          Filters
-        </Button>
-
-        <ToggleColumns table={table} />
       </Flex>
     </Flex>
   );

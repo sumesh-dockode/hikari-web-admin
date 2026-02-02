@@ -73,7 +73,7 @@ export const menuItems = [
   },
   {
     name: 'Stocks',
-    href: routes.eCommerce.product2,
+    href: routes.eCommerce.stocks,
     logo: PiCodesandboxLogoDuotone,
   },
 ];

@@ -94,7 +94,7 @@ export const productsListColumns = [
             size="sm"
             variant="outline"
             aria-label="Download Product"
-            onClick={() => meta?.handleDownloadRow?.(row.original)}
+            onClick={() => (meta as any)?.handleDownloadRow?.(row.original)}
           >
             <PiDownloadSimpleBold className="h-4 w-4" />
           </ActionIcon>

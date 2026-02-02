@@ -7,8 +7,8 @@ export type ProductType = {
   image?: string | null;
   sku?: string;
   stock?: number;
-  price: string;
-  status: string;
+  price?: string;
+  status?: string;
   barcode?:string;
   rating?: number[];
   grossweight?:number;

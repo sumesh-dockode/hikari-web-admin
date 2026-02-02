@@ -71,7 +71,7 @@ export default function EditProductModal({
       name: '',
       label: '',
       description: '',
-      price: '',
+      price: 0,
       productSku: '',
       variantSku: '',
       specifications: [],

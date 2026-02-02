@@ -50,7 +50,7 @@ export default function OtherPagesLayout({
       </div>
       {children}
       <div className="text-center text-sm mt-4">
-        <p>© 2025 Mingler. All rights reserved.</p>
+        <p>© 2025 Hikari. All rights reserved.</p>
       </div>
     </div>
   );

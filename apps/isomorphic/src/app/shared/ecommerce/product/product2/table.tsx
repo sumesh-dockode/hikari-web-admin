@@ -116,7 +116,7 @@ const downloadRowItem = async (row: ProductType) => {
             toast('Delete failed');
           }
         },
-      },
+      } as any,
     },
   });
 

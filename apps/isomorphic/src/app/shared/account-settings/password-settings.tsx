@@ -12,7 +12,6 @@ import {
 } from '@/validators/password-settings.schema';
 import toast from 'react-hot-toast';
 
-/* ---------------- TYPES ---------------- */
 
 type BackendUserType = {
   id: string;
@@ -20,7 +19,6 @@ type BackendUserType = {
   companies: string[];
 };
 
-/* ---------------- COMPONENT ---------------- */
 
 export default function PasswordSettingsView({
   settings,
@@ -152,13 +150,9 @@ export default function PasswordSettingsView({
 
         return (
           <>
-            {/* <ProfileHeader
-              title={user?.username || 'USER NAME'}
-              description="---"
-            /> */}
+          
 
             <div className="mx-auto w-full max-w-screen-2xl">
-              {/* NEW PASSWORD */}
               <HorizontalFormBlockWrapper
                 title="New Password"
                 titleClassName="text-base font-medium"
@@ -177,7 +171,6 @@ export default function PasswordSettingsView({
                 />
               </HorizontalFormBlockWrapper>
 
-              {/* CONFIRM PASSWORD */}
               <HorizontalFormBlockWrapper
                 title="Confirm New Password"
                 titleClassName="text-base font-medium"
@@ -198,10 +191,7 @@ export default function PasswordSettingsView({
 
               <div className="mt-6 flex justify-end">
                 <Button
-                  // className="bg-swa hover:bg-swa1"
                   onClick={handleClick}
-                  // isLoading={isLoading}
-                  // disabled={!user}
                 >
                   Update Password
                 </Button>

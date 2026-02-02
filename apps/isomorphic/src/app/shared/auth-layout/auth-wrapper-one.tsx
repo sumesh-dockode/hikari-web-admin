@@ -3,7 +3,7 @@
 import logoImg from '@public/HIKARI-SKIN-Logo.png';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Button, Title } from 'rizzui';
+import { Button, Title, Text } from 'rizzui';
 import cn from '@core/utils/class-names';
 import { PiArrowLeftBold } from 'react-icons/pi';
 import { FcGoogle } from 'react-icons/fc';
@@ -16,60 +16,91 @@ export default function AuthWrapperThree({
   isSocialLoginActive = false,
   isSignIn = false,
   className = '',
+  bannerTitle,
+  bannerDescription,
+  pageImage,
+  description,
 }: {
   children: React.ReactNode;
   title: React.ReactNode;
   isSocialLoginActive?: boolean;
   isSignIn?: boolean;
   className?: string;
+  bannerTitle?: string;
+  bannerDescription?: string;
+  pageImage?: React.ReactNode;
+  description?: string;
 }) {
   return (
     <>
-      <div className="relative flex min-h-screen w-full flex-col justify-center bg-gradient-to-tr from-[#ca1c73] to-[#a0083b] p-4 md:p-12 lg:p-28">
-        {/* <Link
-          href={'/'}
-          className="mb:pb-3 start-4 z-10 flex items-center justify-center pb-6 pt-3 text-sm font-medium text-white/80 hover:text-white md:absolute md:top-1/2 md:-translate-y-1/2 md:rounded-full"
-        >
-          <PiArrowLeftBold />
-          <span className="-mt-px ms-1 font-lexend">Back tto home</span>
-        </Link> */}
-        <div
-          className={cn(
-            'mx-auto w-full max-w-md rounded-xl bg-white px-4 py-9 dark:bg-gray-50 sm:px-6 md:max-w-xl md:px-10 md:py-12 lg:max-w-[700px] lg:px-16 xl:rounded-2xl 3xl:rounded-3xl',
-            className
-          )}
-        >
-          <div className="flex flex-col items-center">
-            <Link href={'/'} className="mb-7 inline-block max-w-[104px] lg:mb-9">
-              <Image src={logoImg} alt="Hikari" className="dark:invert "  />
-            </Link>
-            <Title
-              as="h2"
-              className="mb-7 text-center text-[26px] leading-snug md:text-3xl md:!leading-normal lg:mb-10 lg:text-4xl lg:leading-normal"
-            >
-              {title}
-            </Title>
+      <div className="min-h-screen justify-between gap-x-8 px-4 py-8 pt-10 md:pt-12 lg:flex lg:p-6 xl:gap-x-10 xl:p-7 2xl:p-10 2xl:pt-10 [&>div]:min-h-[calc(100vh-80px)]">
+        <div className="relative flex w-full items-center justify-center lg:w-5/12 2xl:justify-end 2xl:pe-24">
+          <div className="w-full max-w-sm md:max-w-md lg:py-7 lg:ps-3 lg:pt-16 2xl:w-[630px] 2xl:max-w-none 2xl:ps-20 2xl:pt-7">
+            <div className="mb-7 px-6 pt-3 text-center md:pt-0 lg:px-0 lg:text-start xl:mb-8 2xl:mb-10">
+              <Link
+                href={'/'}
+                className="mb-6 inline-flex max-w-[168px] xl:mb-8"
+              >
+                <Image src={logoImg} alt="Isomorphic" />
+              </Link>
+              <Title
+                as="h2"
+                className="mb-5 text-[26px] leading-snug md:text-3xl md:!leading-normal lg:mb-7 lg:pe-16 lg:text-[28px] xl:text-3xl 2xl:pe-8 2xl:text-4xl"
+              >
+                {title}
+              </Title>
+              <Text className="leading-[1.85] text-gray-700 md:leading-loose lg:pe-8 2xl:pe-14">
+                {description}
+              </Text>
+            </div>
+            {/* {isSocialLoginActive && (
+              <>
+                <div className="grid grid-cols-1 gap-4 pb-5 md:grid-cols-2 md:pb-6 xl:gap-5 xl:pb-7">
+                  <Button
+                    onClick={() =>
+                      // it should be signIn('apple')
+                      handleSignIn()
+                    }
+                    variant="outline"
+                    className="h-11 w-full"
+                  >
+                    <PiAppleLogoFill className="me-2 h-4 w-4 shrink-0" />
+                    <span className="truncate">Signin With Apple</span>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() =>
+                      // it should be signIn('google')
+                      handleSignIn()
+                    }
+                    className="h-11 w-full"
+                  >
+                    <FcGoogle className="me-2 h-4 w-4 shrink-0" />
+                    <span className="truncate">Signin With Google</span>
+                  </Button>
+                </div>
+                <OrSeparation title="OR" className="mb-5 2xl:mb-7" isCenter />
+              </>
+            )} */}
+
+            {children}
           </div>
-          {/* {isSocialLoginActive && (
-            <>
-              <div className="flex flex-col gap-4 pb-6 md:flex-row md:gap-6 md:pb-7">
-                <Button className="h-11 w-full" variant="outline">
-                  <BsFacebook className="me-2 h-5 w-5 shrink-0 text-primary" />
-                  <span className="truncate">Signin With Facebook</span>
-                </Button>
-                <Button variant="outline" className="h-11 w-full">
-                  <FcGoogle className="me-2 h-5 w-5 shrink-0" />
-                  <span className="truncate">Signin With Google</span>
-                </Button>
-              </div>
-              <OrSeparation
-                title={`Or, Sign ${isSignIn ? 'in' : 'up'} with your email`}
-                isCenter
-                className="mb-4"
-              />
-            </>
-          )} */}
-          {children}
+        </div>
+        <div className="hidden w-7/12 items-center justify-center rounded-[20px] bg-gray-50 px-6 dark:bg-gray-100/40 lg:flex xl:justify-start 2xl:px-16">
+          <div className="pb-8 pt-10 text-center xl:pt-16 2xl:block 2xl:w-[1063px]">
+            <div className="mx-auto mb-10 max-w-sm pt-2 2xl:max-w-lg">
+              <Title
+                as="h2"
+                className="mb-5 font-semibold !leading-normal lg:text-[26px] 2xl:px-10 2xl:text-[32px]"
+              >
+                {bannerTitle}
+              </Title>
+              <Text className="leading-[1.85] text-gray-700 md:leading-loose 2xl:px-6">
+                {bannerDescription}
+              </Text>
+            </div>
+            {pageImage}
+          </div>
         </div>
       </div>
     </>

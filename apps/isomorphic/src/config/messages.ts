@@ -91,7 +91,7 @@ export const messages = {
   productSkuIsRequired: 'Product Sku is required',
   nextDayDeliveryRequired: 'Next Day Delivery is required',
   userNameRequired: 'User Name is required',
-  storeManagerIsRequired: 'Store Manager is required',
+  storeManagerIsRequired: 'Store OMS is required',
   variantIncentiveType: 'Incentive Type is required',
   variantIncentiveValue: 'Incentive Value is required',
 };

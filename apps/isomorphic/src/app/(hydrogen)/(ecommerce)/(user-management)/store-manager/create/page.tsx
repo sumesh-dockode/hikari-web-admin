@@ -6,11 +6,11 @@ import { routes } from '@/config/routes';
 import CreateStoreManager from '@/app/shared/ecommerce/store-manager/create-store-manager';
 
 export const metadata = {
-  ...metaObject('Create Store Manager'),
+  ...metaObject('Create Store OMS'),
 };
 
 const pageHeader = {
-  title: 'Create Store Manager',
+  title: 'Create Store OMS',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -18,7 +18,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.storeManager,
-      name: 'Store Manager',
+      name: 'Store OMS',
     },
     {
       name: 'Create',

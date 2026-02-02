@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const pageHeader = {
-  title: 'Edit Store Manager',
+  title: 'Edit Store OMS',
   breadcrumb: [
     {
       href: routes.eCommerce.dashboard,
@@ -26,7 +26,7 @@ const pageHeader = {
     },
     {
       href: routes.eCommerce.storeManager,
-      name: 'Store Manager',
+      name: 'Store OMS',
     },
     {
       name: 'Edit',

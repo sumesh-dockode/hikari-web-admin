@@ -231,7 +231,7 @@ export default function CreateSalesMan({
                 />
               </FormGroup>
               <FormGroup
-                title="Store Manager"
+                title="Store OMS"
                 className="pt-7 @2xl:pt-9 @3xl:grid-cols-12 @3xl:pt-11"
               >
                 <StoreManagerSelectionField

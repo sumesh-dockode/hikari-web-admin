@@ -20,7 +20,7 @@ const StoreManagerSelectionField = ({
   value,
   onChange,
   error,
-  placeholder = "Select Store Manager",
+  placeholder = "Select Store OMS",
 }: StoreManagerSelectionFieldProps) => {
   const [searchText, setSearchText] = useState('');
   const { data: storeManagerData } = usePaginatedStoreManager({
@@ -28,7 +28,7 @@ const StoreManagerSelectionField = ({
   });
   
   // Log the API response to debug
-  console.log('Store Manager API Response:', storeManagerData);
+  console.log('Store OMS API Response:', storeManagerData);
   
   const storeManagerOptions =
     storeManagerData?.data.map((storeManager: StoreManagerDataType) => ({

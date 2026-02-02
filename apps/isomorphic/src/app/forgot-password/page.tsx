@@ -17,18 +17,18 @@ export default function SignIn() {
         </>
       }
       // bannerTitle="The simplest way to manage your workspace."
-      pageImage={
-        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[498px] 2xl:w-[498px]">
-          <Image
-            src={minglerhome1}
-            alt="Sign Up Thumbnail"
-            // fill
-            priority
-            sizes="(max-width: 768px) 100vw"
-            // className="object-cover"
-          />
-        </div>
-      }
+      // pageImage={
+      //   <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[498px] 2xl:w-[498px]">
+      //     <Image
+      //       src={minglerhome1}
+      //       alt="Sign Up Thumbnail"
+      //       // fill
+      //       priority
+      //       sizes="(max-width: 768px) 100vw"
+      //       // className="object-cover"
+      //     />
+      //   </div>
+      // }
     >
       <ForgetPasswordForm />
     </AuthWrapperOne>

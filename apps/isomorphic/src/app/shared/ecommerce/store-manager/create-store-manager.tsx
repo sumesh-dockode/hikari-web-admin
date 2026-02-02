@@ -278,7 +278,7 @@ export default function CreateStoreManager({
               isLoading={isLoading}
               className="w-full @xl:w-auto"
             >
-              {id ? 'Update' : 'Create'} Store Manager
+              {id ? 'Update' : 'Create'} Store OMS
             </Button>
           </div>
         </>

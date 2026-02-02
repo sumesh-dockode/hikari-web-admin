@@ -21,10 +21,10 @@ export function BoronSidebarMenu() {
   return (
     <div className="mt-4 pb-3 2xl:pt-1.5 3xl:mt-6">
       {menuItems.map((item, index) => {
-        const Icon = item.icon;
+        const Icon = (item as any).logo;
         const isActive = pathname === (item?.href as string);
-        const pathnameExistInDropdowns: any = item?.dropdownItems?.filter(
-          (dropdownItem) => dropdownItem.href === pathname
+        const pathnameExistInDropdowns: any = (item as any)?.dropdownItems?.filter(
+          (dropdownItem: any) => dropdownItem.href === pathname
         );
         const isDropdownOpen = Boolean(pathnameExistInDropdowns?.length);
 
@@ -32,7 +32,7 @@ export function BoronSidebarMenu() {
           <Fragment key={item.name + '-' + index}>
             {item?.href ? (
               <>
-                {item?.dropdownItems ? (
+                {(item as any)?.dropdownItems ? (
                   <Collapse
                     defaultOpen={isDropdownOpen}
                     header={({ open, toggle }) => (
@@ -43,7 +43,7 @@ export function BoronSidebarMenu() {
                           isDropdownOpen
                             ? colorPresetName === 'black' && theme === 'dark'
                               ? 'bg-gray-900 text-gray-0'
-                              : 'bg-primary text-gray-0'
+                              : 'bg-secondary1 text-gray-0'
                             : 'text-gray-700 transition-colors duration-200 hover:bg-gray-100 dark:text-gray-700/90 dark:hover:text-gray-700'
                         )}
                       >
@@ -78,7 +78,7 @@ export function BoronSidebarMenu() {
                       </div>
                     )}
                   >
-                    {item?.dropdownItems?.map((dropdownItem, index) => {
+                    {(item as any)?.dropdownItems?.map((dropdownItem: any, index: number) => {
                       const isChildActive =
                         pathname === (dropdownItem?.href as string);
 
@@ -89,7 +89,7 @@ export function BoronSidebarMenu() {
                           className={cn(
                             'mx-3.5 mb-0.5 flex items-center justify-between rounded-md px-3.5 py-2 font-medium capitalize last-of-type:mb-1 lg:last-of-type:mb-2 2xl:mx-5',
                             isChildActive
-                              ? 'text-primary'
+                              ? 'text-secondary1'
                               : 'text-gray-500 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900'
                           )}
                         >
@@ -98,7 +98,7 @@ export function BoronSidebarMenu() {
                               className={cn(
                                 'me-[18px] ms-1 inline-flex h-1 w-1 rounded-full bg-current transition-all duration-200',
                                 isChildActive
-                                  ? 'bg-primary ring-[1px] ring-primary'
+                                  ? 'bg-secondary1  ring-[1px] ring-secondary1'
                                   : 'opacity-40'
                               )}
                             />{' '}
@@ -116,7 +116,7 @@ export function BoronSidebarMenu() {
                     className={cn(
                       'group relative mx-3 my-0.5 flex items-center justify-between rounded-md px-3 py-2 font-medium capitalize lg:my-1 2xl:mx-5 2xl:my-2',
                       isActive
-                        ? 'bg-primary text-gray-0'
+                        ? 'bg-secondary1 text-white'
                         : 'text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-700/90'
                     )}
                   >

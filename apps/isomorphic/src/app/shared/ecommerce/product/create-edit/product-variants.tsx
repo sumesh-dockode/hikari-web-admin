@@ -928,7 +928,7 @@ export default function ProductVariants({
                           storeName: storeInfo.name,
                         });
                       } else {
-                        toast.error('This store manager does not have an associated store');
+                        toast.error('This store OMS does not have an associated store');
                         setSelectedShop(undefined);
                       }
                     }}
@@ -958,12 +958,12 @@ export default function ProductVariants({
 
                     // Validate inputs
                     if (!selectedShop) {
-                      toast.error('Please select a store manager');
+                      toast.error('Please select a store OMS');
                       return;
                     }
 
                     if (!selectedShop.storeId) {
-                      toast.error('The selected store manager does not have a valid store. Please select another store manager.');
+                      toast.error('The selected store OMS does not have a valid store. Please select another store OMS.');
                       return;
                     }
 

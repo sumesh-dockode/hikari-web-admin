@@ -3,77 +3,90 @@
 import { useEffect, useRef } from 'react';
 
 export function useScrollableSlider() {
-  const sliderEl = useRef<HTMLDivElement>(null!);
-  const sliderPrevBtn = useRef<HTMLButtonElement>(null!);
-  const sliderNextBtn = useRef<HTMLButtonElement>(null!);
+  const sliderEl = useRef<HTMLDivElement | null>(null);
+  const sliderPrevBtn = useRef<HTMLButtonElement | null>(null);
+  const sliderNextBtn = useRef<HTMLButtonElement | null>(null);
 
-  function scrollToTheRight() {
-    let offsetWidth = sliderEl.current.offsetWidth;
-    sliderEl.current.scrollLeft += offsetWidth / 2;
-    sliderPrevBtn.current.classList.remove('opacity-0', 'invisible');
-  }
+  const scrollToTheRight = () => {
+    const slider = sliderEl.current;
+    const prevBtn = sliderPrevBtn.current;
 
-  function scrollToTheLeft() {
-    let offsetWidth = sliderEl.current.offsetWidth;
-    sliderEl.current.scrollLeft -= offsetWidth / 2;
-    sliderNextBtn.current.classList.remove('opacity-0', 'invisible');
-  }
+    if (!slider || !prevBtn) return;
+
+    const offsetWidth = slider.offsetWidth;
+    slider.scrollLeft += offsetWidth / 2;
+    prevBtn.classList.remove('opacity-0', 'invisible');
+  };
+
+  const scrollToTheLeft = () => {
+    const slider = sliderEl.current;
+    const nextBtn = sliderNextBtn.current;
+
+    if (!slider || !nextBtn) return;
+
+    const offsetWidth = slider.offsetWidth;
+    slider.scrollLeft -= offsetWidth / 2;
+    nextBtn.classList.remove('opacity-0', 'invisible');
+  };
 
   useEffect(() => {
-    const filterBarEl = sliderEl.current;
+    if (typeof window === 'undefined') return;
+
+    const slider = sliderEl.current;
     const prevBtn = sliderPrevBtn.current;
     const nextBtn = sliderNextBtn.current;
-    const formPageHeaderEl = filterBarEl.classList.contains(
-      'formPageHeaderSliderElJS'
-    );
+
+    if (!slider || !prevBtn || !nextBtn) return;
+
+    const isFormPageHeader =
+      slider.classList.contains('formPageHeaderSliderElJS');
+
+    const initNextPrevBtnVisibility = () => {
+      const { offsetWidth, scrollWidth } = slider;
+
+      if (scrollWidth > offsetWidth) {
+        nextBtn.classList.remove('opacity-0', 'invisible');
+        if (isFormPageHeader) {
+          slider.classList.add('!-mb-[43px]');
+        }
+      } else {
+        nextBtn.classList.add('opacity-0', 'invisible');
+        if (isFormPageHeader) {
+          slider.classList.remove('!-mb-[43px]');
+        }
+      }
+
+      prevBtn.classList.add('opacity-0', 'invisible');
+    };
+
+    const visibleNextAndPrevBtnOnScroll = () => {
+      const { scrollLeft, offsetWidth, scrollWidth } = slider;
+
+      // Right end
+      if (scrollWidth - scrollLeft === offsetWidth) {
+        nextBtn.classList.add('opacity-0', 'invisible');
+        prevBtn.classList.remove('opacity-0', 'invisible');
+      } else {
+        nextBtn.classList.remove('opacity-0', 'invisible');
+      }
+
+      // Left end
+      if (scrollLeft === 0) {
+        prevBtn.classList.add('opacity-0', 'invisible');
+        nextBtn.classList.remove('opacity-0', 'invisible');
+      } else {
+        prevBtn.classList.remove('opacity-0', 'invisible');
+      }
+    };
+
     initNextPrevBtnVisibility();
 
-    // @ts-ignore
-    function initNextPrevBtnVisibility() {
-      let offsetWidth = filterBarEl.offsetWidth;
-      let scrollWidth = filterBarEl.scrollWidth;
-      // show next btn when scrollWidth is gather than offsetWidth
-      if (scrollWidth > offsetWidth) {
-        nextBtn?.classList.remove('opacity-0', 'invisible');
-        if (formPageHeaderEl) {
-          filterBarEl?.classList.add('!-mb-[43px]');
-        }
-      } else {
-        nextBtn?.classList.add('opacity-0', 'invisible');
-        if (formPageHeaderEl) {
-          filterBarEl?.classList.remove('!-mb-[43px]');
-        }
-      }
-      // hide prev btn initially
-      prevBtn?.classList.add('opacity-0', 'invisible');
-    }
-
-    function visibleNextAndPrevBtnOnScroll() {
-      let newScrollLeft = filterBarEl?.scrollLeft,
-        offsetWidth = filterBarEl?.offsetWidth,
-        scrollWidth = filterBarEl?.scrollWidth;
-      // reach to the right end
-      if (scrollWidth - newScrollLeft == offsetWidth) {
-        nextBtn?.classList.add('opacity-0', 'invisible');
-        prevBtn?.classList.remove('opacity-0', 'invisible');
-      } else {
-        nextBtn?.classList.remove('opacity-0', 'invisible');
-      }
-      // reach to the left end
-      if (newScrollLeft === 0) {
-        prevBtn?.classList.add('opacity-0', 'invisible');
-        nextBtn?.classList.remove('opacity-0', 'invisible');
-      } else {
-        prevBtn?.classList.remove('opacity-0', 'invisible');
-      }
-    }
-
     window.addEventListener('resize', initNextPrevBtnVisibility);
-    filterBarEl.addEventListener('scroll', visibleNextAndPrevBtnOnScroll);
-    // clear event
+    slider.addEventListener('scroll', visibleNextAndPrevBtnOnScroll);
+
     return () => {
       window.removeEventListener('resize', initNextPrevBtnVisibility);
-      filterBarEl.removeEventListener('scroll', visibleNextAndPrevBtnOnScroll);
+      slider.removeEventListener('scroll', visibleNextAndPrevBtnOnScroll);
     };
   }, []);
 

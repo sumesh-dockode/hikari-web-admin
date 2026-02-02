@@ -3,7 +3,7 @@
 import ReactQuill from "react-quill-new";
 import { FieldError } from "rizzui";
 import cn from "../utils/class-names";
-import "react-quill-new/dist/quill.snow.css";
+import "quill/dist/quill.snow.css";
 
 interface QuillEditorProps extends ReactQuill.ReactQuillProps {
   error?: string;

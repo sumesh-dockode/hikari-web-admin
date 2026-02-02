@@ -37,7 +37,7 @@ export default function SearchTrigger({
       >
         Search your page...
       </span>
-      <span className="search-command ms-auto hidden items-center text-sm text-gray-600 lg:rounded-md lg:bg-primary lg:px-1.5 lg:py-1 lg:text-xs lg:font-semibold lg:text-primary-foreground xl:flex xl:justify-normal">
+      <span className="search-command ms-auto hidden items-center text-sm text-gray-600 lg:rounded-md lg:bg-zinc-100 lg:px-1.5 lg:py-1 lg:text-xs lg:font-semibold lg:text-zinc-100-foreground xl:flex xl:justify-normal">
         <PiCommand strokeWidth={1.3} className="h-[15px] w-[15px]" />K
       </span>
     </button>

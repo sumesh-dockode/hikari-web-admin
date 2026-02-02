@@ -16,23 +16,23 @@ export default function OtpPage() {
           </span>
         </>
       }
-      bannerTitle="The simplest way to manage your workspace."
-      bannerDescription="Amet minim mollit non deserunt ullamco est sit aliqua dolor do
-    amet sint velit officia consequat duis."
-      pageImage={
-        <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[820px]">
-          <Image
-            src={
-              'https://isomorphic-furyroad.s3.amazonaws.com/public/auth/sign-up.webp'
-            }
-            alt="Sign Up Thumbnail"
-            fill
-            priority
-            sizes="(max-width: 768px) 100vw"
-            className="object-cover"
-          />
-        </div>
-      }
+      // bannerTitle="The simplest way to manage your workspace."
+      // bannerDescription="Amet minim mollit non deserunt ullamco est sit aliqua dolor do
+      // amet sint velit officia consequat duis."
+      // pageImage={
+      //   <div className="relative mx-auto aspect-[4/3.37] w-[500px] xl:w-[620px] 2xl:w-[820px]">
+      //     <Image
+      //       src={
+      //         'https://isomorphic-furyroad.s3.amazonaws.com/public/auth/sign-up.webp'
+      //       }
+      //       alt="Sign Up Thumbnail"
+      //       fill
+      //       priority
+      //       sizes="(max-width: 768px) 100vw"
+      //       className="object-cover"
+      //     />
+      //   </div>
+      // }
     >
       <Text className="-mt-1 mb-9 text-center text-[15px] leading-[1.85] text-gray-700 md:text-base md:!leading-loose lg:text-start xl:-mt-6">
         We have sent you One Time Password to your email.

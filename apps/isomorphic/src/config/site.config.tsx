@@ -25,13 +25,13 @@ export const metaObject = (
   description: string = siteConfig.description
 ): Metadata => {
   return {
-    title: title ? `${title} - Mingler` : siteConfig.title,
+    title: title ? `${title} - HIKARI` : siteConfig.title,
     description,
     openGraph: openGraph ?? {
-      title: title ? `${title} - Mingler` : title,
+      title: title ? `${title} - HIKARI` : title,
       description,
-      url: 'https://mingler-admin.vercel.app',
-      siteName: 'Mingler', // https://developers.google.com/search/docs/appearance/site-names
+      url: 'https://HIKARI-admin.vercel.app',
+      siteName: 'HIKARI', // https://developers.google.com/search/docs/appearance/site-names
       // images: {
       //   url: 'https://s3.amazonaws.com/redqteam.com/isomorphic-furyroad/itemdep/isobanner.png',
       //   width: 1200,

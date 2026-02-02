@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
@@ -24,10 +25,23 @@ export default function ProductsTable({
   },
   paginationClassName,
 }: any) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editRow, setEditRow] = useState<ProductType | null>(null);
   const [editLoading, setEditLoading] = useState(false);
+  const [pageCount, setPageCount] = useState(-1);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access');
+    const refreshToken = localStorage.getItem('refresh');
+    
+    if (!accessToken && !refreshToken) {
+      router.push('/signin');
+    }
+  }, [router]);
+
 const downloadRowItem = async (row: ProductType) => {
   try {
     const token = localStorage.getItem('access');
@@ -89,6 +103,8 @@ const downloadRowItem = async (row: ProductType) => {
       initialState: {
         pagination: { pageIndex: 0, pageSize },
       },
+      manualPagination: true,
+      pageCount: pageCount,
       meta: {
         handleEditRow: (row: ProductType) => {
           setEditRow(row);
@@ -127,8 +143,11 @@ const downloadRowItem = async (row: ProductType) => {
         const token = localStorage.getItem('access');
         if (!token) return;
 
+        const currentPage = table.getState().pagination.pageIndex + 1;
+        const currentPageSize = table.getState().pagination.pageSize;
+
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ecom/admin/stock-batches/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ecom/admin/stock-batches/?page=${currentPage}&page_size=${currentPageSize}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -136,7 +155,13 @@ const downloadRowItem = async (row: ProductType) => {
 
         const result = await res.json()as any;
 
-        const formatted: ProductType[] = result.data.map((item: any) => {
+        const rawData = Array.isArray(result?.data?.results) ? result.data.results : [];
+
+        if (result?.data?.total_pages) {
+          setPageCount(result.data.total_pages);
+        }
+
+        const formatted: ProductType[] = rawData.map((item: any) => {
           const product = item.product_variant.product;
           const variant = item.product_variant;
 
@@ -160,9 +185,14 @@ const downloadRowItem = async (row: ProductType) => {
     };
 
     fetchProducts();
-  }, [setData]);
+  }, [table.getState().pagination.pageIndex, table.getState().pagination.pageSize, setData, table]);
 
-  /* ================= RENDER ================= */
+  useEffect(() => {
+    if (pageCount >= 0) {
+      table.setPageCount(pageCount);
+    }
+  }, [pageCount, table]);
+
   return (
     <>
       {!hideFilters && <Filters table={table} />}

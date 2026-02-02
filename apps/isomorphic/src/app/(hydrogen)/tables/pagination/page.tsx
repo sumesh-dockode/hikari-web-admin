@@ -2,7 +2,7 @@ import { routes } from '@/config/routes';
 import { productsData } from '@/data/products-data';
 import TableLayout from '@/app/(hydrogen)/tables/table-layout';
 import { metaObject } from '@/config/site.config';
-import ProductsTable from '@/app/shared/ecommerce/product/product-list/table';
+import ProductsTable from '@/app/shared/ecommerce/product/product2/table';
 import WidgetCard from '@core/components/cards/widget-card';
 
 export const metadata = {

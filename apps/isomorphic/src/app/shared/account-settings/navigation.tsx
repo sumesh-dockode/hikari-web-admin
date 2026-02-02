@@ -10,14 +10,14 @@ import { useLayout } from '@/layouts/use-layout';
 import { LAYOUT_OPTIONS } from '@/config/enums';
 
 const menuItems = [
-  {
-    label: 'My Details',
-    value: '/forms/profile-settings',
-  },
-  {
-    label: 'Profile',
-    value: '/forms/profile-settings/profile',
-  },
+  // {
+  //   label: 'My Details',
+  //   value: '/forms/profile-settings',
+  // },
+  // {
+  //   label: 'Profile',
+  //   value: '/forms/profile-settings/profile',
+  // },
   {
     label: 'Password',
     value: '/forms/profile-settings/password',
@@ -72,7 +72,7 @@ export default function ProfileSettingsNav() {
         >
           <PiCaretLeftBold className="w-5" />
         </Button>
-        <div className="flex h-[52px] items-start overflow-hidden">
+        {/* <div className="flex h-[52px] items-start overflow-hidden">
           <div
             className="-mb-7 flex w-full gap-3 overflow-x-auto scroll-smooth pb-7 md:gap-5 lg:gap-8"
             ref={sliderEl}
@@ -97,7 +97,7 @@ export default function ProfileSettingsNav() {
               </Link>
             ))}
           </div>
-        </div>
+        </div> */}
         <Button
           title="Next"
           variant="text"

@@ -1,10 +1,12 @@
 import { metaObject } from '@/config/site.config';
-import PersonalInfoView from '@/app/shared/account-settings/personal-info';
+import PasswordSettingsView from '@/app/shared/account-settings/password-settings';
 
 export const metadata = {
   ...metaObject('Profile Settings'),
 };
 
 export default function ProfileSettingsFormPage() {
-  return <PersonalInfoView />;
+  //  return <PersonalInfoView />;
+   return<PasswordSettingsView/>
+
 }

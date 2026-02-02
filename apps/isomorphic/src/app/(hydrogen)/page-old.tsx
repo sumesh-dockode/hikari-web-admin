@@ -7,6 +7,6 @@ export const metadata = {
 };
 
 export default function FileDashboardPage() {
-  // return <>Hello</>;
-  return <EcommerceDashboard />;
+  return <>Hello</>;
+  // return <EcommerceDashboard />;
 }

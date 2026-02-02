@@ -3,7 +3,7 @@
 import Table from '@core/components/table';
 import { productsData, productsDataType } from '@/data/products-data';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
-import { productsListColumns } from '../../ecommerce/product/product-list/columns';
+import { productsListColumns } from '../../ecommerce/product/product2/columns';
 
 export default function ModernTable() {
   const { table, setData } = useTanStackTable<productsDataType>({

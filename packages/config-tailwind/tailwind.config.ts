@@ -14,10 +14,13 @@ const config: Omit<Config, "content"> = {
       xl: "1280px",
       "2xl": "1536px",
       "3xl": "1920px",
-      "4xl": "2560px", // only need to control product grid mode in ultra 4k device
+      "4xl": "2560px",
     },
     extend: {
       colors: {
+        secondary1: "rgb(var(--secondary1) / <alpha-value>)",
+        secondary2: "rgb(var(--secondary2) / <alpha-value>)",
+
         gray: {
           0: "rgb(var(--gray-0) / <alpha-value>)",
           50: "rgb(var(--gray-50) / <alpha-value>)",
@@ -43,6 +46,7 @@ const config: Omit<Config, "content"> = {
           foreground: "rgb(var(--primary-foreground) / <alpha-value>)",
         },
         secondary: {
+          secondary1: "rgb(var(--secondary1) / <alpha-value>)",
           lighter: "rgb(var(--secondary-lighter) / <alpha-value>)",
           DEFAULT: "rgb(var(--secondary-default) / <alpha-value>)",
           dark: "rgb(var(--secondary-dark) / <alpha-value>)",
@@ -73,7 +77,6 @@ const config: Omit<Config, "content"> = {
         inter: ["var(--font-inter)"],
         lexend: ["var(--font-lexend)"],
       },
-      // required these animations for the Loader component
       animation: {
         blink: "blink 1.4s infinite both;",
         "scale-up": "scaleUp 500ms infinite alternate",
@@ -107,7 +110,6 @@ const config: Omit<Config, "content"> = {
             transform: "translateX(-100%)",
           },
           "50%": {
-            /* +0.5s of delay between each loop */
             transform: "translateX(100%)",
           },
           "100%": {

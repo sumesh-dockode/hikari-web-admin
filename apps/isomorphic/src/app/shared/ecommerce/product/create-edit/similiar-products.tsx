@@ -5,7 +5,7 @@ import { Button } from 'rizzui/button';
 import { useState } from 'react';
 import { productsDataType } from '@/data/products-data';
 import { Modal } from '@core/modal-views/modal';
-import ProductsTable from '../product-list/table';
+import ProductsTable from '../product2/table';
 import { PiTrashDuotone } from 'react-icons/pi';
 import usePaginatedProducts from '@/hooks/products/usePaginatedProducts';
 import { useFormContext } from 'react-hook-form';
@@ -141,8 +141,8 @@ export default function SimilarProducts({
                 (id: any) => id !== productId
               )} // remove main product ID
               onSelectionChange={
-                (selected) =>
-                  setTempSelected(selected.filter((p) => p.id !== productId)) // filter out main product
+                (selected: productsDataType[]) =>
+                  setTempSelected(selected.filter((p: productsDataType) => p.id !== productId)) // filter out main product
               }
               classNames={{
                 container: 'border-0 shadow-none',

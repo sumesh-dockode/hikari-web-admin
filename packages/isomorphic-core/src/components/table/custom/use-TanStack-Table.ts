@@ -61,7 +61,15 @@ export function useTanStackTable<T extends Record<string, any>>({
   columnConfig: ColumnDef<T, any>[];
   pagination?: PaginationState;
 }) {
-  const [data, setData] = React.useState<T[]>([...(tableData ?? [])]);
+  const [data, setDataInternal] = React.useState<T[]>([...(tableData ?? [])]);
+  
+  // Wrapper to ensure proper type inference in callbacks
+  const setData = React.useCallback(
+    (updater: T[] | ((prev: T[]) => T[])) => {
+      setDataInternal(updater);
+    },
+    []
+  );
   const [columns] = React.useState(() => [...columnConfig]);
 
   const [globalFilter, setGlobalFilter] = React.useState("");

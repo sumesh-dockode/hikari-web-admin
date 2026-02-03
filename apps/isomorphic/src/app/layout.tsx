@@ -19,6 +19,9 @@ import Providers from './providers';
 export const metadata = {
   title: siteConfig.title,
   description: siteConfig.description,
+  icons: {
+    icon: '/HIKARI-SKIN-Logo.png',
+  },
 };
 
 export default async function RootLayout({

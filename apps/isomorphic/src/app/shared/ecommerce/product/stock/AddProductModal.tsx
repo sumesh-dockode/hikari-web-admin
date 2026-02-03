@@ -5,7 +5,7 @@ import toast from 'react-hot-toast';
 import { useForm, useFieldArray, SubmitHandler, Controller, useWatch, Control } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 
 const specificationSchema = z.object({
   name: z.string().min(1, 'Spec name is required'),
@@ -44,7 +44,7 @@ const fileToBase64 = (file: File): Promise<string> => {
 
 
 export default function AddProductPopup() {
-  const router = useRouter();
+  const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
   const [animate, setAnimate] = useState(false);
@@ -65,7 +65,7 @@ export default function AddProductPopup() {
           name: '',
           label: '',
           description: '',
-          price: 0,
+          price: '' as unknown as number,
           image: undefined as unknown as File,
           specifications: [{ name: '', value: '' }],
         },
@@ -154,7 +154,7 @@ export default function AddProductPopup() {
       setOpen(false); // Close will trigger reset via effect if needed, or we can explicit reset
       reset();
 
-      router.refresh();
+      queryClient.invalidateQueries({ queryKey: ['baseProductTable'] });
     } catch (err) {
       console.log('Submit error:', err);
       toast('Something went wrong');
@@ -191,7 +191,6 @@ export default function AddProductPopup() {
             }`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div className="flex items-center justify-between border-b px-6 py-4">
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">
@@ -296,7 +295,6 @@ export default function AddProductPopup() {
                     <label className={labelClass}>Price</label>
                     <input
                       type="number"
-                      min="0"
                       step="0.01"
                       {...register(`products.${productIndex}.price`)}
                       className={`${inputClass} ${errors.products?.[productIndex]?.price ? errorInputClass : ''}`}

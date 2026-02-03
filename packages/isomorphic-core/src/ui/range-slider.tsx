@@ -21,7 +21,7 @@ const classes = {
     secondary:
       '[&>.rc-slider-track]:bg-secondary [&>.rc-slider-handle]:border-secondary-dark [&>.rc-slider-handle]:hover:border-secondary-dark [&>.rc-slider-handle-dragging]:!border-secondary-dark [&>.rc-slider-handle-dragging]:ring-secondary-light/40 [&>.rc-slider-step>.rc-slider-dot-active]:border-secondary-dark',
     danger:
-      '[&>.rc-slider-track]:bg-red [&>.rc-slider-handle]:border-red-dark [&>.rc-slider-handle]:hover:border-red-dark [&>.rc-slider-handle-dragging]:!border-red-dark [&>.rc-slider-handle-dragging]:ring-red-light/40 [&>.rc-slider-step>.rc-slider-dot-active]:border-red-dark',
+      '[&>.rc-slider-track]:bg-red [&>.rc-slider-handle]:border-red-dark [&>.rc-slider-handle]:ed-dark [&>.rc-slider-handle-dragging]:!border-red-dark [&>.rc-slider-handle-dragging]:ring-red-light/40 [&>.rc-slider-step>.rc-slider-dot-active]:border-red-dark',
     info: '[&>.rc-slider-track]:bg-blue [&>.rc-slider-handle]:border-blue-dark [&>.rc-slider-handle]:hover:border-blue-dark [&>.rc-slider-handle-dragging]:!border-blue-dark [&>.rc-slider-handle-dragging]:ring-blue-light/40 [&>.rc-slider-step>.rc-slider-dot-active]:border-blue-dark',
     success:
       '[&>.rc-slider-track]:bg-green [&>.rc-slider-handle]:border-green-dark [&>.rc-slider-handle]:hover:border-green-dark [&>.rc-slider-handle-dragging]:!border-green-dark [&>.rc-slider-handle-dragging]:ring-green-light/50 [&>.rc-slider-step>.rc-slider-dot-active]:border-green-dark',

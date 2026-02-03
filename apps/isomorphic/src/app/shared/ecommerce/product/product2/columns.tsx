@@ -10,31 +10,11 @@ import { toCurrency } from '@core/utils/to-currency';
 import ConfirmationPopover from '@core/components/confirmation-popover';
 import { PiCheckBold, PiDownloadSimpleBold } from 'react-icons/pi';
 import dayjs from 'dayjs';
+import DateCell from '@core/ui/date-cell';
 
 const columnHelper = createColumnHelper<productsDataType>();
 
 export const productsListColumns = [
-  // columnHelper.display({
-  //   id: 'select',
-  //   size: 50,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       className="ps-3.5"
-  //       aria-label="Select all rows"
-  //       checked={table.getIsAllPageRowsSelected()}
-  //       onChange={() => table.toggleAllPageRowsSelected()}
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       className="ps-3.5"
-  //       aria-label="Select row"
-  //       checked={row.getIsSelected()}
-  //       onChange={() => row.toggleSelected()}
-  //     />
-  //   ),
-  // }),
-
   columnHelper.accessor('name', {
     id: 'name',
     size: 300,
@@ -59,11 +39,7 @@ export const productsListColumns = [
     id: 'time',
     size: 150,
     header: 'Created time',
-    cell: ({ row }) => (
-      <Text className="text-sm">
-        {row.original.time ? dayjs(row.original.time).format('MMM D, YYYY h:mm A') : '-'}
-      </Text>
-    ),
+    cell: ({ row }) => <DateCell date={new Date(row.original.time as string)} />,
   }),
 
   columnHelper.accessor('count', {

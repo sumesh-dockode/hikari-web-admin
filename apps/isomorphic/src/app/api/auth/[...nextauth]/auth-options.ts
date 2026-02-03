@@ -38,7 +38,12 @@ export const authOptions: NextAuthOptions = {
       } as any;
     },
 
-    async redirect({ baseUrl }) {
+    async redirect({ url, baseUrl }) {
+      // If url is relative, prepend baseUrl
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      // If url is on the same origin as baseUrl, allow it
+      else if (new URL(url).origin === baseUrl) return url;
+      // Otherwise redirect to baseUrl
       return baseUrl;
     },
   },

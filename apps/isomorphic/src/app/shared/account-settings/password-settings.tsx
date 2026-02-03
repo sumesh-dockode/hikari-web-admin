@@ -134,15 +134,24 @@ export default function PasswordSettingsView({
     >
       {({ control, formState: { errors }, getValues, trigger }) => {
         const handleClick = async () => {
-          const isValid = await trigger([
-            'newPassword',
-            'confirmedPassword',
-          ]);
-          if (!isValid) return;
+          // Trigger validation on all fields
+          const isValid = await trigger();
+          
+          // Double-check that passwords match
+          const values = getValues();
+          if (values.newPassword !== values.confirmedPassword) {
+            toast.error('Passwords do not match');
+            return;
+          }
+          
+          if (!isValid) {
+            toast.error('Please fix all validation errors');
+            return;
+          }
 
           try {
             setLoading(true);
-            await changePassword(getValues().newPassword);
+            await changePassword(values.newPassword);
           } finally {
             setLoading(false);
           }
@@ -164,7 +173,13 @@ export default function PasswordSettingsView({
                     <Password
                       placeholder="Enter new password"
                       value={field.value ?? ''}
-                      onChange={field.onChange}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        // Trigger validation on confirmedPassword when newPassword changes
+                        if (getValues('confirmedPassword')) {
+                          trigger('confirmedPassword');
+                        }
+                      }}
                       error={errors.newPassword?.message}
                     />
                   )}
@@ -182,7 +197,11 @@ export default function PasswordSettingsView({
                     <Password
                       placeholder="Confirm password"
                       value={field.value ?? ''}
-                      onChange={field.onChange}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        // Trigger validation immediately when confirmedPassword changes
+                        trigger('confirmedPassword');
+                      }}
                       error={errors.confirmedPassword?.message}
                     />
                   )}

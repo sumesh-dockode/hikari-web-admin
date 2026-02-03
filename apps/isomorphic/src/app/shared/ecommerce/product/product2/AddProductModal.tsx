@@ -242,7 +242,7 @@ export default function AddStockPopup() {
                           setSearchTerm(e.target.value);
                           setSearchOpen(true);
                           if (selectedVariantId) {
-                            setValue('product_variant', ''); // Clear form selection if user types
+                            setValue('product_variant', ''); 
                           }
                         }}
                         onFocus={() => {

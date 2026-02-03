@@ -285,7 +285,7 @@ export function TableHeadBasic<TData extends Record<string, any>>({
                   onMouseDown: header.getResizeHandler(),
                   onTouchStart: header.getResizeHandler(),
                 }}
-                className="absolute end-0 top-0 hidden h-full w-0.5 cursor-w-resize bg-gray-400 group-hover:block"
+                className="absolute end-0 top-0 hidden h-full w-0.5 cursor-w-resize group-hover:block"
               />
             )}
           </Table.Head>

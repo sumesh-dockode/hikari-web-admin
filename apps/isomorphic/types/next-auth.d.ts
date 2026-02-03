@@ -7,9 +7,9 @@ declare module 'next-auth' {
       id: string;
       name: string;
       role: string;
-      accessToken: string; // Include access token
-      refreshToken: string; // Include refresh token
     } & DefaultSession['user'];
+    accessToken: string; // Access token at root level
+    refreshToken: string; // Refresh token at root level
   }
 }
 

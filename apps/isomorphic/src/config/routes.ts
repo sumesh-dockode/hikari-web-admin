@@ -4,7 +4,7 @@ export const routes = {
   eCommerce: {
     dashboard: '/',
     products: '/',
-    product2:'/product2',
+    stocks:'/stocks',
     createProduct: '/products/create',
     productDetails: (slug: string) => `/products/${slug}`,
     ediProduct: (slug: string) => `/products/${slug}/edit`,

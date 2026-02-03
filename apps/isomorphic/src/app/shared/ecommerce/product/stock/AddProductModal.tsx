@@ -295,6 +295,9 @@ export default function AddProductPopup() {
                   <div>
                     <label className={labelClass}>Price</label>
                     <input
+                      type="number"
+                      min="0"
+                      step="0.01"
                       {...register(`products.${productIndex}.price`)}
                       className={`${inputClass} ${errors.products?.[productIndex]?.price ? errorInputClass : ''}`}
                       placeholder="0.00"

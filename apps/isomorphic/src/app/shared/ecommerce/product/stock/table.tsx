@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Table from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
@@ -18,10 +19,22 @@ export default function ProductsTable({
 }: {
   pageSize?: number;
 }) {
+  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [editItemId, setEditItemId] = useState<string | null>(null);
   const [editLoading, setEditLoading] = useState(false);
+  const [pageCount, setPageCount] = useState(-1);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const accessToken = localStorage.getItem('access');
+    const refreshToken = localStorage.getItem('refresh');
+    
+    if (!accessToken && !refreshToken) {
+      router.push('/signin');
+    }
+  }, [router]);
 
   const { table, setData } = useTanStackTable<ProductType>({
     tableData: [],
@@ -30,6 +43,8 @@ export default function ProductsTable({
       initialState: {
         pagination: { pageIndex: 0, pageSize },
       },
+      manualPagination: true,
+      pageCount: pageCount,
       meta: {
         handleEditRow: (row: ProductType) => {
           setEditItemId(row.id);
@@ -108,8 +123,13 @@ const handleUpdateProduct = async (values: EditProductValues) => {
         const accessToken = localStorage.getItem('access');
         if (!accessToken) return;
 
+        const currentPage = table.getState().pagination.pageIndex + 1;
+        const currentPageSize = table.getState().pagination.pageSize;
+
+        console.log('Fetching page:', currentPage, 'pageSize:', currentPageSize);
+
         const res = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ecom/admin/product-items/`,
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/ecom/admin/product-items/?page=${currentPage}&page_size=${currentPageSize}`,
           {
             headers: { Authorization: `Bearer ${accessToken}` },
           }
@@ -118,7 +138,16 @@ const handleUpdateProduct = async (values: EditProductValues) => {
         if (!res.ok) return;
 
         const result = await res.json()as any;
-        const rawProducts = Array.isArray(result?.data) ? result.data : [];
+        console.log('API Response:', result);
+        
+        // Data is in result.data.results, not result.data
+        const rawProducts = Array.isArray(result?.data?.results) ? result.data.results : [];
+
+        // Update page count from backend response
+        if (result?.data?.total_pages) {
+          console.log('Setting pageCount to:', result.data.total_pages);
+          setPageCount(result.data.total_pages);
+        }
 
         const formatted: ProductType[] = rawProducts.map((item: any) => ({
           id: String(item.id),
@@ -133,6 +162,7 @@ const handleUpdateProduct = async (values: EditProductValues) => {
           time: '',
         }));
 
+        console.log('Formatted products:', formatted);
         setData(formatted);
       } finally {
         setLoading(false);
@@ -140,7 +170,14 @@ const handleUpdateProduct = async (values: EditProductValues) => {
     };
 
     fetchProducts();
-  }, [setData]);
+  }, [table.getState().pagination.pageIndex, table.getState().pagination.pageSize, setData, table]);
+
+  // Update table's pageCount when state changes
+  useEffect(() => {
+    if (pageCount >= 0) {
+      table.setPageCount(pageCount);
+    }
+  }, [pageCount, table]);
 
   return (
     <>

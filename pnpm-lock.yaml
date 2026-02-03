@@ -110,6 +110,12 @@ importers:
       '@t3-oss/env-nextjs':
         specifier: ^0.11.1
         version: 0.11.1(typescript@5.7.2)(zod@3.25.76)
+      '@tailwindcss/container-queries':
+        specifier: ^0.1.1
+        version: 0.1.1(tailwindcss@3.4.19)
+      '@tailwindcss/forms':
+        specifier: ^0.5.9
+        version: 0.5.11(tailwindcss@3.4.19)
       '@tanstack/match-sorter-utils':
         specifier: ^8.19.4
         version: 8.19.4
@@ -128,6 +134,9 @@ importers:
       ahooks:
         specifier: ^3.8.4
         version: 3.9.6(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      autoprefixer:
+        specifier: ^10.4.23
+        version: 10.4.24(postcss@8.5.6)
       axios:
         specifier: ^1.8.4
         version: 1.13.4
@@ -188,6 +197,9 @@ importers:
       nodemailer:
         specifier: ^6.9.16
         version: 6.10.1
+      postcss:
+        specifier: ^8.5.6
+        version: 8.5.6
       pretty-bytes:
         specifier: ^6.1.1
         version: 6.1.1
@@ -293,9 +305,15 @@ importers:
       swiper:
         specifier: ^11.1.15
         version: 11.2.10
+      tailwind-config:
+        specifier: workspace:*
+        version: link:../../packages/config-tailwind
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.1
+      tailwindcss:
+        specifier: ^3.4.19
+        version: 3.4.19
       typescript:
         specifier: 5.7.2
         version: 5.7.2
@@ -312,12 +330,6 @@ importers:
       '@hookform/devtools':
         specifier: ^4.3.3
         version: 4.4.0(@types/react@19.2.10)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      '@tailwindcss/container-queries':
-        specifier: ^0.1.1
-        version: 0.1.1(tailwindcss@3.4.19)
-      '@tailwindcss/forms':
-        specifier: ^0.5.9
-        version: 0.5.11(tailwindcss@3.4.19)
       '@total-typescript/ts-reset':
         specifier: ^0.6.1
         version: 0.6.1
@@ -354,12 +366,6 @@ importers:
       '@types/react-scroll':
         specifier: ^1.8.10
         version: 1.8.10
-      autoprefixer:
-        specifier: ^10.4.23
-        version: 10.4.24(postcss@8.5.6)
-      postcss:
-        specifier: ^8.5.6
-        version: 8.5.6
       prettier:
         specifier: 3.4.2
         version: 3.4.2
@@ -369,12 +375,6 @@ importers:
       rimraf:
         specifier: ^6.0.1
         version: 6.1.2
-      tailwind-config:
-        specifier: workspace:*
-        version: link:../../packages/config-tailwind
-      tailwindcss:
-        specifier: ^3.4.19
-        version: 3.4.19
       typescript-config:
         specifier: workspace:*
         version: link:../../packages/config-typescript

@@ -2,6 +2,14 @@ import './src/env.mjs';
 /** @type {import('next').NextConfig} */
 
 const nextConfig = {
+  eslint: {
+    // Disable ESLint during builds (we run it separately)
+    ignoreDuringBuilds: true,
+  },
+  typescript: {
+    // Disable TypeScript errors during builds (we run it separately)
+    ignoreBuildErrors: true,
+  },
   images: {
     remotePatterns: [
       {

@@ -3,7 +3,7 @@
 import { useEffect, useState, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { getSession } from 'next-auth/react';
-import Table from '@core/components/table';
+import MainTable from '@core/components/table';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
 import TablePagination from '@core/components/table/pagination';
 import TableFooter from '@core/components/table/footer';
@@ -13,6 +13,7 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { ProductType, TableConfig, CustomActions } from './shared-types';
 import { useBaseProductData } from '../../../hooks/useBaseProductData';
+import TableSkeleton from './TableSkeleton';
 
 export interface BaseProductTableProps {
   config: TableConfig;
@@ -138,11 +139,34 @@ export default function BaseProductTable({
     <>
       {!hideFilters && renderFilters && renderFilters(table)}
 
-      {isLoading && (
-        <div className="py-3 text-sm text-gray-500">Loading products...</div>
+      {isLoading ? (
+        <div className={cn(classNames.container, "overflow-x-auto")}>
+          <table className="w-full">
+            <thead className="border-b border-muted">
+              <tr>
+                {columnConfig.map((col, idx) => (
+                  <th key={idx} className="px-4 py-3 text-left text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    {typeof col.header === 'function' ? '' : (col.header as string)}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <TableSkeleton rows={pageSize} columns={columnConfig.length} />
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <MainTable 
+          table={table} 
+          variant="modern" 
+          classNames={{
+            container: classNames.container,
+            rowClassName: classNames.rowClassName,
+          }} 
+          isLoading={isLoading}
+        />
       )}
-
-      <Table table={table} variant="modern" classNames={classNames} />
 
       {!hideFooter && <TableFooter table={table} />}
 

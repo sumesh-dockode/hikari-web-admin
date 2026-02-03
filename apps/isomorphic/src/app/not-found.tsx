@@ -12,10 +12,10 @@ export default function NotFound() {
     <div className="flex min-h-screen flex-col bg-[#F8FAFC]">
       <div className="sticky top-0 z-40 flex justify-center py-5 backdrop-blur-lg lg:backdrop-blur-none xl:py-10">
         <Link href="/">
-          <Image
+          <Image 
             src={siteConfig.logo}
             alt={siteConfig.title}
-            className="dark:invert"
+            className="dark:invert w-20 "
             priority
           />
         </Link>
@@ -39,9 +39,9 @@ export default function NotFound() {
               as="span"
               size="xl"
               // color="primary"
-              className="mt-8 h-12 bg-primary px-4 xl:h-14 xl:px-6"
+              className="mt-8 h-12 bg-secondary1 hover:bg-secondary2 px-4 xl:h-14 xl:px-6"
             >
-              <PiHouseLineBold className="mr-1.5 text-lg" />
+              <PiHouseLineBold className="mr-1.5 text-lg " />
               Back to home
             </Button>
           </Link>

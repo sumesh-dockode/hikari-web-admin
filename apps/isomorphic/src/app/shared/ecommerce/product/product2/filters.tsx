@@ -3,10 +3,12 @@
 import { FilterDrawerView } from '@core/components/controlled-table/table-filter';
 import ToggleColumns from '@core/components/table-utils/toggle-columns';
 import { type Table as ReactTableType } from '@tanstack/react-table';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { PiFunnel, PiMagnifyingGlassBold } from 'react-icons/pi';
 import { Button, Flex, Input } from 'rizzui';
 import CategorySelectionField from '@/app/shared/category-selection-field';
+
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 
 interface TableToolbarProps<T extends Record<string, any>> {
   table: ReactTableType<T>;
@@ -28,7 +30,10 @@ export default function Filters<TData extends Record<string, any>>({
   handleFilters,
   category,
 }: TableToolbarProps<TData>) {
-  const [searchTerm, setSearchTerm] = useState(searchText);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') ?? '');
   const [categories, setCategories] = useState(category);
 
   const [openDrawer, setOpenDrawer] = useState(false);
@@ -43,19 +48,50 @@ export default function Filters<TData extends Record<string, any>>({
     setOpenDrawer(false);
   };
 
+  const handleSearch = (term: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (term) {
+      params.set('search', term);
+    } else {
+      params.delete('search');
+    }
+    // Reset page to 1 when searching
+    params.delete('page');
+    
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      // Only trigger if searchTerm is different from URL param to avoid initial double fetch or loops
+      // But we just initialized searchTerm from URL, so it should be fine.
+      // We also want to avoid triggering if it hasn't changed.
+      const currentSearch = searchParams.get('search') || '';
+      if (searchTerm !== currentSearch) {
+        handleSearch(searchTerm);
+      }
+    }, 500);
+
+    return () => clearTimeout(timeoutId);
+  }, [searchTerm]);
+
   return (
     <Flex align="center" justify="between" className="mb-4">
       <Input
         type="search"
         placeholder="Search by product name..."
-        value={searchTerm || ''}
+        value={searchTerm}
         onClear={() => {
           setSearchTerm('');
-          handleSearchChange && handleSearchChange('');
+          handleSearch('');
         }}
         onChange={(e) => {
           setSearchTerm(e.target.value);
-          handleSearchChange && handleSearchChange(e.target.value);
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            handleSearch(searchTerm);
+          }
         }}
         inputClassName="h-9"
         clearable={true}

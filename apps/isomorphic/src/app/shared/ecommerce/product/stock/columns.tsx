@@ -16,31 +16,12 @@ import ConfirmationPopover from '@core/components/confirmation-popover';
 import { PiCheckBold } from 'react-icons/pi';
 import { useRouter } from 'next/navigation';
 import { Button } from 'rizzui';
+import DateCell from '@core/ui/date-cell';
 // import router from 'next/navigation';
 
 const columnHelper = createColumnHelper<ProductType>();
 
 export const productsListColumns = [
-  // columnHelper.display({
-  //   id: 'select',
-  //   size: 50,
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       className="ps-3.5"
-  //       aria-label="Select all rows"
-  //       checked={table.getIsAllPageRowsSelected()}
-  //       onChange={() => table.toggleAllPageRowsSelected()}
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       className="ps-3.5"
-  //       aria-label="Select row"
-  //       checked={row.getIsSelected()}
-  //       onChange={() => row.toggleSelected()}
-  //     />
-  //   ),
-  // }),
   columnHelper.accessor('name', {
     id: 'name',
     size: 300,
@@ -61,17 +42,12 @@ export const productsListColumns = [
     ),
   }),
   columnHelper.display({
-    id: 'time',
+    id: 'sku',
     size: 150,
     header: 'Sku',
     cell: ({ row }) => <Text className="text-sm">{row.original.sku}</Text>,
   }),
-  // columnHelper.accessor('stock', {
-  //   id: 'stock',
-  //   size: 200,
-  //   header: 'Stock',
-  //   cell: ({ row }) => getStockStatus(row.original.stock),
-  // }),
+
   columnHelper.accessor('count', {
     id: 'count',
     size: 150,
@@ -82,19 +58,6 @@ export const productsListColumns = [
       </Text>
     ),
   }),
-  // columnHelper.display({
-  //   id: 'rating',
-  //   size: 200,
-  //   header: 'Rating',
-  //   cell: ({ row }) => getRatings(row.original.rating),
-  // }),
-  // columnHelper.display({
-  //   id: 'category',
-  //   size: 200,
-  //   header: 'Category',
-  //   cell: ({ row }) => row.original.category,
-  // }),
-
   columnHelper.display({
     id: 'action',
     size: 120,
@@ -105,16 +68,6 @@ export const productsListColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
-        {/* <Link href="/product2">
-          <Button
-            size="sm"
-            variant="solid"
-            className="bg-secondary1 hover:bg-secondary1"
-          >
-            <CircleArrowRight />
-          </Button>
-        </Link> */}
-
         <Tooltip
           size="sm"
           content={'Edit Product'}

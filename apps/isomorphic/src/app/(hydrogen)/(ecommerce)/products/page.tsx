@@ -14,10 +14,7 @@ import AddProductView from '@/app/shared/ecommerce/product/stock/AddProductModal
 const pageHeader = {
   title: 'Products',
   breadcrumb: [
-    {
-      href: routes.eCommerce.dashboard,
-      name: 'E-Commerce',
-    },
+
     {
       href: routes.eCommerce.products,
       name: 'Products',

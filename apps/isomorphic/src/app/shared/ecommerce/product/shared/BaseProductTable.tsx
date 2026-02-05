@@ -50,7 +50,6 @@ export default function BaseProductTable({
   const searchParams = useSearchParams();
   const search = searchParams.get('search') || '';
 
-  // Auth check
   useEffect(() => {
     const accessToken = localStorage.getItem('access');
     const refreshToken = localStorage.getItem('refresh');
@@ -112,7 +111,6 @@ export default function BaseProductTable({
     },
   });
 
-  // Fetch products using custom hook
   const currentPage = table.getState().pagination.pageIndex + 1;
   const currentPageSize = table.getState().pagination.pageSize;
 
@@ -123,12 +121,10 @@ export default function BaseProductTable({
     search,
   });
 
-  // Update table data when formatted data changes
   useEffect(() => {
     setData(formattedData);
   }, [formattedData, setData]);
 
-  // Update page count when it changes
   useEffect(() => {
     if (totalPages >= 0) {
       setPageCount(totalPages);

@@ -40,7 +40,7 @@ export function useProduct2Table() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `stock-batch-${row.id}.csv`;
+      link.download = `stock-batch-${row.id}.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -1,23 +1,21 @@
 'use client';
 
 import { useEffect, useState, ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
-import { getSession } from 'next-auth/react';
-import MainTable from '@core/components/table';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useTanStackTable } from '@core/components/table/custom/use-TanStack-Table';
+import Table from '@core/components/table';
 import TablePagination from '@core/components/table/pagination';
 import TableFooter from '@core/components/table/footer';
+import TableSkeleton from './TableSkeleton';
 import cn from '@core/utils/class-names';
 import toast from 'react-hot-toast';
+import { useBaseProductData } from '@/app/shared/hooks/useBaseProductData';
+import { ProductType, TableConfig, CustomActions } from './shared-types';
 import { ColumnDef } from '@tanstack/react-table';
 
-import { ProductType, TableConfig, CustomActions } from './shared-types';
-import { useBaseProductData } from '../../../hooks/useBaseProductData';
-import TableSkeleton from './TableSkeleton';
-
-export interface BaseProductTableProps {
+interface BaseProductTableProps {
   config: TableConfig;
-  columnConfig: ColumnDef<ProductType, any>[];
+  columnConfig: ColumnDef<ProductType>[];
   customActions?: CustomActions;
   renderFilters?: (table: any) => ReactNode;
   editModal?: ReactNode;
@@ -49,8 +47,9 @@ export default function BaseProductTable({
   paginationClassName,
 }: BaseProductTableProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const search = searchParams.get('search') || '';
 
-  // Auth check
   useEffect(() => {
     const accessToken = localStorage.getItem('access');
     const refreshToken = localStorage.getItem('refresh');
@@ -78,8 +77,7 @@ export default function BaseProductTable({
             await customActions.handleDeleteRow(row);
           } else {
             try {
-              const session = await getSession();
-              const token = session?.accessToken; 
+              const token = localStorage.getItem('access');
               
               if (!token) {
                 toast.error('Access token missing');
@@ -113,7 +111,6 @@ export default function BaseProductTable({
     },
   });
 
-  // Fetch products using custom hook
   const currentPage = table.getState().pagination.pageIndex + 1;
   const currentPageSize = table.getState().pagination.pageSize;
 
@@ -121,14 +118,13 @@ export default function BaseProductTable({
     config,
     currentPage,
     currentPageSize,
+    search,
   });
 
-  // Update table data when formatted data changes
   useEffect(() => {
     setData(formattedData);
-  }, [formattedData]);
+  }, [formattedData, setData]);
 
-  // Update page count when it changes
   useEffect(() => {
     if (totalPages >= 0) {
       setPageCount(totalPages);
@@ -140,7 +136,7 @@ export default function BaseProductTable({
       {!hideFilters && renderFilters && renderFilters(table)}
 
       {isLoading ? (
-        <div className={cn(classNames.container, "overflow-x-auto")}>
+        <div className={cn(classNames?.container, "overflow-x-auto")}>
           <table className="w-full">
             <thead className="border-b border-muted">
               <tr>
@@ -157,12 +153,12 @@ export default function BaseProductTable({
           </table>
         </div>
       ) : (
-        <MainTable 
+        <Table 
           table={table} 
           variant="modern" 
           classNames={{
-            container: classNames.container,
-            rowClassName: classNames.rowClassName,
+            container: classNames?.container,
+            rowClassName: classNames?.rowClassName,
           }} 
           isLoading={isLoading}
         />

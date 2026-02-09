@@ -279,7 +279,7 @@ export default function EditProductModal({
                       {...register(`specifications.${index}.name`)}
                       error={errors.specifications?.[index]?.name?.message}
                     />
-                    <InputField
+                    <TextAreaField
                       label="Description"
                       {...register(`specifications.${index}.value`)}
                       error={errors.specifications?.[index]?.value?.message}

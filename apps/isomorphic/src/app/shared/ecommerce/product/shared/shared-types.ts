@@ -23,6 +23,7 @@ export type ProductType = {
   description?: string;
   count?: string | number;
   time?: string | number;
+  attachment?: string | null;
 };
 
 export interface TableConfig<T = ProductType> {
@@ -34,5 +35,6 @@ export interface TableConfig<T = ProductType> {
 export interface CustomActions<T = ProductType> {
   handleEditRow?: (row: T) => void;
   handleDeleteRow?: (row: T) => Promise<void>;
-  handleDownloadRow?: (row: T) => Promise<void>;
+  handleDownloadRow?: (row: T) => void;
+  handleRetryDownloadRow?: (row: T) => Promise<void>;
 }

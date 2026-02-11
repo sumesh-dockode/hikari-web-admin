@@ -8,7 +8,7 @@ import { ActionIcon, Checkbox, Flex, Text, Tooltip } from 'rizzui';
 import AvatarCard from '@core/ui/avatar-card';
 import { toCurrency } from '@core/utils/to-currency';
 import ConfirmationPopover from '@core/components/confirmation-popover';
-import { PiCheckBold, PiDownloadSimpleBold } from 'react-icons/pi';
+import { PiCheckBold, PiDownloadSimpleBold, PiArrowClockwiseBold } from 'react-icons/pi';
 import dayjs from 'dayjs';
 import DateCell from '@core/ui/date-cell';
 
@@ -63,20 +63,30 @@ export const productsListColumns = [
       },
     }) => (
       <Flex align="center" justify="end" gap="3" className="pe-4">
-        
 
-        <Tooltip size="sm" content="Download" placement="top" color="invert">
-          <ActionIcon
-            size="sm"
-            variant="outline"
-            aria-label="Download Product"
-            onClick={() => (meta as any)?.handleDownloadRow?.(row.original)}
-          >
-            <PiDownloadSimpleBold className="h-4 w-4" />
-          </ActionIcon>
-        </Tooltip>
-
-   
+        {row.original.attachment ? (
+          <Tooltip size="sm" content="Download" placement="top" color="invert">
+            <ActionIcon
+              size="sm"
+              variant="outline"
+              aria-label="Download Product"
+              onClick={() => (meta as any)?.handleDownloadRow?.(row.original)}
+            >
+              <PiDownloadSimpleBold className="h-4 w-4" />
+            </ActionIcon>
+          </Tooltip>
+        ) : (
+          <Tooltip size="sm" content="Retry Download" placement="top" color="invert">
+            <ActionIcon
+              size="sm"
+              variant="outline"
+              aria-label="Retry Download"
+              onClick={() => (meta as any)?.handleRetryDownloadRow?.(row.original)}
+            >
+              <PiArrowClockwiseBold className="h-4 w-4" />
+            </ActionIcon>
+          </Tooltip>
+        )}
 
         <DeletePopover
           title={`Delete the product`}

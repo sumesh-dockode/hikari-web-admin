@@ -16,6 +16,7 @@ export type productsDataType = {
   similar_products?: string[];
   status?: string;
   image?: string | null;
+  attachment?: string | null;
   // rating: any;
 };
 export type variantDataType = {

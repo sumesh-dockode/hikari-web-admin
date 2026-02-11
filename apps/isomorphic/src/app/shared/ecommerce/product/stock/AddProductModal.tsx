@@ -422,7 +422,8 @@ function SpecificationsArray({ control, productIndex, register, errors, labelCla
 
                     <div>
                         <label className={labelClass}>Description</label>
-                        <input
+                        <textarea
+                            rows={3}
                             {...register(`products.${productIndex}.specifications.${specIndex}.value`)}
                             className={`${inputClass} ${errors.products?.[productIndex]?.specifications?.[specIndex]?.value ? errorInputClass : ''}`}
                             placeholder="Enter description"

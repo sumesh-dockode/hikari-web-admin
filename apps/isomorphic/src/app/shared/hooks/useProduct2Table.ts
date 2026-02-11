@@ -10,11 +10,26 @@ export function useProduct2Table() {
   const [editLoading, setEditLoading] = useState(false);
   const queryClient = useQueryClient();
 
-  const downloadRowItem = async (row: ProductType) => {
+  const downloadRowItem = (row: ProductType) => {
+    if (!row.attachment) {
+      toast('No attachment available for download');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = row.attachment;
+    link.download = `stock-batch-${row.id}.zip`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const retryDownloadRowItem = async (row: ProductType) => {
     try {
       const session = await getSession();
-      const token = session?.accessToken; // Fixed: accessToken is at root level
-      
+      const token = session?.accessToken;
+
       if (!token) {
         toast('Access token missing');
         return;
@@ -127,6 +142,7 @@ export function useProduct2Table() {
           time: item.created_at || '',
           product_images: variant.image ? [variant.image] : [],
           description: product.description || '',
+          attachment: item.attachment || null,
         };
       });
     },
@@ -142,6 +158,7 @@ export function useProduct2Table() {
       setEditOpen(true);
     },
     handleDownloadRow: downloadRowItem,
+    handleRetryDownloadRow: retryDownloadRowItem,
     handleDeleteRow: handleDeleteRow,
   };
 
